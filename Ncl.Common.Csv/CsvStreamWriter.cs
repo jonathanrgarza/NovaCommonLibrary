@@ -15,12 +15,18 @@ namespace Ncl.Common.Csv
     {
         //CSV Standard: https://datatracker.ietf.org/doc/html/rfc4180
 
+        /// <summary>
+        ///     The new line string based on the CSV standard.
+        /// </summary>
+        public const string NewLine = "\r\n";
+
         private bool _isDisposed;
-        private readonly TextWriter _stream;
-        private readonly bool _leaveOpen;
         private IFormatProvider _formatProvider;
+        protected readonly TextWriter _stream;
+        protected readonly bool _leaveOpen;
         protected int _fieldPosition;
-        private char separator = ',';
+        protected int _rowsWritten;
+        protected char separator = ',';
 
         /// <summary>
         ///     Gets/Sets the format provider.
@@ -47,16 +53,31 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Gets/Sets the separator character.
         /// </summary>
+        /// <exception cref="ArgumentException">value is equal to a quotation mark ("), return feed (\r) or newline character (\n).</exception>
         public char Separator
         {
             get => separator;
-            set => separator = value;
+            set
+            {
+                if (value == '"' || value == '\r' || value == '\n')
+                {
+                    throw new ArgumentException(
+                        "Separator value can not be a quotation mark (\"), return feed (\\r) or newline character (\\n)");
+                }
+
+                separator = value;
+            }
         }
 
         /// <summary>
         ///     Gets the field position in the current row.
         /// </summary>
         public int FieldPosition { get => _fieldPosition; protected set => _fieldPosition = value; }
+
+        /// <summary>
+        ///     Gets the rows written for the current stream.
+        /// </summary>
+        public int RowsWritten { get => _rowsWritten; protected set => _rowsWritten = value; }
 
         /// <summary>
         ///     Initializes a new instance of <see cref="CsvStreamWriter"/>.
@@ -400,18 +421,19 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes the row terminating char(s) to the stream.
+        ///     Writes the row terminating characters to the stream.
         /// </summary>
         /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
         public CsvStreamWriter WriteRowEnd()
         {
-            _stream.Write("\n");
+            _stream.Write(NewLine);
             _fieldPosition = 0;
+            _rowsWritten++;
             return this;
         }
 
         /// <summary>
-        ///     Writes the row terminating char(s) to the stream asynchronously.
+        ///     Writes the row terminating characters to the stream asynchronously.
         /// </summary>
         /// <returns>
         ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
@@ -419,8 +441,9 @@ namespace Ncl.Common.Csv
         /// </returns>
         public async Task<CsvStreamWriter> WriteRowEndAsync()
         {
-            await _stream.WriteAsync("\n").ConfigureAwait(false);
+            await _stream.WriteAsync(NewLine).ConfigureAwait(false);
             _fieldPosition = 0;
+            _rowsWritten++;
             return this;
         }
 
