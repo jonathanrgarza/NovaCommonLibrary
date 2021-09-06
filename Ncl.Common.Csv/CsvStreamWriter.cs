@@ -20,6 +20,11 @@ namespace Ncl.Common.Csv
         /// </summary>
         public const string NewLine = "\r\n";
 
+        /// <summary>
+        ///     The double quote (") character.
+        /// </summary>
+        protected const char DoubleQuoteChar = '"';
+
         private bool _isDisposed;
         private IFormatProvider _formatProvider;
         protected readonly TextWriter _stream;
@@ -59,7 +64,7 @@ namespace Ncl.Common.Csv
             get => separator;
             set
             {
-                if (value == '"' || value == '\r' || value == '\n')
+                if (value == DoubleQuoteChar || value == '\r' || value == '\n')
                 {
                     throw new ArgumentException(
                         "Separator value can not be a quotation mark (\"), return feed (\\r) or newline character (\\n)");
@@ -282,7 +287,7 @@ namespace Ncl.Common.Csv
             bool needsEscaping = false;
             foreach (char character in value)
             {
-                if (character != '\n' && character != '\r' && character != '"' && character != Separator)
+                if (character != '\n' && character != '\r' && character != DoubleQuoteChar && character != Separator)
                     continue;
 
                 needsEscaping = true;
@@ -292,16 +297,18 @@ namespace Ncl.Common.Csv
             if (needsEscaping == false)
                 return value;
 
+            string replacedValue = value.Replace("\"", "\"\"");
+
             var sb = new StringBuilder(value.Length + 2);
 
             //Escape character
-            sb.Append('"');
+            sb.Append(DoubleQuoteChar);
 
             //Field's content
-            sb.Append(value);
+            sb.Append(replacedValue);
 
             //Escape character
-            sb.Append('"');
+            sb.Append(DoubleQuoteChar);
 
             return sb.ToString();
         }
@@ -323,7 +330,7 @@ namespace Ncl.Common.Csv
             for (int i = 0; i < buffer.Length; i++)
             {
                 char character = buffer[i];
-                if (character != '\n' && character != '\r' && character != '"' && character != Separator)
+                if (character != '\n' && character != '\r' && character != DoubleQuoteChar && character != Separator)
                     continue;
 
                 needsEscaping = true;
@@ -333,11 +340,14 @@ namespace Ncl.Common.Csv
             if (needsEscaping == false)
                 return buffer.ToString();
 
-            //Escape character
-            buffer.Insert(0, '"');
+            //Replace all double quotes in buffer as two double quotes
+            buffer.Replace("\"", "\"\"");
 
             //Escape character
-            buffer.Append('"');
+            buffer.Insert(0, DoubleQuoteChar);
+
+            //Escape character
+            buffer.Append(DoubleQuoteChar);
 
             return buffer.ToString();
         }
@@ -933,6 +943,10 @@ namespace Ncl.Common.Csv
             if (escapedText == null)
                 return this;
 
+            if (_fieldPosition != 0)
+            {
+                _stream.Write(Separator);
+            }
             _stream.Write(escapedText);
             _fieldPosition++;
             return this;
@@ -964,6 +978,10 @@ namespace Ncl.Common.Csv
             if (escapedText == null)
                 return this;
 
+            if (_fieldPosition != 0)
+            {
+                await _stream.WriteAsync(Separator).ConfigureAwait(false);
+            }
             await _stream.WriteAsync(escapedText).ConfigureAwait(false);
             _fieldPosition++;
             return this;
