@@ -21,6 +21,11 @@ namespace Ncl.Common.Csv
         public const string NewLine = "\r\n";
 
         /// <summary>
+        ///     The exception message for attempting to write a header after the first row.
+        /// </summary>
+        protected const string HeaderRowWrittenMsg = "The first row has already been written. Can not write a header entry";
+
+        /// <summary>
         ///     The double quote (") character.
         /// </summary>
         protected const char DoubleQuoteChar = '"';
@@ -32,6 +37,7 @@ namespace Ncl.Common.Csv
         protected int _fieldPosition;
         protected int _rowsWritten;
         protected char separator = ',';
+        protected List<string> _headers;
 
         /// <summary>
         ///     Gets/Sets the format provider.
@@ -83,6 +89,21 @@ namespace Ncl.Common.Csv
         ///     Gets the rows written for the current stream.
         /// </summary>
         public int RowsWritten { get => _rowsWritten; protected set => _rowsWritten = value; }
+
+        /// <summary>
+        ///     Gets if the first row has been written. Special as it can optionally be a header row.
+        /// </summary>
+        public bool FirstRowWritten => _rowsWritten > 0;
+
+        /// <summary>
+        ///     Gets if the a header row has been written.
+        /// </summary>
+        public bool HeaderRowWritten => _rowsWritten > 0 && (_headers?.Count ?? 0) > 0;
+
+        /// <summary>
+        ///     The headers written by this stream. Default value is null when no headers have been written.
+        /// </summary>
+        public IReadOnlyList<string> Headers => _headers?.AsReadOnly();
 
         /// <summary>
         ///     Initializes a new instance of <see cref="CsvStreamWriter"/>.
@@ -297,15 +318,21 @@ namespace Ncl.Common.Csv
             if (needsEscaping == false)
                 return value;
 
-            string replacedValue = value.Replace("\"", "\"\"");
-
-            var sb = new StringBuilder(value.Length + 2);
+            var sb = new StringBuilder(value.Length + 4);
 
             //Escape character
             sb.Append(DoubleQuoteChar);
 
             //Field's content
-            sb.Append(replacedValue);
+            foreach (char character in value)
+            {
+                if (character == DoubleQuoteChar)
+                {
+                    sb.Append(DoubleQuoteChar);
+                }
+
+                sb.Append(character);
+            }
 
             //Escape character
             sb.Append(DoubleQuoteChar);
@@ -359,10 +386,23 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="header">The header to write.</param>
         /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
         public CsvStreamWriter WriteHeader(string header)
         {
-            //TODO: Do any special header handling/tracking
-            return WriteUnescapedField(header);
+            if (header == null)
+                return this;
+
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+
+            if (_headers == null)
+            {
+                _headers = new List<string>();
+            }
+
+            _headers.Add(header);
+
+            return WriteUnescapedEntry(header, true);
         }
 
         /// <summary>
@@ -375,10 +415,23 @@ namespace Ncl.Common.Csv
         ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
         ///     the asynchronous write operation.
         /// </returns>
+        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
         public Task<CsvStreamWriter> WriteHeaderAsync(string header)
         {
-            //TODO: Do any special header handling/tracking
-            return WriteUnescapedFieldAsync(header);
+            if (header == null)
+                return Task.FromResult(this);
+
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+
+            if (_headers == null)
+            {
+                _headers = new List<string>();
+            }
+
+            _headers.Add(header);
+
+            return WriteUnescapedEntryAsync(header, true);
         }
 
         /// <summary>
@@ -389,19 +442,30 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="headers">The header row to write.</param>
         /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
         public CsvStreamWriter WriteHeaderRow(IEnumerable<string> headers)
         {
             if (headers == null)
                 return this;
 
-            //TODO: Do any special header handling/tracking
-            foreach (var header in headers)
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+
+            if (_headers == null)
             {
-                WriteUnescapedField(header);
+                _headers = new List<string>();
             }
 
-            WriteRowEnd();
-            return this;
+            foreach (var header in headers)
+            {
+                if (header == null)
+                    continue;
+
+                _headers.Add(header);
+                WriteUnescapedEntry(header, true);
+            }
+
+            return WriteRowEnd();
         }
 
         /// <summary>
@@ -415,19 +479,125 @@ namespace Ncl.Common.Csv
         ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
         ///     the asynchronous write operation.
         /// </returns>
+        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
         public async Task<CsvStreamWriter> WriteHeaderRowAsync(IEnumerable<string> headers)
         {
             if (headers == null)
                 return this;
 
-            //TODO: Do any special header handling/tracking
-            foreach (var header in headers)
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+
+            if (_headers == null)
             {
-                await WriteUnescapedFieldAsync(header).ConfigureAwait(false);
+                _headers = new List<string>();
             }
 
-            await WriteRowEndAsync().ConfigureAwait(false);
-            return this;
+            foreach (var header in headers)
+            {
+                if (header == null)
+                    continue;
+
+                _headers.Add(header);
+                await WriteUnescapedEntryAsync(header, true).ConfigureAwait(false);
+            }
+
+            return await WriteRowEndAsync().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Writes headers to the stream as the header entries
+        ///     then moves to the start of the next row.
+        ///     The headers will be escaped, if necessary.
+        ///     If <paramref name="header"/> and <paramref name="headers"/> is null or empty, nothing is written to the stream.
+        /// </summary>
+        /// <param name="header">The first header to write.</param>
+        /// <param name="headers">The other headers to write.</param>
+        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
+        public CsvStreamWriter WriteHeaderRow(string header, params string[] headers)
+        {
+            if (headers == null)
+                return this;
+
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+
+            if (_headers == null)
+            {
+                _headers = new List<string>();
+            }
+
+            if (header != null)
+            {
+                _headers.Add(header);
+                WriteUnescapedEntry(header, true);
+            }
+
+            if (headers == null || headers.Length == 0)
+            {
+                return WriteRowEnd();
+            }
+
+            foreach (var otherHeader in headers)
+            {
+                if (otherHeader == null)
+                    continue;
+
+                _headers.Add(otherHeader);
+                WriteUnescapedEntry(otherHeader, true);
+            }
+
+            return WriteRowEnd();
+        }
+
+        /// <summary>
+        ///     Writes headers to the stream as the header entries
+        ///     then moves to the start of the next row.
+        ///     The headers will be escaped, if necessary.
+        ///     If <paramref name="header"/> and <paramref name="headers"/> is null or empty, nothing is written to the stream.
+        /// </summary>
+        /// <param name="header">The first header to write.</param>
+        /// <param name="headers">The other headers to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
+        public async Task<CsvStreamWriter> WriteHeaderRowAsync(string header, params string[] headers)
+        {
+            if (headers == null)
+                return this;
+
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+
+            if (_headers == null)
+            {
+                _headers = new List<string>();
+            }
+
+            if (header != null)
+            {
+                _headers.Add(header);
+                WriteUnescapedEntry(header, true);
+            }
+
+            if (headers == null || headers.Length == 0)
+            {
+                return await WriteRowEndAsync().ConfigureAwait(false);
+            }
+
+            foreach (var otherHeader in headers)
+            {
+                if (otherHeader == null)
+                    continue;
+
+                _headers.Add(otherHeader);
+                await WriteUnescapedEntryAsync(otherHeader, true).ConfigureAwait(false);
+            }
+
+            return await WriteRowEndAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -466,7 +636,7 @@ namespace Ncl.Common.Csv
         /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
         public CsvStreamWriter WriteField(string value)
         {
-            return WriteUnescapedField(value);
+            return WriteUnescapedEntry(value);
         }
 
         /// <summary>
@@ -481,7 +651,7 @@ namespace Ncl.Common.Csv
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(string value)
         {
-            return WriteUnescapedFieldAsync(value);
+            return WriteUnescapedEntryAsync(value);
         }
 
         /// <summary>
@@ -498,7 +668,7 @@ namespace Ncl.Common.Csv
                 return this;
 
             string valueStr = string.Format(FormatProvider, format, args);
-            return WriteUnescapedField(valueStr);
+            return WriteUnescapedEntry(valueStr);
         }
 
         /// <summary>
@@ -518,7 +688,7 @@ namespace Ncl.Common.Csv
                 return Task.FromResult(this);
 
             string valueStr = string.Format(FormatProvider, format, args);
-            return WriteUnescapedFieldAsync(valueStr);
+            return WriteUnescapedEntryAsync(valueStr);
         }
 
         /// <summary>
@@ -534,9 +704,9 @@ namespace Ncl.Common.Csv
                 return this;
 
             if (value is IFormattable formattable)
-                return WriteUnescapedField(formattable.ToString(null, FormatProvider));
+                return WriteUnescapedEntry(formattable.ToString(null, FormatProvider));
 
-            return WriteUnescapedField(value.ToString());
+            return WriteUnescapedEntry(value.ToString());
         }
 
         /// <summary>
@@ -555,9 +725,9 @@ namespace Ncl.Common.Csv
                 return Task.FromResult(this);
 
             if (value is IFormattable formattable)
-                return WriteUnescapedFieldAsync(formattable.ToString(null, FormatProvider));
+                return WriteUnescapedEntryAsync(formattable.ToString(null, FormatProvider));
 
-            return WriteUnescapedFieldAsync(value.ToString());
+            return WriteUnescapedEntryAsync(value.ToString());
         }
 
         /// <summary>
@@ -585,7 +755,7 @@ namespace Ncl.Common.Csv
 
             sb.Append(buffer, index, count);
 
-            return WriteUnescapedField(sb);
+            return WriteUnescapedEntry(sb);
         }
 
         /// <summary>
@@ -616,7 +786,7 @@ namespace Ncl.Common.Csv
 
             sb.Append(buffer, index, count);
 
-            return WriteUnescapedFieldAsync(sb);
+            return WriteUnescapedEntryAsync(sb);
         }
 
         /// <summary>
@@ -633,13 +803,13 @@ namespace Ncl.Common.Csv
                 return this;
 
             if (buffer.Length == 0)
-                return WriteUnescapedField(string.Empty);
+                return WriteUnescapedEntry(string.Empty);
 
             var sb = new StringBuilder(buffer.Length + 2);
 
             sb.Append(buffer);
 
-            return WriteUnescapedField(sb);
+            return WriteUnescapedEntry(sb);
         }
 
         /// <summary>
@@ -659,12 +829,12 @@ namespace Ncl.Common.Csv
                 return Task.FromResult(this);
 
             if (buffer.Length == 0)
-                return WriteUnescapedFieldAsync(string.Empty);
+                return WriteUnescapedEntryAsync(string.Empty);
 
             var sb = new StringBuilder(buffer.Length + 2);
             sb.Append(buffer);
 
-            return WriteUnescapedFieldAsync(sb);
+            return WriteUnescapedEntryAsync(sb);
         }
 
         /// <summary>
@@ -677,7 +847,7 @@ namespace Ncl.Common.Csv
         public CsvStreamWriter WriteField(char value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedField(valueStr);
+            return WriteUnescapedEntry(valueStr);
         }
 
         /// <summary>
@@ -693,7 +863,7 @@ namespace Ncl.Common.Csv
         public Task<CsvStreamWriter> WriteFieldAsync(char value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedFieldAsync(valueStr);
+            return WriteUnescapedEntryAsync(valueStr);
         }
 
         /// <summary>
@@ -706,7 +876,7 @@ namespace Ncl.Common.Csv
         public CsvStreamWriter WriteField(float value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedField(valueStr);
+            return WriteUnescapedEntry(valueStr);
         }
 
         /// <summary>
@@ -722,7 +892,7 @@ namespace Ncl.Common.Csv
         public Task<CsvStreamWriter> WriteFieldAsync(float value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedFieldAsync(valueStr);
+            return WriteUnescapedEntryAsync(valueStr);
         }
 
         /// <summary>
@@ -735,7 +905,7 @@ namespace Ncl.Common.Csv
         public CsvStreamWriter WriteField(bool value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedField(valueStr);
+            return WriteUnescapedEntry(valueStr);
         }
 
         /// <summary>
@@ -751,7 +921,7 @@ namespace Ncl.Common.Csv
         public Task<CsvStreamWriter> WriteFieldAsync(bool value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedFieldAsync(valueStr);
+            return WriteUnescapedEntryAsync(valueStr);
         }
 
         /// <summary>
@@ -764,7 +934,7 @@ namespace Ncl.Common.Csv
         public CsvStreamWriter WriteField(ulong value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedField(valueStr);
+            return WriteUnescapedEntry(valueStr);
         }
 
         /// <summary>
@@ -780,7 +950,7 @@ namespace Ncl.Common.Csv
         public Task<CsvStreamWriter> WriteFieldAsync(ulong value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedFieldAsync(valueStr);
+            return WriteUnescapedEntryAsync(valueStr);
         }
 
         /// <summary>
@@ -793,7 +963,7 @@ namespace Ncl.Common.Csv
         public CsvStreamWriter WriteField(uint value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedField(valueStr);
+            return WriteUnescapedEntry(valueStr);
         }
 
         /// <summary>
@@ -809,7 +979,7 @@ namespace Ncl.Common.Csv
         public Task<CsvStreamWriter> WriteFieldAsync(uint value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedFieldAsync(valueStr);
+            return WriteUnescapedEntryAsync(valueStr);
         }
 
         /// <summary>
@@ -822,7 +992,7 @@ namespace Ncl.Common.Csv
         public CsvStreamWriter WriteField(long value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedField(valueStr);
+            return WriteUnescapedEntry(valueStr);
         }
 
         /// <summary>
@@ -838,7 +1008,7 @@ namespace Ncl.Common.Csv
         public Task<CsvStreamWriter> WriteFieldAsync(long value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedFieldAsync(valueStr);
+            return WriteUnescapedEntryAsync(valueStr);
         }
 
         /// <summary>
@@ -851,7 +1021,7 @@ namespace Ncl.Common.Csv
         public CsvStreamWriter WriteField(int value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedField(valueStr);
+            return WriteUnescapedEntry(valueStr);
         }
 
         /// <summary>
@@ -867,7 +1037,7 @@ namespace Ncl.Common.Csv
         public Task<CsvStreamWriter> WriteFieldAsync(int value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedFieldAsync(valueStr);
+            return WriteUnescapedEntryAsync(valueStr);
         }
 
         /// <summary>
@@ -880,7 +1050,7 @@ namespace Ncl.Common.Csv
         public CsvStreamWriter WriteField(double value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedField(valueStr);
+            return WriteUnescapedEntry(valueStr);
         }
 
         /// <summary>
@@ -896,7 +1066,7 @@ namespace Ncl.Common.Csv
         public Task<CsvStreamWriter> WriteFieldAsync(double value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedFieldAsync(valueStr);
+            return WriteUnescapedEntryAsync(valueStr);
         }
 
         /// <summary>
@@ -909,7 +1079,7 @@ namespace Ncl.Common.Csv
         public CsvStreamWriter WriteField(decimal value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedField(valueStr);
+            return WriteUnescapedEntry(valueStr);
         }
 
         /// <summary>
@@ -925,18 +1095,25 @@ namespace Ncl.Common.Csv
         public Task<CsvStreamWriter> WriteFieldAsync(decimal value)
         {
             string valueStr = value.ToString(_formatProvider);
-            return WriteUnescapedFieldAsync(valueStr);
+            return WriteUnescapedEntryAsync(valueStr);
         }
 
         /// <summary>
         ///     Writes a string to the text string or stream.
         /// </summary>
         /// <param name="value">The string to write.</param>
+        /// <param name="isHeader">Is the value being written a header.</param>
         /// <returns>This instance.</returns>
-        protected virtual CsvStreamWriter WriteUnescapedField(string value)
+        protected virtual CsvStreamWriter WriteUnescapedEntry(string value, bool isHeader = false)
         {
             if (_isDisposed)
                 throw new ObjectDisposedException(nameof(CsvStreamWriter));
+
+            if (isHeader == false && FirstRowWritten == false && _headers?.Count > 0)
+            {
+                //Move to the next row since this is a field entry and the header row isn't complete
+                WriteRowEnd();
+            }
 
             string escapedText = EscapeField(value);
 
@@ -958,6 +1135,7 @@ namespace Ncl.Common.Csv
         /// <param name="value">
         ///     The string to write. If value is null, nothing is written to the text stream.
         /// </param>
+        /// <param name="isHeader">Is the value being written a header.</param>
         /// <returns>
         ///     A task with this instance as the result and 
         ///     that represents the asynchronous write operation.
@@ -968,10 +1146,16 @@ namespace Ncl.Common.Csv
         /// <exception cref="InvalidOperationException">
         ///     The <see cref="CsvStreamWriter"/> is currently in use by a previous write operation.
         /// </exception>
-        protected virtual async Task<CsvStreamWriter> WriteUnescapedFieldAsync(string value)
+        protected virtual async Task<CsvStreamWriter> WriteUnescapedEntryAsync(string value, bool isHeader = false)
         {
             if (_isDisposed)
                 throw new ObjectDisposedException(nameof(CsvStreamWriter));
+
+            if (isHeader == false && FirstRowWritten == false && _headers?.Count > 0)
+            {
+                //Move to the next row since this is a field entry and the header row isn't complete
+                WriteRowEnd();
+            }
 
             string escapedText = EscapeField(value);
 
@@ -993,11 +1177,18 @@ namespace Ncl.Common.Csv
         /// <param name="buffer">
         ///     The buffer to write. If buffer is null, nothing is written to the text stream.
         /// </param>
+        /// <param name="isHeader">Is the value being written a header.</param>
         /// <returns>This instance.</returns>
-        protected virtual CsvStreamWriter WriteUnescapedField(StringBuilder buffer)
+        protected virtual CsvStreamWriter WriteUnescapedEntry(StringBuilder buffer, bool isHeader = false)
         {
             if (_isDisposed)
                 throw new ObjectDisposedException(nameof(CsvStreamWriter));
+
+            if (isHeader == false && FirstRowWritten == false && _headers?.Count > 0)
+            {
+                //Move to the next row since this is a field entry and the header row isn't complete
+                WriteRowEnd();
+            }
 
             string escapedText = EscapeField(buffer);
 
@@ -1020,6 +1211,7 @@ namespace Ncl.Common.Csv
         /// <param name="buffer">
         ///     The buffer to write. If buffer is null, nothing is written to the text stream.
         /// </param>
+        /// <param name="isHeader">Is the value being written a header.</param>
         /// <returns>
         ///     A task with this instance as the result and 
         ///     that represents the asynchronous write operation.
@@ -1030,10 +1222,16 @@ namespace Ncl.Common.Csv
         /// <exception cref="InvalidOperationException">
         ///     The <see cref="CsvStreamWriter"/> is currently in use by a previous write operation.
         /// </exception>
-        protected virtual async Task<CsvStreamWriter> WriteUnescapedFieldAsync(StringBuilder buffer)
+        protected virtual async Task<CsvStreamWriter> WriteUnescapedEntryAsync(StringBuilder buffer, bool isHeader = false)
         {
             if (_isDisposed)
                 throw new ObjectDisposedException(nameof(CsvStreamWriter));
+
+            if (isHeader == false && FirstRowWritten == false && _headers?.Count > 0)
+            {
+                //Move to the next row since this is a field entry and the header row isn't complete
+                WriteRowEnd();
+            }
 
             string escapedText = EscapeField(buffer);
 
