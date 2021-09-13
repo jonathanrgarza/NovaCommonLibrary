@@ -1,9 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
-using Ncl.Common.Core.Infrastructure;
 using Xunit;
 
-namespace Ncl.Common.Core.Tests.Infrastructure
+namespace Ncl.Common.Core.Infrastructure.Tests
 {
     public class NotifyingObjectTests
     {
@@ -32,6 +31,8 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             Assert.NotNull(actual);
             Assert.Equal(expected, actual.PropertyName);
         }
+
+        #region Normal Set
 
         [Fact]
         public void Set_SetsValueWithDifferentValue()
@@ -134,6 +135,810 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             //Assert
             Assert.Null(actual);
         }
+
+        [Fact]
+        public void Set1_SetsValueWithDifferentValue()
+        {
+            //Arrange
+            const int expected = 10;
+            int actual = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            instance.SetImpl(ref actual, expected, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void Set1_ReturnsTrueWithDifferentValue()
+        {
+            //Arrange
+            const bool expected = true;
+            int initialValue = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            bool actual = instance.SetImpl(ref initialValue, 10, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void Set1_RaisesEventWithDifferentValue()
+        {
+            //Arrange
+            var expected = new PropertyChangedEventArgs("Value");
+            var instance = new NotifyingObjectMock();
+
+            PropertyChangedEventArgs actual = null;
+            instance.PropertyChanged += (sender, args) =>
+            {
+                actual = args;
+            };
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            int initialValue = 0;
+            instance.SetImpl(ref initialValue, 10, callOnSet, "Value");
+
+            //Assert
+            Assert.NotNull(actual);
+            Assert.Equal(expected.PropertyName, actual.PropertyName);
+        }
+
+        [Fact]
+        public void Set1_CallActionWithDifferentValue()
+        {
+            //Arrange
+            var expected = true;
+            var instance = new NotifyingObjectMock();
+
+            bool actual = false;
+            void callOnSet()
+            {
+                actual = true;
+            }
+
+            //Act
+            int initialValue = 0;
+            instance.SetImpl(ref initialValue, 10, callOnSet, "Value");
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void Set1_NoChangeWithSameValue()
+        {
+            //Arrange
+            const int expected = 10;
+            int actual = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            instance.SetImpl(ref actual, expected, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void Set1_ReturnsFalseWithSameValue()
+        {
+            //Arrange
+            const bool expected = false;
+            int initialValue = 10;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            bool actual = instance.SetImpl(ref initialValue, 10, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void Set1_NoEventWithSameValue()
+        {
+            //Arrange
+            var instance = new NotifyingObjectMock();
+
+            PropertyChangedEventArgs actual = null;
+            instance.PropertyChanged += (sender, args) =>
+            {
+                actual = args;
+            };
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            int initialValue = 5;
+            instance.SetImpl(ref initialValue, 5, callOnSet, "Value");
+
+            //Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public void Set1_DontCallActionWithSameValue()
+        {
+            //Arrange
+            var expected = false;
+            var instance = new NotifyingObjectMock();
+
+            bool actual = false;
+            void callOnSet()
+            {
+                actual = true;
+            }
+
+            //Act
+            int initialValue = 5;
+            instance.SetImpl(ref initialValue, 5, callOnSet, "Value");
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetAndCallFirst_SetsValueWithDifferentValue()
+        {
+            //Arrange
+            const int expected = 10;
+            int actual = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            instance.SetAndCallFirstImpl(ref actual, expected, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetAndCallFirst_ReturnsTrueWithDifferentValue()
+        {
+            //Arrange
+            const bool expected = true;
+            int initialValue = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            bool actual = instance.SetAndCallFirstImpl(ref initialValue, 10, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetAndCallFirst_RaisesEventWithDifferentValue()
+        {
+            //Arrange
+            var expected = new PropertyChangedEventArgs("Value");
+            var instance = new NotifyingObjectMock();
+
+            PropertyChangedEventArgs actual = null;
+            instance.PropertyChanged += (sender, args) =>
+            {
+                actual = args;
+            };
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            int initialValue = 0;
+            instance.SetAndCallFirstImpl(ref initialValue, 10, callOnSet, "Value");
+
+            //Assert
+            Assert.NotNull(actual);
+            Assert.Equal(expected.PropertyName, actual.PropertyName);
+        }
+
+        [Fact]
+        public void SetAndCallFirst_CallActionWithDifferentValue()
+        {
+            //Arrange
+            var expected = true;
+            var instance = new NotifyingObjectMock();
+
+            bool actual = false;
+            void callOnSet()
+            {
+                actual = true;
+            }
+
+            //Act
+            int initialValue = 0;
+            instance.SetAndCallFirstImpl(ref initialValue, 10, callOnSet, "Value");
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetAndCallFirst_NoChangeWithSameValue()
+        {
+            //Arrange
+            const int expected = 10;
+            int actual = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            instance.SetAndCallFirstImpl(ref actual, expected, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetAndCallFirst_ReturnsFalseWithSameValue()
+        {
+            //Arrange
+            const bool expected = false;
+            int initialValue = 10;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            bool actual = instance.SetAndCallFirstImpl(ref initialValue, 10, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetAndCallFirst_NoEventWithSameValue()
+        {
+            //Arrange
+            var instance = new NotifyingObjectMock();
+
+            PropertyChangedEventArgs actual = null;
+            instance.PropertyChanged += (sender, args) =>
+            {
+                actual = args;
+            };
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            int initialValue = 5;
+            instance.SetAndCallFirstImpl(ref initialValue, 5, callOnSet, "Value");
+
+            //Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public void SetAndCallFirst_DontCallActionWithSameValue()
+        {
+            //Arrange
+            var expected = false;
+            var instance = new NotifyingObjectMock();
+
+            bool actual = false;
+            void callOnSet()
+            {
+                actual = true;
+            }
+
+            //Act
+            int initialValue = 5;
+            instance.SetAndCallFirstImpl(ref initialValue, 5, callOnSet, "Value");
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        #endregion
+
+        #region Double Set
+
+        [Fact]
+        public void SetDouble_SetsValueWithDifferentValue()
+        {
+            //Arrange
+            const double expected = 10.5;
+            double actual = 0;
+            var instance = new NotifyingObjectMock();
+
+            //Act
+            instance.SetDoubleImpl(ref actual, expected);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDouble_ReturnsTrueWithDifferentValue()
+        {
+            //Arrange
+            const bool expected = true;
+            double initialValue = 0;
+            var instance = new NotifyingObjectMock();
+
+            //Act
+            bool actual = instance.SetDoubleImpl(ref initialValue, 10.5);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDouble_RaisesEventWithDifferentValue()
+        {
+            //Arrange
+            var expected = new PropertyChangedEventArgs("Value");
+            var instance = new NotifyingObjectMock();
+
+            PropertyChangedEventArgs actual = null;
+            instance.PropertyChanged += (sender, args) =>
+            {
+                actual = args;
+            };
+
+            //Act
+            double initialValue = 0;
+            instance.SetDoubleImpl(ref initialValue, 10.5, 3, "Value");
+
+            //Assert
+            Assert.NotNull(actual);
+            Assert.Equal(expected.PropertyName, actual.PropertyName);
+        }
+
+        [Fact]
+        public void SetDouble_NoChangeWithSameValue()
+        {
+            //Arrange
+            const double expected = 10.5;
+            double actual = 0;
+            var instance = new NotifyingObjectMock();
+
+            //Act
+            instance.SetDoubleImpl(ref actual, expected);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDouble_ReturnsFalseWithSameValue()
+        {
+            //Arrange
+            const bool expected = false;
+            double initialValue = 10.5;
+            var instance = new NotifyingObjectMock();
+
+            //Act
+            bool actual = instance.SetDoubleImpl(ref initialValue, 10.5);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDouble_NoEventWithSameValue()
+        {
+            //Arrange
+            var instance = new NotifyingObjectMock();
+
+            PropertyChangedEventArgs actual = null;
+            instance.PropertyChanged += (sender, args) =>
+            {
+                actual = args;
+            };
+
+            //Act
+            double initialValue = 5.5;
+            instance.SetDoubleImpl(ref initialValue, 5.5, 3, "Value");
+
+            //Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public void SetDouble1_SetsValueWithDifferentValue()
+        {
+            //Arrange
+            const double expected = 10.5;
+            double actual = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            instance.SetDoubleImpl(ref actual, expected, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDouble1_ReturnsTrueWithDifferentValue()
+        {
+            //Arrange
+            const bool expected = true;
+            double initialValue = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            bool actual = instance.SetDoubleImpl(ref initialValue, 10.5, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDouble1_RaisesEventWithDifferentValue()
+        {
+            //Arrange
+            var expected = new PropertyChangedEventArgs("Value");
+            var instance = new NotifyingObjectMock();
+
+            PropertyChangedEventArgs actual = null;
+            instance.PropertyChanged += (sender, args) =>
+            {
+                actual = args;
+            };
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            double initialValue = 0;
+            instance.SetDoubleImpl(ref initialValue, 10.5, callOnSet, 3, "Value");
+
+            //Assert
+            Assert.NotNull(actual);
+            Assert.Equal(expected.PropertyName, actual.PropertyName);
+        }
+
+        [Fact]
+        public void SetDouble1_CallActionWithDifferentValue()
+        {
+            //Arrange
+            var expected = true;
+            var instance = new NotifyingObjectMock();
+
+            bool actual = false;
+            void callOnSet()
+            {
+                actual = true;
+            }
+
+            //Act
+            double initialValue = 0;
+            instance.SetDoubleImpl(ref initialValue, 10.5, callOnSet, 3, "Value");
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDouble1_NoChangeWithSameValue()
+        {
+            //Arrange
+            const int expected = 10;
+            double actual = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            instance.SetDoubleImpl(ref actual, expected, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDouble1_ReturnsFalseWithSameValue()
+        {
+            //Arrange
+            const bool expected = false;
+            double initialValue = 10.5;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            bool actual = instance.SetDoubleImpl(ref initialValue, 10.5, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDouble1_NoEventWithSameValue()
+        {
+            //Arrange
+            var instance = new NotifyingObjectMock();
+
+            PropertyChangedEventArgs actual = null;
+            instance.PropertyChanged += (sender, args) =>
+            {
+                actual = args;
+            };
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            double initialValue = 5.5;
+            instance.SetDoubleImpl(ref initialValue, 5.5, callOnSet, 3, "Value");
+
+            //Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public void SetDouble1_DontCallActionWithSameValue()
+        {
+            //Arrange
+            var expected = false;
+            var instance = new NotifyingObjectMock();
+
+            bool actual = false;
+            void callOnSet()
+            {
+                actual = true;
+            }
+
+            //Act
+            double initialValue = 5.5;
+            instance.SetDoubleImpl(ref initialValue, 5.5, callOnSet, 3, "Value");
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDoubleAndCallFirst_SetsValueWithDifferentValue()
+        {
+            //Arrange
+            const double expected = 10.5;
+            double actual = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            instance.SetDoubleAndCallFirstImpl(ref actual, expected, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDoubleAndCallFirst_ReturnsTrueWithDifferentValue()
+        {
+            //Arrange
+            const bool expected = true;
+            double initialValue = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            bool actual = instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDoubleAndCallFirst_RaisesEventWithDifferentValue()
+        {
+            //Arrange
+            var expected = new PropertyChangedEventArgs("Value");
+            var instance = new NotifyingObjectMock();
+
+            PropertyChangedEventArgs actual = null;
+            instance.PropertyChanged += (sender, args) =>
+            {
+                actual = args;
+            };
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            double initialValue = 0;
+            instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, callOnSet, 3, "Value");
+
+            //Assert
+            Assert.NotNull(actual);
+            Assert.Equal(expected.PropertyName, actual.PropertyName);
+        }
+
+        [Fact]
+        public void SetDoubleAndCallFirst_CallActionWithDifferentValue()
+        {
+            //Arrange
+            var expected = true;
+            var instance = new NotifyingObjectMock();
+
+            bool actual = false;
+            void callOnSet()
+            {
+                actual = true;
+            }
+
+            //Act
+            double initialValue = 0;
+            instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, callOnSet, 3, "Value");
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDoubleAndCallFirst_NoChangeWithSameValue()
+        {
+            //Arrange
+            const double expected = 10.5;
+            double actual = 0;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            instance.SetDoubleAndCallFirstImpl(ref actual, expected, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDoubleAndCallFirst_ReturnsFalseWithSameValue()
+        {
+            //Arrange
+            const bool expected = false;
+            double initialValue = 10.5;
+            var instance = new NotifyingObjectMock();
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            bool actual = instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, callOnSet);
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void SetDoubleAndCallFirst_NoEventWithSameValue()
+        {
+            //Arrange
+            var instance = new NotifyingObjectMock();
+
+            PropertyChangedEventArgs actual = null;
+            instance.PropertyChanged += (sender, args) =>
+            {
+                actual = args;
+            };
+
+            static void callOnSet()
+            {
+
+            }
+
+            //Act
+            double initialValue = 5.5;
+            instance.SetDoubleAndCallFirstImpl(ref initialValue, 5.5, callOnSet, 3, "Value");
+
+            //Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public void SetDoubleAndCallFirst_DontCallActionWithSameValue()
+        {
+            //Arrange
+            var expected = false;
+            var instance = new NotifyingObjectMock();
+
+            bool actual = false;
+            void callOnSet()
+            {
+                actual = true;
+            }
+
+            //Act
+            double initialValue = 5.5;
+            instance.SetDoubleAndCallFirstImpl(ref initialValue, 5.5, callOnSet, 3, "Value");
+
+            //Assert
+            Assert.Equal(actual, expected);
+        }
+
+        #endregion
 
         /// <summary>
         ///     Mock implementation of <see cref="NotifyingObject"/> to allow unit testing.
