@@ -777,12 +777,14 @@ namespace Ncl.Common.Core.Infrastructure.Tests
 
         #region Double Set
 
-        [Fact]
-        public void SetDouble_SetsValueWithDifferentValue()
+        [Theory]
+        [InlineData(0.0, 10.5)]
+        [InlineData(0.0, double.NaN)]
+        [InlineData(0.0, double.NegativeInfinity)]
+        [InlineData(0.0, double.PositiveInfinity)]
+        public void SetDouble_SetsValueWithDifferentValue(double actual, double expected)
         {
             //Arrange
-            const double expected = 10.5;
-            double actual = 0.0;
             var instance = new NotifyingObjectMock();
 
             //Act
@@ -792,23 +794,30 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             Assert.Equal(actual, expected);
         }
 
-        [Fact]
-        public void SetDouble_ReturnsTrueWithDifferentValue()
+        [Theory]
+        [InlineData(0.0, 10.5)]
+        [InlineData(0.0, double.NaN)]
+        [InlineData(0.0, double.NegativeInfinity)]
+        [InlineData(0.0, double.PositiveInfinity)]
+        public void SetDouble_ReturnsTrueWithDifferentValue(double initialValue, double setValue)
         {
             //Arrange
             const bool expected = true;
-            double initialValue = 0.0;
             var instance = new NotifyingObjectMock();
 
             //Act
-            bool actual = instance.SetDoubleImpl(ref initialValue, 10.5);
+            bool actual = instance.SetDoubleImpl(ref initialValue, setValue);
 
             //Assert
             Assert.Equal(actual, expected);
         }
 
-        [Fact]
-        public void SetDouble_RaisesEventWithDifferentValue()
+        [Theory]
+        [InlineData(0.0, 10.5)]
+        [InlineData(0.0, double.NaN)]
+        [InlineData(0.0, double.NegativeInfinity)]
+        [InlineData(0.0, double.PositiveInfinity)]
+        public void SetDouble_RaisesEventWithDifferentValue(double initialValue, double setValue)
         {
             //Arrange
             var expected = new PropertyChangedEventArgs("Value");
@@ -818,46 +827,56 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             instance.PropertyChanged += (_, args) => { actual = args; };
 
             //Act
-            double initialValue = 0.0;
-            instance.SetDoubleImpl(ref initialValue, 10.5, 3, "Value");
+            instance.SetDoubleImpl(ref initialValue, setValue, 3, "Value");
 
             //Assert
             Assert.NotNull(actual);
             Assert.Equal(expected.PropertyName, actual.PropertyName);
         }
 
-        [Fact]
-        public void SetDouble_NoChangeWithSameValue()
+        [Theory]
+        [InlineData(10.5, 10.5)]
+        [InlineData(double.NaN, double.NaN)]
+        [InlineData(double.NegativeInfinity, double.NegativeInfinity)]
+        [InlineData(double.PositiveInfinity, double.PositiveInfinity)]
+        public void SetDouble_NoChangeWithSameValue(double actual, double expected)
         {
             //Arrange
-            const double expected = 10.5;
-            double actual = 0.0;
             var instance = new NotifyingObjectMock();
 
             //Act
+            double initialValue = actual;
             instance.SetDoubleImpl(ref actual, expected);
 
             //Assert
+            Assert.Equal(initialValue, expected);
             Assert.Equal(actual, expected);
         }
 
-        [Fact]
-        public void SetDouble_ReturnsFalseWithSameValue()
+        [Theory]
+        [InlineData(10.5, 10.5)]
+        [InlineData(double.NaN, double.NaN)]
+        [InlineData(double.NegativeInfinity, double.NegativeInfinity)]
+        [InlineData(double.PositiveInfinity, double.PositiveInfinity)]
+        public void SetDouble_ReturnsFalseWithSameValue(double initialValue, double setValue)
         {
             //Arrange
             const bool expected = false;
-            double initialValue = 10.5;
             var instance = new NotifyingObjectMock();
 
             //Act
-            bool actual = instance.SetDoubleImpl(ref initialValue, 10.5);
+            bool actual = instance.SetDoubleImpl(ref initialValue, setValue);
 
             //Assert
             Assert.Equal(actual, expected);
         }
 
-        [Fact]
-        public void SetDouble_NoEventWithSameValue()
+        [Theory]
+        [InlineData(10.5, 10.5)]
+        [InlineData(double.NaN, double.NaN)]
+        [InlineData(double.NegativeInfinity, double.NegativeInfinity)]
+        [InlineData(double.PositiveInfinity, double.PositiveInfinity)]
+        public void SetDouble_NoEventWithSameValue(double initialValue, double setValue)
         {
             //Arrange
             var instance = new NotifyingObjectMock();
@@ -866,8 +885,7 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             instance.PropertyChanged += (_, args) => { actual = args; };
 
             //Act
-            double initialValue = 5.5;
-            instance.SetDoubleImpl(ref initialValue, 5.5, 3, "Value");
+            instance.SetDoubleImpl(ref initialValue, setValue, 3, "Value");
 
             //Assert
             Assert.Null(actual);
@@ -1205,12 +1223,14 @@ namespace Ncl.Common.Core.Infrastructure.Tests
 
         #region Float Set
 
-        [Fact]
-        public void SetFloat_SetsValueWithDifferentValue()
+        [Theory]
+        [InlineData(0.0f, 10.5f)]
+        [InlineData(0.0f, float.NaN)]
+        [InlineData(0.0f, float.NegativeInfinity)]
+        [InlineData(0.0f, float.PositiveInfinity)]
+        public void SetFloat_SetsValueWithDifferentValue(float actual, float expected)
         {
             //Arrange
-            const float expected = 10.5f;
-            float actual = 0.0f;
             var instance = new NotifyingObjectMock();
 
             //Act
@@ -1220,23 +1240,30 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             Assert.Equal(actual, expected);
         }
 
-        [Fact]
-        public void SetFloat_ReturnsTrueWithDifferentValue()
+        [Theory]
+        [InlineData(0.0f, 10.5f)]
+        [InlineData(0.0f, float.NaN)]
+        [InlineData(0.0f, float.NegativeInfinity)]
+        [InlineData(0.0f, float.PositiveInfinity)]
+        public void SetFloat_ReturnsTrueWithDifferentValue(float initialValue, float setValue)
         {
             //Arrange
             const bool expected = true;
-            float initialValue = 0.0f;
             var instance = new NotifyingObjectMock();
 
             //Act
-            bool actual = instance.SetFloatImpl(ref initialValue, 10.5f);
+            bool actual = instance.SetFloatImpl(ref initialValue, setValue);
 
             //Assert
             Assert.Equal(actual, expected);
         }
 
-        [Fact]
-        public void SetFloat_RaisesEventWithDifferentValue()
+        [Theory]
+        [InlineData(0.0f, 10.5f)]
+        [InlineData(0.0f, float.NaN)]
+        [InlineData(0.0f, float.NegativeInfinity)]
+        [InlineData(0.0f, float.PositiveInfinity)]
+        public void SetFloat_RaisesEventWithDifferentValue(float initialValue, float setValue)
         {
             //Arrange
             var expected = new PropertyChangedEventArgs("Value");
@@ -1246,46 +1273,56 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             instance.PropertyChanged += (_, args) => { actual = args; };
 
             //Act
-            float initialValue = 0.0f;
-            instance.SetFloatImpl(ref initialValue, 10.5f, 3, "Value");
+            instance.SetFloatImpl(ref initialValue, setValue, 3, "Value");
 
             //Assert
             Assert.NotNull(actual);
             Assert.Equal(expected.PropertyName, actual.PropertyName);
         }
 
-        [Fact]
-        public void SetFloat_NoChangeWithSameValue()
+        [Theory]
+        [InlineData(10.5f, 10.5f)]
+        [InlineData(float.NaN, float.NaN)]
+        [InlineData(float.NegativeInfinity, float.NegativeInfinity)]
+        [InlineData(float.PositiveInfinity, float.PositiveInfinity)]
+        public void SetFloat_NoChangeWithSameValue(float actual, float expected)
         {
             //Arrange
-            const float expected = 10.5f;
-            float actual = 0.0f;
             var instance = new NotifyingObjectMock();
 
             //Act
+            double initialValue = actual;
             instance.SetFloatImpl(ref actual, expected);
 
             //Assert
+            Assert.Equal(initialValue, expected);
             Assert.Equal(actual, expected);
         }
 
-        [Fact]
-        public void SetFloat_ReturnsFalseWithSameValue()
+        [Theory]
+        [InlineData(10.5f, 10.5f)]
+        [InlineData(float.NaN, float.NaN)]
+        [InlineData(float.NegativeInfinity, float.NegativeInfinity)]
+        [InlineData(float.PositiveInfinity, float.PositiveInfinity)]
+        public void SetFloat_ReturnsFalseWithSameValue(float initialValue, float setValue)
         {
             //Arrange
             const bool expected = false;
-            float initialValue = 10.5f;
             var instance = new NotifyingObjectMock();
 
             //Act
-            bool actual = instance.SetFloatImpl(ref initialValue, 10.5f);
+            bool actual = instance.SetFloatImpl(ref initialValue, setValue);
 
             //Assert
             Assert.Equal(actual, expected);
         }
 
-        [Fact]
-        public void SetFloat_NoEventWithSameValue()
+        [Theory]
+        [InlineData(10.5f, 10.5f)]
+        [InlineData(float.NaN, float.NaN)]
+        [InlineData(float.NegativeInfinity, float.NegativeInfinity)]
+        [InlineData(float.PositiveInfinity, float.PositiveInfinity)]
+        public void SetFloat_NoEventWithSameValue(float initialValue, float setValue)
         {
             //Arrange
             var instance = new NotifyingObjectMock();
@@ -1294,8 +1331,7 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             instance.PropertyChanged += (_, args) => { actual = args; };
 
             //Act
-            float initialValue = 5.5f;
-            instance.SetFloatImpl(ref initialValue, 5.5f, 3, "Value");
+            instance.SetFloatImpl(ref initialValue, setValue, 3, "Value");
 
             //Assert
             Assert.Null(actual);
