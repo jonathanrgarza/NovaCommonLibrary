@@ -61,7 +61,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var instance = new Temperature(expected, uom);
 
             //Act
-            var actual = instance.Convert(uom);
+            Temperature actual = instance.Convert(uom);
 
             //Assert
             Assert.Equal(uom, actual.Unit);
@@ -75,14 +75,13 @@ namespace Ncl.Common.Core.Measurement.Tests
         [InlineData(1.0, TemperatureUoM.Celsius, TemperatureUoM.Fahrenheit, 33.8)]
         [InlineData(1.0, TemperatureUoM.Fahrenheit, TemperatureUoM.Kelvin, 255.928)]
         [InlineData(1.0, TemperatureUoM.Fahrenheit, TemperatureUoM.Celsius, -17.2222)]
-
         public void Convert_DifferentUoMShouldReturnConvertedValue(double initialValue, TemperatureUoM from, TemperatureUoM to, double expected)
         {
             //Arrange
             var instance = new Temperature(initialValue, from);
 
             //Act
-            var actual = instance.Convert(to);
+            Temperature actual = instance.Convert(to);
 
             //Assert
             Assert.Equal(to, actual.Unit);
@@ -98,11 +97,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const TemperatureUoM expectedUoM = TemperatureUoM.Celsius;
 
             double otherValue = 1.5;
-            TemperatureUoM otherUnit = TemperatureUoM.Celsius;
+            var otherUnit = TemperatureUoM.Celsius;
             var mock = new Temperature(3.5, TemperatureUoM.Celsius);
             var mock2 = new Temperature(otherValue, otherUnit);
 
-            var actual = mock.Add(mock2);
+            Temperature actual = mock.Add(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);

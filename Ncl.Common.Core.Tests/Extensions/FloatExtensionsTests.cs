@@ -35,7 +35,7 @@ namespace Ncl.Common.Core.Extensions.Tests
         [InlineData(150f, 0.333333f, 49.99995f)]
         public void IsEqual_CalculatedValuesShouldReturnTrue(float first, float second, float expected)
         {
-            var result = first * second;
+            float result = first * second;
             Assert.True(result.IsEqual(expected));
         }
 
@@ -98,7 +98,7 @@ namespace Ncl.Common.Core.Extensions.Tests
         [InlineData(150f, 0.333333f, 49.99995f)]
         public void IsEqualTo_CalculatedValuesShouldReturnTrue(float first, float second, float expected)
         {
-            var result = first * second;
+            float result = first * second;
             Assert.True(result.IsEqualTo(expected));
         }
 

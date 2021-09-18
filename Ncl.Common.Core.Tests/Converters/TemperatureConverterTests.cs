@@ -5,7 +5,7 @@ namespace Ncl.Common.Core.Converters.Tests
 {
     public class TemperatureConverterTests
     {
-        private const int precison = 3;
+        private const int Precision = 3;
 
         [Fact]
         public void TemperatureConverter_ShouldConstructInstance()
@@ -49,7 +49,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.Convert(initialValue, from, to);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToKelvin(expected, TemperatureUoM.Kelvin);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Theory]
@@ -78,7 +78,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToKelvin(initialValue, from);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToCelsius(expected, TemperatureUoM.Celsius);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Theory]
@@ -107,7 +107,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToCelsius(initialValue, from);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToFahrenheit(expected, TemperatureUoM.Fahrenheit);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Theory]
@@ -136,7 +136,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToFahrenheit(initialValue, from);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
     }
 }

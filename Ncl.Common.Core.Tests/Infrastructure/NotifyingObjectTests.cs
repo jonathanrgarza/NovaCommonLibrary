@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Xunit;
 
 namespace Ncl.Common.Core.Infrastructure.Tests
@@ -30,6 +31,313 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             Assert.Equal(instance, actualSender);
             Assert.NotNull(actual);
             Assert.Equal(expected, actual.PropertyName);
+        }
+
+        /// <summary>
+        ///     Mock implementation of <see cref="NotifyingObject" /> to allow unit testing.
+        /// </summary>
+        private class NotifyingObjectMock : NotifyingObject
+        {
+            /// <summary>
+            ///     Raises the PropertyChanged event for the given property name.
+            ///     The calling member's name will be used as the parameter, by default.
+            /// </summary>
+            /// <param name="name">
+            ///     The property's name.
+            ///     Can specify <see cref="string.Empty" /> or null to signal all properties have changed.
+            /// </param>
+            public void OnPropertyChangedImpl([CallerMemberName] string name = null)
+            {
+                OnPropertyChanged(name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            /// </summary>
+            /// <typeparam name="T">The field's type.</typeparam>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetImpl<T>(ref T current, T value, [CallerMemberName] string name = null)
+            {
+                return Set(ref current, value, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set.
+            /// </summary>
+            /// <typeparam name="T">The field's type.</typeparam>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetImpl<T>(ref T current, T value, Action onSetAction,
+                [CallerMemberName] string name = null)
+            {
+                return Set(ref current, value, onSetAction, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set before raising the <see cref="NotifyingObject.PropertyChanged" />
+            ///     event.
+            /// </summary>
+            /// <typeparam name="T">The field's type.</typeparam>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetAndCallFirstImpl<T>(ref T current, T value, Action onSetAction,
+                [CallerMemberName] string name = null)
+            {
+                return SetAndCallFirst(ref current, value, onSetAction, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetDoubleImpl(ref double current, double value, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDouble(ref current, value, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetDoubleImpl(ref double current, double value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDouble(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set before raising the <see cref="NotifyingObject.PropertyChanged" />
+            ///     event.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetDoubleAndCallFirstImpl(ref double current, double value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDoubleAndCallFirst(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetFloatImpl(ref float current, float value, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloat(ref current, value, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetFloatImpl(ref float current, float value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloat(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set before raising the <see cref="NotifyingObject.PropertyChanged" />
+            ///     event.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetFloatAndCallFirstImpl(ref float current, float value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloatAndCallFirst(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetDoubleImpl(ref double? current, double? value, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDouble(ref current, value, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetDoubleImpl(ref double? current, double? value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDouble(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set before raising the <see cref="NotifyingObject.PropertyChanged" />
+            ///     event.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetDoubleAndCallFirstImpl(ref double? current, double? value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDoubleAndCallFirst(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetFloatImpl(ref float? current, float? value, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloat(ref current, value, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set.
+            /// </summary>
+            /// <typeparam name="T">The field's type.</typeparam>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetFloatImpl(ref float? current, float? value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloat(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set before raising the <see cref="NotifyingObject.PropertyChanged" />
+            ///     event.
+            /// </summary>
+            /// <typeparam name="T">The field's type.</typeparam>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns>True if the field's value changed, otherwise, false.</returns>
+            public bool SetFloatAndCallFirstImpl(ref float? current, float? value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloatAndCallFirst(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Determines if the <paramref name="current" /> is considered equal to
+            ///     the <paramref name="value" /> based on precision given by <paramref name="decimals" /> value.
+            /// </summary>
+            /// <param name="current">The current value.</param>
+            /// <param name="value">The other value to compare against.</param>
+            /// <param name="decimals">The decimal precision.</param>
+            /// <returns>True if the two values are considered equal, otherwise, false.</returns>
+            public bool IsDoubleEqualImpl(double current, double value, int decimals)
+            {
+                return IsDoubleEqual(current, value, decimals);
+            }
+
+            /// <summary>
+            ///     Determines if the <paramref name="current" /> is considered equal to
+            ///     the <paramref name="value" /> based on precision given by <paramref name="decimals" /> value.
+            /// </summary>
+            /// <param name="current">The current value.</param>
+            /// <param name="value">The other value to compare against.</param>
+            /// <param name="decimals">The decimal precision.</param>
+            /// <returns>True if the two values are considered equal, otherwise, false.</returns>
+            public bool IsFloatEqualImpl(float current, float value, int decimals)
+            {
+                return IsFloatEqual(current, value, decimals);
+            }
+
+            /// <summary>
+            ///     Determines if the <paramref name="current" /> is considered equal to
+            ///     the <paramref name="value" /> based on precision given by <paramref name="decimals" /> value.
+            /// </summary>
+            /// <param name="current">The current value.</param>
+            /// <param name="value">The other value to compare against.</param>
+            /// <param name="decimals">The decimal precision.</param>
+            /// <returns>True if the two values are considered equal, otherwise, false.</returns>
+            public bool IsDoubleEqualImpl(double? current, double? value, int decimals)
+            {
+                return IsDoubleEqual(current, value, decimals);
+            }
+
+            /// <summary>
+            ///     Determines if the <paramref name="current" /> is considered equal to
+            ///     the <paramref name="value" /> based on precision given by <paramref name="decimals" /> value.
+            /// </summary>
+            /// <param name="current">The current value.</param>
+            /// <param name="value">The other value to compare against.</param>
+            /// <param name="decimals">The decimal precision.</param>
+            /// <returns>True if the two values are considered equal, otherwise, false.</returns>
+            public bool IsFloatEqualImpl(float? current, float? value, int decimals)
+            {
+                return IsFloatEqual(current, value, decimals);
+            }
         }
 
         #region Normal Set
@@ -72,10 +380,7 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
             //Act
             int initialValue = 0;
@@ -123,10 +428,7 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
             //Act
             int initialValue = 5;
@@ -144,13 +446,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             int actual = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            instance.SetImpl(ref actual, expected, callOnSet);
+            instance.SetImpl(ref actual, expected, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -164,13 +465,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             int initialValue = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            bool actual = instance.SetImpl(ref initialValue, 10, callOnSet);
+            bool actual = instance.SetImpl(ref initialValue, 10, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -184,19 +484,15 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
             int initialValue = 0;
-            instance.SetImpl(ref initialValue, 10, callOnSet, "Value");
+            instance.SetImpl(ref initialValue, 10, CallOnSet, "Value");
 
             //Assert
             Assert.NotNull(actual);
@@ -207,18 +503,19 @@ namespace Ncl.Common.Core.Infrastructure.Tests
         public void Set1_CallActionWithDifferentValue()
         {
             //Arrange
-            var expected = true;
+            bool expected = true;
             var instance = new NotifyingObjectMock();
 
             bool actual = false;
-            void callOnSet()
+
+            void CallOnSet()
             {
                 actual = true;
             }
 
             //Act
             int initialValue = 0;
-            instance.SetImpl(ref initialValue, 10, callOnSet, "Value");
+            instance.SetImpl(ref initialValue, 10, CallOnSet, "Value");
 
             //Assert
             Assert.Equal(actual, expected);
@@ -232,13 +529,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             int actual = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            instance.SetImpl(ref actual, expected, callOnSet);
+            instance.SetImpl(ref actual, expected, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -252,13 +548,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             int initialValue = 10;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            bool actual = instance.SetImpl(ref initialValue, 10, callOnSet);
+            bool actual = instance.SetImpl(ref initialValue, 10, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -271,19 +566,15 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
             int initialValue = 5;
-            instance.SetImpl(ref initialValue, 5, callOnSet, "Value");
+            instance.SetImpl(ref initialValue, 5, CallOnSet, "Value");
 
             //Assert
             Assert.Null(actual);
@@ -293,18 +584,19 @@ namespace Ncl.Common.Core.Infrastructure.Tests
         public void Set1_DontCallActionWithSameValue()
         {
             //Arrange
-            var expected = false;
+            bool expected = false;
             var instance = new NotifyingObjectMock();
 
             bool actual = false;
-            void callOnSet()
+
+            void CallOnSet()
             {
                 actual = true;
             }
 
             //Act
             int initialValue = 5;
-            instance.SetImpl(ref initialValue, 5, callOnSet, "Value");
+            instance.SetImpl(ref initialValue, 5, CallOnSet, "Value");
 
             //Assert
             Assert.Equal(actual, expected);
@@ -318,13 +610,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             int actual = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            instance.SetAndCallFirstImpl(ref actual, expected, callOnSet);
+            instance.SetAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -338,13 +629,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             int initialValue = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            bool actual = instance.SetAndCallFirstImpl(ref initialValue, 10, callOnSet);
+            bool actual = instance.SetAndCallFirstImpl(ref initialValue, 10, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -358,19 +648,15 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
             int initialValue = 0;
-            instance.SetAndCallFirstImpl(ref initialValue, 10, callOnSet, "Value");
+            instance.SetAndCallFirstImpl(ref initialValue, 10, CallOnSet, "Value");
 
             //Assert
             Assert.NotNull(actual);
@@ -381,18 +667,19 @@ namespace Ncl.Common.Core.Infrastructure.Tests
         public void SetAndCallFirst_CallActionWithDifferentValue()
         {
             //Arrange
-            var expected = true;
+            bool expected = true;
             var instance = new NotifyingObjectMock();
 
             bool actual = false;
-            void callOnSet()
+
+            void CallOnSet()
             {
                 actual = true;
             }
 
             //Act
             int initialValue = 0;
-            instance.SetAndCallFirstImpl(ref initialValue, 10, callOnSet, "Value");
+            instance.SetAndCallFirstImpl(ref initialValue, 10, CallOnSet, "Value");
 
             //Assert
             Assert.Equal(actual, expected);
@@ -406,13 +693,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             int actual = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            instance.SetAndCallFirstImpl(ref actual, expected, callOnSet);
+            instance.SetAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -426,13 +712,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             int initialValue = 10;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            bool actual = instance.SetAndCallFirstImpl(ref initialValue, 10, callOnSet);
+            bool actual = instance.SetAndCallFirstImpl(ref initialValue, 10, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -445,19 +730,15 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
             int initialValue = 5;
-            instance.SetAndCallFirstImpl(ref initialValue, 5, callOnSet, "Value");
+            instance.SetAndCallFirstImpl(ref initialValue, 5, CallOnSet, "Value");
 
             //Assert
             Assert.Null(actual);
@@ -467,18 +748,19 @@ namespace Ncl.Common.Core.Infrastructure.Tests
         public void SetAndCallFirst_DontCallActionWithSameValue()
         {
             //Arrange
-            var expected = false;
+            bool expected = false;
             var instance = new NotifyingObjectMock();
 
             bool actual = false;
-            void callOnSet()
+
+            void CallOnSet()
             {
                 actual = true;
             }
 
             //Act
             int initialValue = 5;
-            instance.SetAndCallFirstImpl(ref initialValue, 5, callOnSet, "Value");
+            instance.SetAndCallFirstImpl(ref initialValue, 5, CallOnSet, "Value");
 
             //Assert
             Assert.Equal(actual, expected);
@@ -526,10 +808,7 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
             //Act
             double initialValue = 0;
@@ -577,10 +856,7 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
             //Act
             double initialValue = 5.5;
@@ -598,13 +874,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             double actual = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            instance.SetDoubleImpl(ref actual, expected, callOnSet);
+            instance.SetDoubleImpl(ref actual, expected, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -618,13 +893,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             double initialValue = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            bool actual = instance.SetDoubleImpl(ref initialValue, 10.5, callOnSet);
+            bool actual = instance.SetDoubleImpl(ref initialValue, 10.5, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -638,19 +912,15 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
             double initialValue = 0;
-            instance.SetDoubleImpl(ref initialValue, 10.5, callOnSet, 3, "Value");
+            instance.SetDoubleImpl(ref initialValue, 10.5, CallOnSet, 3, "Value");
 
             //Assert
             Assert.NotNull(actual);
@@ -661,18 +931,19 @@ namespace Ncl.Common.Core.Infrastructure.Tests
         public void SetDouble1_CallActionWithDifferentValue()
         {
             //Arrange
-            var expected = true;
+            bool expected = true;
             var instance = new NotifyingObjectMock();
 
             bool actual = false;
-            void callOnSet()
+
+            void CallOnSet()
             {
                 actual = true;
             }
 
             //Act
             double initialValue = 0;
-            instance.SetDoubleImpl(ref initialValue, 10.5, callOnSet, 3, "Value");
+            instance.SetDoubleImpl(ref initialValue, 10.5, CallOnSet, 3, "Value");
 
             //Assert
             Assert.Equal(actual, expected);
@@ -686,13 +957,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             double actual = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            instance.SetDoubleImpl(ref actual, expected, callOnSet);
+            instance.SetDoubleImpl(ref actual, expected, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -706,13 +976,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             double initialValue = 10.5;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            bool actual = instance.SetDoubleImpl(ref initialValue, 10.5, callOnSet);
+            bool actual = instance.SetDoubleImpl(ref initialValue, 10.5, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -725,19 +994,15 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
             double initialValue = 5.5;
-            instance.SetDoubleImpl(ref initialValue, 5.5, callOnSet, 3, "Value");
+            instance.SetDoubleImpl(ref initialValue, 5.5, CallOnSet, 3, "Value");
 
             //Assert
             Assert.Null(actual);
@@ -747,18 +1012,19 @@ namespace Ncl.Common.Core.Infrastructure.Tests
         public void SetDouble1_DontCallActionWithSameValue()
         {
             //Arrange
-            var expected = false;
+            bool expected = false;
             var instance = new NotifyingObjectMock();
 
             bool actual = false;
-            void callOnSet()
+
+            void CallOnSet()
             {
                 actual = true;
             }
 
             //Act
             double initialValue = 5.5;
-            instance.SetDoubleImpl(ref initialValue, 5.5, callOnSet, 3, "Value");
+            instance.SetDoubleImpl(ref initialValue, 5.5, CallOnSet, 3, "Value");
 
             //Assert
             Assert.Equal(actual, expected);
@@ -772,13 +1038,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             double actual = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            instance.SetDoubleAndCallFirstImpl(ref actual, expected, callOnSet);
+            instance.SetDoubleAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -792,13 +1057,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             double initialValue = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            bool actual = instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, callOnSet);
+            bool actual = instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -812,19 +1076,15 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
             double initialValue = 0;
-            instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, callOnSet, 3, "Value");
+            instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, CallOnSet, 3, "Value");
 
             //Assert
             Assert.NotNull(actual);
@@ -835,18 +1095,19 @@ namespace Ncl.Common.Core.Infrastructure.Tests
         public void SetDoubleAndCallFirst_CallActionWithDifferentValue()
         {
             //Arrange
-            var expected = true;
+            bool expected = true;
             var instance = new NotifyingObjectMock();
 
             bool actual = false;
-            void callOnSet()
+
+            void CallOnSet()
             {
                 actual = true;
             }
 
             //Act
             double initialValue = 0;
-            instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, callOnSet, 3, "Value");
+            instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, CallOnSet, 3, "Value");
 
             //Assert
             Assert.Equal(actual, expected);
@@ -860,13 +1121,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             double actual = 0;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            instance.SetDoubleAndCallFirstImpl(ref actual, expected, callOnSet);
+            instance.SetDoubleAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -880,13 +1140,12 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             double initialValue = 10.5;
             var instance = new NotifyingObjectMock();
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
-            bool actual = instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, callOnSet);
+            bool actual = instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, CallOnSet);
 
             //Assert
             Assert.Equal(actual, expected);
@@ -899,19 +1158,15 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var instance = new NotifyingObjectMock();
 
             PropertyChangedEventArgs actual = null;
-            instance.PropertyChanged += (sender, args) =>
-            {
-                actual = args;
-            };
+            instance.PropertyChanged += (sender, args) => { actual = args; };
 
-            static void callOnSet()
+            static void CallOnSet()
             {
-
             }
 
             //Act
             double initialValue = 5.5;
-            instance.SetDoubleAndCallFirstImpl(ref initialValue, 5.5, callOnSet, 3, "Value");
+            instance.SetDoubleAndCallFirstImpl(ref initialValue, 5.5, CallOnSet, 3, "Value");
 
             //Assert
             Assert.Null(actual);
@@ -921,325 +1176,24 @@ namespace Ncl.Common.Core.Infrastructure.Tests
         public void SetDoubleAndCallFirst_DontCallActionWithSameValue()
         {
             //Arrange
-            var expected = false;
+            bool expected = false;
             var instance = new NotifyingObjectMock();
 
             bool actual = false;
-            void callOnSet()
+
+            void CallOnSet()
             {
                 actual = true;
             }
 
             //Act
             double initialValue = 5.5;
-            instance.SetDoubleAndCallFirstImpl(ref initialValue, 5.5, callOnSet, 3, "Value");
+            instance.SetDoubleAndCallFirstImpl(ref initialValue, 5.5, CallOnSet, 3, "Value");
 
             //Assert
             Assert.Equal(actual, expected);
         }
 
         #endregion
-
-        /// <summary>
-        ///     Mock implementation of <see cref="NotifyingObject"/> to allow unit testing.
-        /// </summary>
-        private class NotifyingObjectMock : NotifyingObject
-        {
-            /// <summary>
-            ///     Raises the PropertyChanged event for the given property name.
-            ///     The calling member's name will be used as the parameter, by default.
-            /// </summary>
-            /// <param name="name">
-            ///     The property's name. 
-            ///     Can specify <see cref="string.Empty"/> or null to signal all properties have changed.
-            /// </param>
-            public void OnPropertyChangedImpl([System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                OnPropertyChanged(name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            /// </summary>
-            /// <typeparam name="T">The field's type.</typeparam>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetImpl<T>(ref T current, T value, [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return Set(ref current, value, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action"/> when the value is set.
-            /// </summary>
-            /// <typeparam name="T">The field's type.</typeparam>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetImpl<T>(ref T current, T value, Action onSetAction,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return Set(ref current, value, onSetAction, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action"/> when the value is set before raising the <see cref="PropertyChanged"/> event.
-            /// </summary>
-            /// <typeparam name="T">The field's type.</typeparam>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetAndCallFirstImpl<T>(ref T current, T value, Action onSetAction,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetAndCallFirst(ref current, value, onSetAction, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetDoubleImpl(ref double current, double value, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetDouble(ref current, value, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action"/> when the value is set.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetDoubleImpl(ref double current, double value, Action onSetAction, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetDouble(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action"/> when the value is set before raising the <see cref="PropertyChanged"/> event.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetDoubleAndCallFirstImpl(ref double current, double value, Action onSetAction, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetDoubleAndCallFirst(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetFloatImpl(ref float current, float value, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetFloat(ref current, value, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action"/> when the value is set.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetFloatImpl(ref float current, float value, Action onSetAction, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetFloat(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action"/> when the value is set before raising the <see cref="PropertyChanged"/> event.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetFloatAndCallFirstImpl(ref float current, float value, Action onSetAction, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetFloatAndCallFirst(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetDoubleImpl(ref double? current, double? value, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetDouble(ref current, value, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action"/> when the value is set.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetDoubleImpl(ref double? current, double? value, Action onSetAction, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetDouble(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action"/> when the value is set before raising the <see cref="PropertyChanged"/> event.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetDoubleAndCallFirstImpl(ref double? current, double? value, Action onSetAction, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetDoubleAndCallFirst(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetFloatImpl(ref float? current, float? value, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetFloat(ref current, value, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action"/> when the value is set.
-            /// </summary>
-            /// <typeparam name="T">The field's type.</typeparam>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetFloatImpl(ref float? current, float? value, Action onSetAction, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetFloat(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action"/> when the value is set before raising the <see cref="PropertyChanged"/> event.
-            /// </summary>
-            /// <typeparam name="T">The field's type.</typeparam>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns>True if the field's value changed, otherwise, false.</returns>
-            public bool SetFloatAndCallFirstImpl(ref float? current, float? value, Action onSetAction, int decimals = 3,
-                [System.Runtime.CompilerServices.CallerMemberName] string name = null)
-            {
-                return SetFloatAndCallFirst(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Determines if the <paramref name="current"/> is considered equal to 
-            ///     the <paramref name="value"/> based on precision given by <paramref name="decimals"/> value.
-            /// </summary>
-            /// <param name="current">The current value.</param>
-            /// <param name="value">The other value to compare against.</param>
-            /// <param name="decimals">The decimal precision.</param>
-            /// <returns>True if the two values are considered equal, otherwise, false.</returns>
-            public bool IsDoubleEqualImpl(double current, double value, int decimals)
-            {
-                return IsDoubleEqual(current, value, decimals);
-            }
-
-            /// <summary>
-            ///     Determines if the <paramref name="current"/> is considered equal to 
-            ///     the <paramref name="value"/> based on precision given by <paramref name="decimals"/> value.
-            /// </summary>
-            /// <param name="current">The current value.</param>
-            /// <param name="value">The other value to compare against.</param>
-            /// <param name="decimals">The decimal precision.</param>
-            /// <returns>True if the two values are considered equal, otherwise, false.</returns>
-            public bool IsFloatEqualImpl(float current, float value, int decimals)
-            {
-                return IsFloatEqual(current, value, decimals);
-            }
-
-            /// <summary>
-            ///     Determines if the <paramref name="current"/> is considered equal to 
-            ///     the <paramref name="value"/> based on precision given by <paramref name="decimals"/> value.
-            /// </summary>
-            /// <param name="current">The current value.</param>
-            /// <param name="value">The other value to compare against.</param>
-            /// <param name="decimals">The decimal precision.</param>
-            /// <returns>True if the two values are considered equal, otherwise, false.</returns>
-            public bool IsDoubleEqualImpl(double? current, double? value, int decimals)
-            {
-                return IsDoubleEqual(current, value, decimals);
-            }
-
-            /// <summary>
-            ///     Determines if the <paramref name="current"/> is considered equal to 
-            ///     the <paramref name="value"/> based on precision given by <paramref name="decimals"/> value.
-            /// </summary>
-            /// <param name="current">The current value.</param>
-            /// <param name="value">The other value to compare against.</param>
-            /// <param name="decimals">The decimal precision.</param>
-            /// <returns>True if the two values are considered equal, otherwise, false.</returns>
-            public bool IsFloatEqualImpl(float? current, float? value, int decimals)
-            {
-                return IsFloatEqual(current, value, decimals);
-            }
-        }
     }
 }

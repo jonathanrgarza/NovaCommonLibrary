@@ -35,7 +35,7 @@ namespace Ncl.Common.Core.Extensions.Tests
         [InlineData(150, 0.333333, 49.99995)]
         public void IsEqual_CalculatedValuesShouldReturnTrue(double first, double second, double expected)
         {
-            var result = first * second;
+            double result = first * second;
             Assert.True(result.IsEqual(expected));
         }
 
@@ -98,7 +98,7 @@ namespace Ncl.Common.Core.Extensions.Tests
         [InlineData(150, 0.333333, 49.99995)]
         public void IsEqualTo_CalculatedValuesShouldReturnTrue(double first, double second, double expected)
         {
-            var result = first * second;
+            double result = first * second;
             Assert.True(result.IsEqualTo(expected));
         }
 

@@ -5,7 +5,7 @@ namespace Ncl.Common.Core.Converters.Tests
 {
     public class DistanceConverterTests
     {
-        private const int precison = 3;
+        private const int Precision = 3;
 
         [Fact]
         public void DistanceConverter_ShouldConstructInstance()
@@ -52,7 +52,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.Convert(initialValue, from, to);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
     }
 }

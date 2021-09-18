@@ -9,15 +9,6 @@ namespace Ncl.Common.Core.Extensions.Tests
         private const string HasAttributesValueEnumDesc = "1st value";
         private const string HasAttributesValueEnumAbbre = "1st";
 
-        //Some test enum to be used with the following unit tests
-        private enum TestEnum
-        {
-            None,
-            [Description(HasAttributesValueEnumDesc)]
-            [Abbreviation(HasAttributesValueEnumAbbre)]
-            HasAttributesValue,
-        }
-
         [Fact]
         public void GetAttributeOfType_PresentAttributeShouldReturnValue()
         {
@@ -25,7 +16,7 @@ namespace Ncl.Common.Core.Extensions.Tests
             const string expected = HasAttributesValueEnumDesc;
 
             //Act
-            var actual = TestEnum.HasAttributesValue.GetAttributeOfType<DescriptionAttribute>()?.Description;
+            string actual = TestEnum.HasAttributesValue.GetAttributeOfType<DescriptionAttribute>()?.Description;
 
             //Assert
             Assert.Equal(expected, actual);
@@ -35,7 +26,7 @@ namespace Ncl.Common.Core.Extensions.Tests
         public void GetAttributeOfType_NotPresentAttributeShouldReturnNull()
         {
             //Act
-            var actual = TestEnum.None.GetAttributeOfType<DescriptionAttribute>()?.Description;
+            string actual = TestEnum.None.GetAttributeOfType<DescriptionAttribute>()?.Description;
 
             //Assert
             Assert.Null(actual);
@@ -48,7 +39,7 @@ namespace Ncl.Common.Core.Extensions.Tests
             const string expected = HasAttributesValueEnumDesc;
 
             //Act
-            var actual = TestEnum.HasAttributesValue.GetDescription();
+            string actual = TestEnum.HasAttributesValue.GetDescription();
 
             //Assert
             Assert.Equal(expected, actual);
@@ -58,10 +49,10 @@ namespace Ncl.Common.Core.Extensions.Tests
         public void GetDescription_NotPresentAttributeShouldReturnName()
         {
             //Arrange
-            var expected = TestEnum.None.ToString();
+            string expected = TestEnum.None.ToString();
 
             //Act
-            var actual = TestEnum.None.GetDescription();
+            string actual = TestEnum.None.GetDescription();
 
             //Assert
             Assert.Equal(expected, actual);
@@ -71,7 +62,7 @@ namespace Ncl.Common.Core.Extensions.Tests
         public void GetDescription1_PresentAttributeShouldReturnTrue()
         {
             //Act
-            var actual = TestEnum.HasAttributesValue.GetDescription(out _);
+            bool actual = TestEnum.HasAttributesValue.GetDescription(out _);
 
             //Assert
             Assert.True(actual);
@@ -94,7 +85,7 @@ namespace Ncl.Common.Core.Extensions.Tests
         public void GetDescription1_NotPresentAttributeShouldReturnFalse()
         {
             //Act
-            var actual = TestEnum.None.GetDescription(out _);
+            bool actual = TestEnum.None.GetDescription(out _);
 
             //Assert
             Assert.False(actual);
@@ -120,7 +111,7 @@ namespace Ncl.Common.Core.Extensions.Tests
             const string expected = HasAttributesValueEnumAbbre;
 
             //Act
-            var actual = TestEnum.HasAttributesValue.GetAbbreviation();
+            string actual = TestEnum.HasAttributesValue.GetAbbreviation();
 
             //Assert
             Assert.Equal(expected, actual);
@@ -133,7 +124,7 @@ namespace Ncl.Common.Core.Extensions.Tests
             string expected = TestEnum.None.ToString();
 
             //Act
-            var actual = TestEnum.None.GetAbbreviation();
+            string actual = TestEnum.None.GetAbbreviation();
 
             //Assert
             Assert.Equal(expected, actual);
@@ -143,7 +134,7 @@ namespace Ncl.Common.Core.Extensions.Tests
         public void GetAbbreviation1_PresentAttributeShouldReturnTrue()
         {
             //Act
-            var actual = TestEnum.HasAttributesValue.GetAbbreviation(out _);
+            bool actual = TestEnum.HasAttributesValue.GetAbbreviation(out _);
 
             //Assert
             Assert.True(actual);
@@ -166,7 +157,7 @@ namespace Ncl.Common.Core.Extensions.Tests
         public void GetAbbreviation1_NotPresentAttributeShouldReturnFalse()
         {
             //Act
-            var actual = TestEnum.None.GetAbbreviation(out _);
+            bool actual = TestEnum.None.GetAbbreviation(out _);
 
             //Assert
             Assert.False(actual);
@@ -183,6 +174,16 @@ namespace Ncl.Common.Core.Extensions.Tests
 
             //Assert
             Assert.Equal(expected, actual);
+        }
+
+        //Some test enum to be used with the following unit tests
+        private enum TestEnum
+        {
+            None,
+
+            [Description(HasAttributesValueEnumDesc)]
+            [Abbreviation(HasAttributesValueEnumAbbre)]
+            HasAttributesValue
         }
     }
 }

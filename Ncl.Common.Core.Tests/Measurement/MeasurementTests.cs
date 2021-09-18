@@ -7,61 +7,8 @@ namespace Ncl.Common.Core.Measurement.Tests
 {
     public class MeasurementTests
     {
-        private const string firstAbbr = "1st";
-        private const string secondAbbr = "2nd";
-
-        private enum MockUoM
-        {
-            [Abbreviation(firstAbbr)]
-            First,
-            [Abbreviation(secondAbbr)]
-            Second
-        }
-
-        private class MockMeasurement : Measurement<MockMeasurement, MockUoM>
-        {
-            public MockMeasurement() : base()
-            {
-            }
-
-            public MockMeasurement(double value, MockUoM unit) : base(value, unit)
-            {
-            }
-
-            public MockMeasurement(MockMeasurement instance) : base(instance)
-            {
-            }
-
-            public override MockMeasurement Convert(MockUoM newUnit)
-            {
-                //Simple conversion logic
-                var curUnit = Unit;
-                if (curUnit == newUnit)
-                    return this;
-
-                double convertedValue;
-                if (newUnit == MockUoM.First)
-                {
-                    convertedValue = Value * 10.0;
-                }
-                else
-                {
-                    convertedValue = Value / 10.0;
-                }
-
-                return new MockMeasurement(convertedValue, newUnit);
-            }
-
-            protected override MockMeasurement NewInstance()
-            {
-                return new MockMeasurement();
-            }
-
-            protected override MockMeasurement NewInstance(double value, MockUoM unit)
-            {
-                return new MockMeasurement(value, unit);
-            }
-        }
+        private const string FirstAbbr = "1st";
+        private const string SecondAbbr = "2nd";
 
         [Fact]
         public void Measurement_ShouldCreateDefaultInstance()
@@ -133,7 +80,7 @@ namespace Ncl.Common.Core.Measurement.Tests
         {
             var mock = new MockMeasurement();
 
-            var actual = mock.Equals(null);
+            bool actual = mock.Equals(null);
 
             Assert.False(actual);
         }
@@ -143,7 +90,7 @@ namespace Ncl.Common.Core.Measurement.Tests
         {
             var mock = new MockMeasurement();
 
-            var actual = mock.Equals("test string");
+            bool actual = mock.Equals("test string");
 
             Assert.False(actual);
         }
@@ -152,9 +99,9 @@ namespace Ncl.Common.Core.Measurement.Tests
         public void Equals_CompareToSameTypeDifferentValue_ShouldReturnFalse()
         {
             var mock = new MockMeasurement();
-            var mock2 = (object)new MockMeasurement(1.0, MockUoM.First);
+            object mock2 = (object)new MockMeasurement(1.0, MockUoM.First);
 
-            var actual = mock.Equals(mock2);
+            bool actual = mock.Equals(mock2);
 
             Assert.False(actual);
         }
@@ -163,9 +110,9 @@ namespace Ncl.Common.Core.Measurement.Tests
         public void Equals_CompareToSameTypeSameValue_ShouldReturnTrue()
         {
             var mock = new MockMeasurement(1.0, MockUoM.First);
-            var mock2 = (object)new MockMeasurement(1.0, MockUoM.First);
+            object mock2 = (object)new MockMeasurement(1.0, MockUoM.First);
 
-            var actual = mock.Equals(mock2);
+            bool actual = mock.Equals(mock2);
 
             Assert.True(actual);
         }
@@ -176,7 +123,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var mock = new MockMeasurement(2.0, MockUoM.First);
             var mock2 = new MockMeasurement(1.0, MockUoM.First);
 
-            var actual = mock.Equals(mock2);
+            bool actual = mock.Equals(mock2);
 
             Assert.False(actual);
         }
@@ -187,7 +134,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var mock = new MockMeasurement(1.0, MockUoM.First);
             var mock2 = new MockMeasurement(1.0, MockUoM.Second);
 
-            var actual = mock.Equals(mock2);
+            bool actual = mock.Equals(mock2);
 
             Assert.False(actual);
         }
@@ -198,7 +145,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var mock = new MockMeasurement(1.0, MockUoM.First);
             var mock2 = new MockMeasurement(1.0, MockUoM.First);
 
-            var actual = mock.Equals(mock2);
+            bool actual = mock.Equals(mock2);
 
             Assert.True(actual);
         }
@@ -209,8 +156,8 @@ namespace Ncl.Common.Core.Measurement.Tests
             var mock = new MockMeasurement(1.0, MockUoM.First);
             var mock2 = new MockMeasurement(1.0, MockUoM.First);
 
-            var firstHash = mock.GetHashCode();
-            var secondHash = mock2.GetHashCode();
+            int firstHash = mock.GetHashCode();
+            int secondHash = mock2.GetHashCode();
 
             Assert.Equal(firstHash, secondHash);
         }
@@ -221,8 +168,8 @@ namespace Ncl.Common.Core.Measurement.Tests
             var mock = new MockMeasurement(5.0, MockUoM.First);
             var mock2 = new MockMeasurement(1.0, MockUoM.First);
 
-            var firstHash = mock.GetHashCode();
-            var secondHash = mock2.GetHashCode();
+            int firstHash = mock.GetHashCode();
+            int secondHash = mock2.GetHashCode();
 
             Assert.NotEqual(firstHash, secondHash);
         }
@@ -233,8 +180,8 @@ namespace Ncl.Common.Core.Measurement.Tests
             var mock = new MockMeasurement(1.0, MockUoM.First);
             var mock2 = new MockMeasurement(1.0, MockUoM.Second);
 
-            var firstHash = mock.GetHashCode();
-            var secondHash = mock2.GetHashCode();
+            int firstHash = mock.GetHashCode();
+            int secondHash = mock2.GetHashCode();
 
             Assert.NotEqual(firstHash, secondHash);
         }
@@ -242,10 +189,10 @@ namespace Ncl.Common.Core.Measurement.Tests
         [Fact]
         public void ToString_SetValueAndUoM_ShouldReturnStringRep()
         {
-            var expected = $"{1} {MockUoM.First.GetAbbreviation()}";
+            string expected = $"{1} {MockUoM.First.GetAbbreviation()}";
             var mock = new MockMeasurement(1.0, MockUoM.First);
 
-            var actual = mock.ToString();
+            string actual = mock.ToString();
 
             Assert.Equal(expected, actual);
         }
@@ -255,10 +202,10 @@ namespace Ncl.Common.Core.Measurement.Tests
         {
             const int precision = 2;
             string format = $"F{precision}";
-            var expected = $"{2.123456789.ToString(format)} {MockUoM.First.GetAbbreviation()}";
+            string expected = $"{2.123456789.ToString(format)} {MockUoM.First.GetAbbreviation()}";
             var mock = new MockMeasurement(2.123456789, MockUoM.First);
 
-            var actual = mock.ToString(precision);
+            string actual = mock.ToString(precision);
 
             Assert.Equal(expected, actual);
         }
@@ -269,10 +216,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var mock = new MockMeasurement(3.5, MockUoM.First);
             MockMeasurement mock2 = null;
 
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                mock.Add(mock2);
-            });
+            Assert.Throws<ArgumentNullException>(() => { mock.Add(mock2); });
         }
 
         [Fact]
@@ -282,11 +226,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock.Add(mock2);
+            MockMeasurement actual = mock.Add(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -299,11 +243,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock.Add(mock2);
+            MockMeasurement actual = mock.Add(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -316,11 +260,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
 
-            var actual = mock.Add(otherValue, otherUnit);
+            MockMeasurement actual = mock.Add(otherValue, otherUnit);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -333,11 +277,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
 
-            var actual = mock.Add(otherValue, otherUnit);
+            MockMeasurement actual = mock.Add(otherValue, otherUnit);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -347,11 +291,11 @@ namespace Ncl.Common.Core.Measurement.Tests
         public void OperatorAdd_NullLeft_ShouldThrowException()
         {
             MockMeasurement mock = null;
-            MockMeasurement mock2 = new MockMeasurement(3.5, MockUoM.First);
+            var mock2 = new MockMeasurement(3.5, MockUoM.First);
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var result = mock + mock2;
+                MockMeasurement result = mock + mock2;
             });
         }
 
@@ -363,7 +307,7 @@ namespace Ncl.Common.Core.Measurement.Tests
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var result = mock + mock2;
+                MockMeasurement result = mock + mock2;
             });
         }
 
@@ -374,11 +318,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock + mock2;
+            MockMeasurement actual = mock + mock2;
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -391,11 +335,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock + mock2;
+            MockMeasurement actual = mock + mock2;
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -407,10 +351,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var mock = new MockMeasurement(3.5, MockUoM.First);
             MockMeasurement mock2 = null;
 
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                mock.Subtract(mock2);
-            });
+            Assert.Throws<ArgumentNullException>(() => { mock.Subtract(mock2); });
         }
 
         [Fact]
@@ -420,11 +361,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock.Subtract(mock2);
+            MockMeasurement actual = mock.Subtract(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -437,11 +378,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock.Subtract(mock2);
+            MockMeasurement actual = mock.Subtract(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -454,11 +395,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
 
-            var actual = mock.Subtract(otherValue, otherUnit);
+            MockMeasurement actual = mock.Subtract(otherValue, otherUnit);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -471,11 +412,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
 
-            var actual = mock.Subtract(otherValue, otherUnit);
+            MockMeasurement actual = mock.Subtract(otherValue, otherUnit);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -485,11 +426,11 @@ namespace Ncl.Common.Core.Measurement.Tests
         public void OperatorSubtract_NullLeft_ShouldThrowException()
         {
             MockMeasurement mock = null;
-            MockMeasurement mock2 = new MockMeasurement(3.5, MockUoM.First);
+            var mock2 = new MockMeasurement(3.5, MockUoM.First);
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var result = mock - mock2;
+                MockMeasurement result = mock - mock2;
             });
         }
 
@@ -501,7 +442,7 @@ namespace Ncl.Common.Core.Measurement.Tests
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var result = mock - mock2;
+                MockMeasurement result = mock - mock2;
             });
         }
 
@@ -512,11 +453,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock - mock2;
+            MockMeasurement actual = mock - mock2;
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -529,11 +470,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock - mock2;
+            MockMeasurement actual = mock - mock2;
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -545,10 +486,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var mock = new MockMeasurement(3.5, MockUoM.First);
             MockMeasurement mock2 = null;
 
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                mock.Multiply(mock2);
-            });
+            Assert.Throws<ArgumentNullException>(() => { mock.Multiply(mock2); });
         }
 
         [Fact]
@@ -558,11 +496,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock.Multiply(mock2);
+            MockMeasurement actual = mock.Multiply(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -575,11 +513,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock.Multiply(mock2);
+            MockMeasurement actual = mock.Multiply(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -592,11 +530,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
 
-            var actual = mock.Multiply(otherValue, otherUnit);
+            MockMeasurement actual = mock.Multiply(otherValue, otherUnit);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -609,11 +547,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
 
-            var actual = mock.Multiply(otherValue, otherUnit);
+            MockMeasurement actual = mock.Multiply(otherValue, otherUnit);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -623,11 +561,11 @@ namespace Ncl.Common.Core.Measurement.Tests
         public void OperatorMultiply_NullLeft_ShouldThrowException()
         {
             MockMeasurement mock = null;
-            MockMeasurement mock2 = new MockMeasurement(3.5, MockUoM.First);
+            var mock2 = new MockMeasurement(3.5, MockUoM.First);
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var result = mock * mock2;
+                MockMeasurement result = mock * mock2;
             });
         }
 
@@ -639,7 +577,7 @@ namespace Ncl.Common.Core.Measurement.Tests
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var result = mock * mock2;
+                MockMeasurement result = mock * mock2;
             });
         }
 
@@ -650,11 +588,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock * mock2;
+            MockMeasurement actual = mock * mock2;
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -667,11 +605,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock * mock2;
+            MockMeasurement actual = mock * mock2;
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -683,21 +621,18 @@ namespace Ncl.Common.Core.Measurement.Tests
             var mock = new MockMeasurement(3.5, MockUoM.First);
             MockMeasurement mock2 = null;
 
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                mock.Divide(mock2);
-            });
+            Assert.Throws<ArgumentNullException>(() => { mock.Divide(mock2); });
         }
 
         [Fact]
         public void Divide_DivideByZero_ShouldThrowException()
         {
             var mock = new MockMeasurement(3.5, MockUoM.First);
-            MockMeasurement mock2 = new MockMeasurement(-0.0, MockUoM.First);
+            var mock2 = new MockMeasurement(-0.0, MockUoM.First);
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                var result = mock.Divide(mock2);
+                MockMeasurement result = mock.Divide(mock2);
             });
         }
 
@@ -708,11 +643,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock.Divide(mock2);
+            MockMeasurement actual = mock.Divide(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -725,11 +660,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock.Divide(mock2);
+            MockMeasurement actual = mock.Divide(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -739,12 +674,12 @@ namespace Ncl.Common.Core.Measurement.Tests
         public void Divide1_DivideByZero_ShouldThrowException()
         {
             double otherValue = 0.0;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                var result = mock.Divide(otherValue, otherUnit);
+                MockMeasurement result = mock.Divide(otherValue, otherUnit);
             });
         }
 
@@ -755,11 +690,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
 
-            var actual = mock.Divide(otherValue, otherUnit);
+            MockMeasurement actual = mock.Divide(otherValue, otherUnit);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -772,11 +707,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
 
-            var actual = mock.Divide(otherValue, otherUnit);
+            MockMeasurement actual = mock.Divide(otherValue, otherUnit);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -786,11 +721,11 @@ namespace Ncl.Common.Core.Measurement.Tests
         public void OperatorDivide_NullLeft_ShouldThrowException()
         {
             MockMeasurement mock = null;
-            MockMeasurement mock2 = new MockMeasurement(3.5, MockUoM.First);
+            var mock2 = new MockMeasurement(3.5, MockUoM.First);
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var result = mock / mock2;
+                MockMeasurement result = mock / mock2;
             });
         }
 
@@ -802,7 +737,7 @@ namespace Ncl.Common.Core.Measurement.Tests
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var result = mock / mock2;
+                MockMeasurement result = mock / mock2;
             });
         }
 
@@ -810,11 +745,11 @@ namespace Ncl.Common.Core.Measurement.Tests
         public void OperatorDivide_DivideByZero_ShouldThrowException()
         {
             var mock = new MockMeasurement(3.5, MockUoM.First);
-            MockMeasurement mock2 = new MockMeasurement(0.0, MockUoM.First);
+            var mock2 = new MockMeasurement(0.0, MockUoM.First);
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                var result = mock / mock2;
+                MockMeasurement result = mock / mock2;
             });
         }
 
@@ -825,11 +760,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock / mock2;
+            MockMeasurement actual = mock / mock2;
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -842,11 +777,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock / mock2;
+            MockMeasurement actual = mock / mock2;
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -858,21 +793,18 @@ namespace Ncl.Common.Core.Measurement.Tests
             var mock = new MockMeasurement(3.5, MockUoM.First);
             MockMeasurement mock2 = null;
 
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                mock.Modulus(mock2);
-            });
+            Assert.Throws<ArgumentNullException>(() => { mock.Modulus(mock2); });
         }
 
         [Fact]
         public void Modulus_DivideByZero_ShouldThrowException()
         {
             var mock = new MockMeasurement(3.5, MockUoM.First);
-            MockMeasurement mock2 = new MockMeasurement(0.0, MockUoM.First);
+            var mock2 = new MockMeasurement(0.0, MockUoM.First);
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                var result = mock.Modulus(mock2);
+                MockMeasurement result = mock.Modulus(mock2);
             });
         }
 
@@ -883,11 +815,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock.Modulus(mock2);
+            MockMeasurement actual = mock.Modulus(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -900,11 +832,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock.Modulus(mock2);
+            MockMeasurement actual = mock.Modulus(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -914,12 +846,12 @@ namespace Ncl.Common.Core.Measurement.Tests
         public void Modulus1_DivideByZero_ShouldThrowException()
         {
             double otherValue = 0.0;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                var result = mock.Modulus(otherValue, otherUnit);
+                MockMeasurement result = mock.Modulus(otherValue, otherUnit);
             });
         }
 
@@ -930,11 +862,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
 
-            var actual = mock.Modulus(otherValue, otherUnit);
+            MockMeasurement actual = mock.Modulus(otherValue, otherUnit);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -947,11 +879,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
 
 
-            var actual = mock.Modulus(otherValue, otherUnit);
+            MockMeasurement actual = mock.Modulus(otherValue, otherUnit);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -961,11 +893,11 @@ namespace Ncl.Common.Core.Measurement.Tests
         public void OperatorModulus_NullLeft_ShouldThrowException()
         {
             MockMeasurement mock = null;
-            MockMeasurement mock2 = new MockMeasurement(3.5, MockUoM.First);
+            var mock2 = new MockMeasurement(3.5, MockUoM.First);
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var result = mock % mock2;
+                MockMeasurement result = mock % mock2;
             });
         }
 
@@ -977,7 +909,7 @@ namespace Ncl.Common.Core.Measurement.Tests
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var result = mock % mock2;
+                MockMeasurement result = mock % mock2;
             });
         }
 
@@ -985,11 +917,11 @@ namespace Ncl.Common.Core.Measurement.Tests
         public void OperatorModulus_DivideByZero_ShouldThrowException()
         {
             var mock = new MockMeasurement(3.5, MockUoM.First);
-            MockMeasurement mock2 = new MockMeasurement(0.0, MockUoM.First);
+            var mock2 = new MockMeasurement(0.0, MockUoM.First);
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                var result = mock % mock2;
+                MockMeasurement result = mock % mock2;
             });
         }
 
@@ -1000,11 +932,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 1.5;
-            MockUoM otherUnit = MockUoM.First;
+            var otherUnit = MockUoM.First;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock % mock2;
+            MockMeasurement actual = mock % mock2;
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -1017,14 +949,64 @@ namespace Ncl.Common.Core.Measurement.Tests
             const MockUoM expectedUoM = MockUoM.First;
 
             double otherValue = 0.15;
-            MockUoM otherUnit = MockUoM.Second;
+            var otherUnit = MockUoM.Second;
             var mock = new MockMeasurement(3.5, MockUoM.First);
             var mock2 = new MockMeasurement(otherValue, otherUnit);
 
-            var actual = mock % mock2;
+            MockMeasurement actual = mock % mock2;
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
+        }
+
+        private enum MockUoM
+        {
+            [Abbreviation(FirstAbbr)]
+            First,
+
+            [Abbreviation(SecondAbbr)]
+            Second
+        }
+
+        private class MockMeasurement : Measurement<MockMeasurement, MockUoM>
+        {
+            public MockMeasurement()
+            {
+            }
+
+            public MockMeasurement(double value, MockUoM unit) : base(value, unit)
+            {
+            }
+
+            public MockMeasurement(MockMeasurement instance) : base(instance)
+            {
+            }
+
+            public override MockMeasurement Convert(MockUoM newUnit)
+            {
+                //Simple conversion logic
+                MockUoM curUnit = Unit;
+                if (curUnit == newUnit)
+                    return this;
+
+                double convertedValue;
+                if (newUnit == MockUoM.First)
+                    convertedValue = Value * 10.0;
+                else
+                    convertedValue = Value / 10.0;
+
+                return new MockMeasurement(convertedValue, newUnit);
+            }
+
+            protected override MockMeasurement NewInstance()
+            {
+                return new MockMeasurement();
+            }
+
+            protected override MockMeasurement NewInstance(double value, MockUoM unit)
+            {
+                return new MockMeasurement(value, unit);
+            }
         }
     }
 }

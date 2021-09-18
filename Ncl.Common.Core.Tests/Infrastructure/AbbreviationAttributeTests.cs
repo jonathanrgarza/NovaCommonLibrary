@@ -47,10 +47,10 @@ namespace Ncl.Common.Core.Infrastructure.Tests
         {
             //Arrange
             var firstInstance = new AbbreviationAttribute(first);
-            var secondInstance = (object)new AbbreviationAttribute(second); //Force as object to ensure test of Equals(object)
+            object secondInstance = (object)new AbbreviationAttribute(second); //Force as object to ensure test of Equals(object)
 
             //Act
-            var result = firstInstance.Equals(secondInstance);
+            bool result = firstInstance.Equals(secondInstance);
 
             //Assert
             Assert.True(result);
@@ -63,10 +63,10 @@ namespace Ncl.Common.Core.Infrastructure.Tests
         {
             //Arrange
             var firstInstance = new AbbreviationAttribute(first);
-            var secondInstance = (object)new AbbreviationAttribute(second); //Force as object to ensure test of Equals(object)
+            object secondInstance = (object)new AbbreviationAttribute(second); //Force as object to ensure test of Equals(object)
 
             //Act
-            var result = firstInstance.Equals(secondInstance);
+            bool result = firstInstance.Equals(secondInstance);
 
             //Assert
             Assert.False(result);
@@ -77,10 +77,10 @@ namespace Ncl.Common.Core.Infrastructure.Tests
         {
             //Arrange
             var firstInstance = new AbbreviationAttribute();
-            var secondInstance = "";
+            string secondInstance = "";
 
             //Act
-            var result = firstInstance.Equals(secondInstance);
+            bool result = firstInstance.Equals(secondInstance);
 
             //Assert
             Assert.False(result);
@@ -96,7 +96,7 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var secondInstance = new AbbreviationAttribute(second); //Force as object to ensure test of Equals(object)
 
             //Act
-            var result = firstInstance.Equals(secondInstance);
+            bool result = firstInstance.Equals(secondInstance);
 
             //Assert
             Assert.True(result);
@@ -112,7 +112,7 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var secondInstance = new AbbreviationAttribute(second);
 
             //Act
-            var result = firstInstance.Equals(secondInstance);
+            bool result = firstInstance.Equals(secondInstance);
 
             //Assert
             Assert.False(result);
@@ -125,7 +125,7 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var firstInstance = new AbbreviationAttribute();
 
             //Act
-            var result = firstInstance.Equals(null);
+            bool result = firstInstance.Equals(null);
 
             //Assert
             Assert.False(result);
@@ -139,8 +139,8 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var secondInstance = new AbbreviationAttribute("test");
 
             //Act
-            var hashCode1 = firstInstance.GetHashCode();
-            var hashCode2 = secondInstance.GetHashCode();
+            int hashCode1 = firstInstance.GetHashCode();
+            int hashCode2 = secondInstance.GetHashCode();
 
             //Assert
             Assert.True(hashCode1 == hashCode2);
@@ -154,8 +154,8 @@ namespace Ncl.Common.Core.Infrastructure.Tests
             var secondInstance = new AbbreviationAttribute("t");
 
             //Act
-            var hashCode1 = firstInstance.GetHashCode();
-            var hashCode2 = secondInstance.GetHashCode();
+            int hashCode1 = firstInstance.GetHashCode();
+            int hashCode2 = secondInstance.GetHashCode();
 
             //Assert
             Assert.False(hashCode1 == hashCode2);

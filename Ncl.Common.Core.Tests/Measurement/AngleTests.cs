@@ -61,7 +61,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var instance = new Angle(expected, uom);
 
             //Act
-            var actual = instance.Convert(uom);
+            Angle actual = instance.Convert(uom);
 
             //Assert
             Assert.Equal(uom, actual.Unit);
@@ -75,14 +75,13 @@ namespace Ncl.Common.Core.Measurement.Tests
         [InlineData(1.0, AngleUoM.Degree, AngleUoM.Revolution, 0.00278)]
         [InlineData(1.0, AngleUoM.Revolution, AngleUoM.Radian, 6.28319)]
         [InlineData(1.0, AngleUoM.Revolution, AngleUoM.Degree, 360.0)]
-
         public void Convert_DifferentUoMShouldReturnConvertedValue(double initialValue, AngleUoM from, AngleUoM to, double expected)
         {
             //Arrange
             var instance = new Angle(initialValue, from);
 
             //Act
-            var actual = instance.Convert(to);
+            Angle actual = instance.Convert(to);
 
             //Assert
             Assert.Equal(to, actual.Unit);
@@ -97,12 +96,12 @@ namespace Ncl.Common.Core.Measurement.Tests
             const double expectedValue = 5.0;
             const AngleUoM expectedUoM = AngleUoM.Radian;
 
-            double otherValue = 1.5;
-            AngleUoM otherUnit = AngleUoM.Radian;
+            const double otherValue = 1.5;
+            const AngleUoM otherUnit = AngleUoM.Radian;
             var mock = new Angle(3.5, AngleUoM.Radian);
             var mock2 = new Angle(otherValue, otherUnit);
 
-            var actual = mock.Add(mock2);
+            Angle actual = mock.Add(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
@@ -116,7 +115,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var instance = new Angle(expected, AngleUoM.Degree);
 
             //Act
-            var actual = instance.ToDegree(true);
+            Angle actual = instance.ToDegree(true);
 
             //Assert
             Assert.Equal(AngleUoM.Degree, actual.Unit);
@@ -136,7 +135,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var instance = new Angle(initial, AngleUoM.Degree);
 
             //Act
-            var actual = instance.ToDegree(false);
+            Angle actual = instance.ToDegree(false);
 
             //Assert
             Assert.Equal(AngleUoM.Degree, actual.Unit);
@@ -157,7 +156,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var instance = new Angle(initial, AngleUoM.Degree);
 
             //Act
-            var actual = instance.ToDegree(true);
+            Angle actual = instance.ToDegree(true);
 
             //Assert
             Assert.Equal(AngleUoM.Degree, actual.Unit);
@@ -167,14 +166,13 @@ namespace Ncl.Common.Core.Measurement.Tests
         [Theory]
         [InlineData(1.0, AngleUoM.Radian, 57.29578)]
         [InlineData(1.0, AngleUoM.Revolution, 0.0)]
-
         public void ToDegree_DifferentUoMShouldReturnNormalizedValue(double initialValue, AngleUoM from, double expected)
         {
             //Arrange
             var instance = new Angle(initialValue, from);
 
             //Act
-            var actual = instance.ToDegree(true);
+            Angle actual = instance.ToDegree(true);
 
             //Assert
             Assert.Equal(AngleUoM.Degree, actual.Unit);

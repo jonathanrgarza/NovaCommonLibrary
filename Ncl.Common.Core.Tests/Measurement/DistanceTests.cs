@@ -62,7 +62,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var instance = new Distance(expected, uom);
 
             //Act
-            var actual = instance.Convert(uom);
+            Distance actual = instance.Convert(uom);
 
             //Assert
             Assert.Equal(uom, actual.Unit);
@@ -84,7 +84,7 @@ namespace Ncl.Common.Core.Measurement.Tests
             var instance = new Distance(initialValue, from);
 
             //Act
-            var actual = instance.Convert(to);
+            Distance actual = instance.Convert(to);
 
             //Assert
             Assert.Equal(to, actual.Unit);
@@ -100,11 +100,11 @@ namespace Ncl.Common.Core.Measurement.Tests
             const DistanceUoM expectedUoM = DistanceUoM.Meter;
 
             double otherValue = 1.5;
-            DistanceUoM otherUnit = DistanceUoM.Meter;
+            var otherUnit = DistanceUoM.Meter;
             var mock = new Distance(3.5, DistanceUoM.Meter);
             var mock2 = new Distance(otherValue, otherUnit);
 
-            var actual = mock.Add(mock2);
+            Distance actual = mock.Add(mock2);
 
             Assert.Equal(expectedValue, actual.Value, 2);
             Assert.Equal(expectedUoM, actual.Unit);
