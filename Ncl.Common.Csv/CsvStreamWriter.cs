@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,7 +40,7 @@ namespace Ncl.Common.Csv
 
         private bool _isDisposed;
         protected int _rowsWritten;
-        protected char separator = ',';
+        protected char _separator = ',';
 
         /// <summary>
         ///     Initializes a new instance of <see cref="CsvStreamWriter" />.
@@ -120,7 +121,7 @@ namespace Ncl.Common.Csv
         /// <exception cref="ArgumentException">value is equal to a quotation mark ("), return feed (\r) or newline character (\n).</exception>
         public char Separator
         {
-            get => separator;
+            get => _separator;
             set
             {
                 if (value == DoubleQuoteChar || value == '\r' || value == '\n')
@@ -129,7 +130,7 @@ namespace Ncl.Common.Csv
                         "Separator value can not be a quotation mark (\"), return feed (\\r) or newline character (\\n)");
                 }
 
-                separator = value;
+                _separator = value;
             }
         }
 
@@ -323,15 +324,8 @@ namespace Ncl.Common.Csv
             if (string.IsNullOrEmpty(value))
                 return value;
 
-            bool needsEscaping = false;
-            foreach (char character in value)
-            {
-                if (character != '\n' && character != '\r' && character != DoubleQuoteChar && character != Separator)
-                    continue;
-
-                needsEscaping = true;
-                break;
-            }
+            bool needsEscaping = value.Any(
+                character => character == '\n' || character == '\r' || character == DoubleQuoteChar || character == Separator);
 
             if (needsEscaping == false)
                 return value;
@@ -1191,7 +1185,7 @@ namespace Ncl.Common.Csv
             if (isHeader == false && FirstRowWritten == false && _headers?.Count > 0)
             {
                 //Move to the next row since this is a field entry and the header row isn't complete
-                WriteRowEnd();
+                await WriteRowEndAsync();
             }
 
             string escapedText = EscapeField(value);
@@ -1269,7 +1263,7 @@ namespace Ncl.Common.Csv
             if (isHeader == false && FirstRowWritten == false && _headers?.Count > 0)
             {
                 //Move to the next row since this is a field entry and the header row isn't complete
-                WriteRowEnd();
+                await WriteRowEndAsync();
             }
 
             string escapedText = EscapeField(buffer);
