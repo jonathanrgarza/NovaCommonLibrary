@@ -13,14 +13,14 @@ namespace Ncl.Common.Core.Measurement
         private static readonly IMeasurementConverter<TemperatureUoM> _converter = new TemperatureConverter();
 
         /// <summary>
-        ///     Initializes a new instance of <see cref="Temperature"/>.
+        ///     Initializes a new instance of <see cref="Temperature" />.
         /// </summary>
-        public Temperature() : base()
+        public Temperature()
         {
         }
 
         /// <summary>
-        ///     Initializes a new instance of <see cref="Temperature"/>.
+        ///     Initializes a new instance of <see cref="Temperature" />.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="unit">The unit.</param>
@@ -29,34 +29,34 @@ namespace Ncl.Common.Core.Measurement
         }
 
         /// <summary>
-        ///     Initializes a new instance of <see cref="Temperature"/>.
+        ///     Initializes a new instance of <see cref="Temperature" />.
         /// </summary>
         /// <param name="instance">The instance to copy.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="instance"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="instance" /> is null.</exception>
         public Temperature(Temperature instance) : base(instance)
         {
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override Temperature NewInstance()
         {
             return new Temperature();
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override Temperature NewInstance(double value, TemperatureUoM unit)
         {
             return new Temperature(value, unit);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override Temperature Convert(TemperatureUoM newUnit)
         {
-            var curUnit = Unit;
+            TemperatureUoM curUnit = Unit;
             if (curUnit == newUnit)
                 return this;
 
-            var convertedValue = _converter.Convert(Value, curUnit, newUnit);
+            double convertedValue = _converter.Convert(Value, curUnit, newUnit);
             return new Temperature(convertedValue, newUnit);
         }
     }

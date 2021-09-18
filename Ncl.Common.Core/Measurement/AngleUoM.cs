@@ -18,6 +18,6 @@ namespace Ncl.Common.Core.Measurement
 
         [Description("Revolution")]
         [Abbreviation("rev")]
-        Revolution, //A.K.A a Turn
+        Revolution //A.K.A a Turn
     }
 }

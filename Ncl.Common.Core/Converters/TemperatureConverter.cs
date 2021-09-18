@@ -8,7 +8,7 @@ namespace Ncl.Common.Core.Converters
     /// </summary>
     public class TemperatureConverter : IMeasurementConverter<TemperatureUoM>
     {
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public double Convert(double value, TemperatureUoM fromUnit, TemperatureUoM toUnit)
         {
             if (fromUnit == toUnit)
@@ -97,7 +97,7 @@ namespace Ncl.Common.Core.Converters
 
             if (fromUnit == TemperatureUoM.Celsius)
             {
-                convertedValue = (value * 1.8) + 32;
+                convertedValue = value * 1.8 + 32;
                 return convertedValue;
             }
 

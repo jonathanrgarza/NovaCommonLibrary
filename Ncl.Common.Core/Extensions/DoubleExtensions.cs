@@ -3,7 +3,7 @@
 namespace Ncl.Common.Core.Extensions
 {
     /// <summary>
-    ///     Extensions methods for the <see cref="double"/> type.
+    ///     Extensions methods for the <see cref="double" /> type.
     /// </summary>
     public static class DoubleExtensions
     {
@@ -32,28 +32,19 @@ namespace Ncl.Common.Core.Extensions
             if (currentIsNaN && valueIsNaN)
                 return true;
             if (currentIsNaN || valueIsNaN)
-            {
                 return false;
-            }
 
             //Check infinity case
-            if (double.IsInfinity(left) || double.IsInfinity(right))
-            {
-                if (double.IsPositiveInfinity(left) && double.IsPositiveInfinity(right))
-                {
-                    return true;
-                }
+            if (!double.IsInfinity(left) && !double.IsInfinity(right))
+                return Math.Abs(left - right) < tolerance; //Normal value case
 
-                if (double.IsNegativeInfinity(left) && double.IsNegativeInfinity(right))
-                {
-                    return true;
-                }
+            if (double.IsPositiveInfinity(left) && double.IsPositiveInfinity(right))
+                return true;
 
-                return false;
-            }
+            if (double.IsNegativeInfinity(left) && double.IsNegativeInfinity(right))
+                return true;
 
-            //Check normal value case
-            return Math.Abs(left - right) < tolerance;
+            return false;
         }
 
         /// <summary>
@@ -74,8 +65,8 @@ namespace Ncl.Common.Core.Extensions
         }
 
         /// <summary>
-        ///     Determines if the <paramref name="current"/> is considered equal to 
-        ///     the <paramref name="value"/> based on precision given by <paramref name="decimals"/> value.
+        ///     Determines if the <paramref name="current" /> is considered equal to
+        ///     the <paramref name="value" /> based on precision given by <paramref name="decimals" /> value.
         /// </summary>
         /// <param name="current">The current value.</param>
         /// <param name="value">The other value to compare against.</param>
@@ -89,22 +80,16 @@ namespace Ncl.Common.Core.Extensions
             if (currentIsNaN && valueIsNaN)
                 return true;
             if (currentIsNaN || valueIsNaN)
-            {
                 return false;
-            }
 
             //Check infinity case
             if (double.IsInfinity(current) || double.IsInfinity(value))
             {
                 if (double.IsPositiveInfinity(current) && double.IsPositiveInfinity(value))
-                {
                     return true;
-                }
 
                 if (double.IsNegativeInfinity(current) && double.IsNegativeInfinity(value))
-                {
                     return true;
-                }
 
                 return false;
             }
@@ -120,8 +105,8 @@ namespace Ncl.Common.Core.Extensions
         }
 
         /// <summary>
-        ///     Determines if the <paramref name="current"/> is considered equal to 
-        ///     the <paramref name="value"/> based on precision given by <paramref name="decimals"/> value.
+        ///     Determines if the <paramref name="current" /> is considered equal to
+        ///     the <paramref name="value" /> based on precision given by <paramref name="decimals" /> value.
         /// </summary>
         /// <param name="current">The current value.</param>
         /// <param name="value">The other value to compare against.</param>

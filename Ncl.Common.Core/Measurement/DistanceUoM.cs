@@ -15,9 +15,11 @@ namespace Ncl.Common.Core.Measurement
         [Description("Millimeters")]
         [Abbreviation("mm")]
         Millimeter,
+
         [Description("Centimeters")]
         [Abbreviation("cm")]
         Centimeter,
+
         [Description("Kilometers")]
         [Abbreviation("km")]
         Kilometer,
@@ -26,12 +28,15 @@ namespace Ncl.Common.Core.Measurement
         [Description("Inches")]
         [Abbreviation("in")]
         Inch,
+
         [Description("Feet")]
         [Abbreviation("ft")]
         Foot,
+
         [Description("Yards")]
         [Abbreviation("yd")]
         Yard,
+
         [Description("Miles")]
         [Abbreviation("mi")]
         Mile

@@ -13,14 +13,14 @@ namespace Ncl.Common.Core.Measurement
         private static readonly IMeasurementConverter<DistanceUoM> _converter = new DistanceConverter();
 
         /// <summary>
-        ///     Initializes a new instance of <see cref="Distance"/>.
+        ///     Initializes a new instance of <see cref="Distance" />.
         /// </summary>
-        public Distance() : base()
+        public Distance()
         {
         }
 
         /// <summary>
-        ///     Initializes a new instance of <see cref="Distance"/>.
+        ///     Initializes a new instance of <see cref="Distance" />.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="unit">The unit.</param>
@@ -29,34 +29,34 @@ namespace Ncl.Common.Core.Measurement
         }
 
         /// <summary>
-        ///     Initializes a new instance of <see cref="Distance"/>.
+        ///     Initializes a new instance of <see cref="Distance" />.
         /// </summary>
         /// <param name="instance">The instance to copy.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="instance"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="instance" /> is null.</exception>
         public Distance(Distance instance) : base(instance)
         {
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override Distance NewInstance()
         {
             return new Distance();
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override Distance NewInstance(double value, DistanceUoM unit)
         {
             return new Distance(value, unit);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override Distance Convert(DistanceUoM newUnit)
         {
-            var curUnit = Unit;
+            DistanceUoM curUnit = Unit;
             if (curUnit == newUnit)
                 return this;
 
-            var convertedValue = _converter.Convert(Value, curUnit, newUnit);
+            double convertedValue = _converter.Convert(Value, curUnit, newUnit);
             return new Distance(convertedValue, newUnit);
         }
     }

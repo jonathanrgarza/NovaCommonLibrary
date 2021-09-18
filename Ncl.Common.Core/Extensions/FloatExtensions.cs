@@ -3,7 +3,7 @@
 namespace Ncl.Common.Core.Extensions
 {
     /// <summary>
-    ///     Extensions methods for the <see cref="float"/> type.
+    ///     Extensions methods for the <see cref="float" /> type.
     /// </summary>
     public static class FloatExtensions
     {
@@ -32,27 +32,19 @@ namespace Ncl.Common.Core.Extensions
             if (currentIsNaN && valueIsNaN)
                 return true;
             if (currentIsNaN || valueIsNaN)
-            {
                 return false;
-            }
 
             //Check infinity case
-            if (float.IsInfinity(left) || float.IsInfinity(right))
-            {
-                if (float.IsPositiveInfinity(left) && float.IsPositiveInfinity(right))
-                {
-                    return true;
-                }
+            if (!float.IsInfinity(left) && !float.IsInfinity(right))
+                return Math.Abs(left - right) < tolerance; // Normal number case
 
-                if (float.IsNegativeInfinity(left) && float.IsNegativeInfinity(right))
-                {
-                    return true;
-                }
+            if (float.IsPositiveInfinity(left) && float.IsPositiveInfinity(right))
+                return true;
 
-                return false;
-            }
+            if (float.IsNegativeInfinity(left) && float.IsNegativeInfinity(right))
+                return true;
 
-            return Math.Abs(left - right) < tolerance;
+            return false;
         }
 
         /// <summary>
@@ -73,8 +65,8 @@ namespace Ncl.Common.Core.Extensions
         }
 
         /// <summary>
-        ///     Determines if the <paramref name="left"/> is considered equal to 
-        ///     the <paramref name="right"/> based on precision given by <paramref name="decimals"/> value.
+        ///     Determines if the <paramref name="left" /> is considered equal to
+        ///     the <paramref name="right" /> based on precision given by <paramref name="decimals" /> value.
         /// </summary>
         /// <param name="left">The current value.</param>
         /// <param name="right">The other value to compare against.</param>
@@ -88,22 +80,16 @@ namespace Ncl.Common.Core.Extensions
             if (currentIsNaN && valueIsNaN)
                 return true;
             if (currentIsNaN || valueIsNaN)
-            {
                 return false;
-            }
 
             //Check infinity case
             if (float.IsInfinity(left) || float.IsInfinity(right))
             {
                 if (float.IsPositiveInfinity(left) && float.IsPositiveInfinity(right))
-                {
                     return true;
-                }
 
                 if (float.IsNegativeInfinity(left) && float.IsNegativeInfinity(right))
-                {
                     return true;
-                }
 
                 return false;
             }
@@ -119,8 +105,8 @@ namespace Ncl.Common.Core.Extensions
         }
 
         /// <summary>
-        ///     Determines if the <paramref name="left"/> is considered equal to 
-        ///     the <paramref name="right"/> based on precision given by <paramref name="decimals"/> value.
+        ///     Determines if the <paramref name="left" /> is considered equal to
+        ///     the <paramref name="right" /> based on precision given by <paramref name="decimals" /> value.
         /// </summary>
         /// <param name="left">The current value.</param>
         /// <param name="right">The other value to compare against.</param>

@@ -13,13 +13,47 @@ namespace Ncl.Common.Core.Measurement
         where T : Measurement<T, UoM> where UoM : Enum
     {
         /// <summary>
-        ///     The default value for a <see cref="Measurement{T, UoM}"/>.
+        ///     The default value for a <see cref="Measurement{T, UoM}" />.
         /// </summary>
         /// <remarks>
-        ///     The default value is not considered as having a value by <see cref="Measurement{T, UoM}"/> and thus
-        ///     <see cref="HasValue"/> would return false.
+        ///     The default value is not considered as having a value by <see cref="Measurement{T, UoM}" /> and thus
+        ///     <see cref="HasValue" /> would return false.
         /// </remarks>
         public const double DefaultValue = double.NaN;
+
+        /// <summary>
+        ///     Initializes a new instance of <see cref="Measurement{T, UoM}" />.
+        /// </summary>
+        protected Measurement()
+        {
+            Value = DefaultValue;
+            Unit = default;
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of <see cref="Measurement{T, UoM}" />.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="unit">The unit.</param>
+        protected Measurement(double value, UoM unit)
+        {
+            Value = value;
+            Unit = unit;
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of <see cref="Measurement{T, UoM}" />.
+        /// </summary>
+        /// <param name="instance">The instance to copy.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="instance" /> is null.</exception>
+        protected Measurement(Measurement<T, UoM> instance)
+        {
+            if (instance == null)
+                throw new ArgumentNullException(nameof(instance));
+
+            Value = instance.Value;
+            Unit = instance.Unit;
+        }
 
         /// <summary>
         ///     Gets the value of this measurement.
@@ -36,47 +70,7 @@ namespace Ncl.Common.Core.Measurement
         /// </summary>
         public bool HasValue => double.IsNaN(Value);
 
-        /// <summary>
-        ///     Initializes a new instance of <see cref="Measurement{T, UoM}"/>.
-        /// </summary>
-        protected Measurement()
-        {
-            Value = DefaultValue;
-            Unit = default;
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of <see cref="Measurement{T, UoM}"/>.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <param name="unit">The unit.</param>
-        protected Measurement(double value, UoM unit)
-        {
-            Value = value;
-            Unit = unit;
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of <see cref="Measurement{T, UoM}"/>.
-        /// </summary>
-        /// <param name="instance">The instance to copy.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="instance"/> is null.</exception>
-        protected Measurement(Measurement<T, UoM> instance)
-        {
-            if (instance == null)
-                throw new ArgumentNullException(nameof(instance));
-
-            Value = instance.Value;
-            Unit = instance.Unit;
-        }
-
-        /// <inheritdoc/>
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as T);
-        }
-
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool Equals(T other)
         {
             return other != null &&
@@ -84,7 +78,13 @@ namespace Ncl.Common.Core.Measurement
                    Value.IsEqual(other.Value);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as T);
+        }
+
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             int hashCode = -177567199;
@@ -93,17 +93,17 @@ namespace Ncl.Common.Core.Measurement
             return hashCode;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"{Value} {Unit.GetAbbreviation()}";
         }
 
         /// <summary>
-        ///     Returns a string that represents the current object with 
-        ///     the <see cref="Value"/> rounded to the given number of decimals.
+        ///     Returns a string that represents the current object with
+        ///     the <see cref="Value" /> rounded to the given number of decimals.
         /// </summary>
-        /// <param name="decimals">The number of decimals to round the <see cref="Value"/> to.</param>
+        /// <param name="decimals">The number of decimals to round the <see cref="Value" /> to.</param>
         /// <returns>A string that represents the current object.</returns>
         public virtual string ToString(uint decimals)
         {
@@ -145,7 +145,7 @@ namespace Ncl.Common.Core.Measurement
             double convertedValue = value;
             if (thisUnit.Equals(unit) == false)
             {
-                var instance = NewInstance(value, unit).Convert(thisUnit);
+                T instance = NewInstance(value, unit).Convert(thisUnit);
                 convertedValue = instance.Value;
             }
 
@@ -184,7 +184,7 @@ namespace Ncl.Common.Core.Measurement
             double convertedValue = value;
             if (thisUnit.Equals(unit) == false)
             {
-                var instance = NewInstance(value, unit).Convert(thisUnit);
+                T instance = NewInstance(value, unit).Convert(thisUnit);
                 convertedValue = instance.Value;
             }
 
@@ -223,7 +223,7 @@ namespace Ncl.Common.Core.Measurement
             double convertedValue = value;
             if (thisUnit.Equals(unit) == false)
             {
-                var instance = NewInstance(value, unit).Convert(thisUnit);
+                T instance = NewInstance(value, unit).Convert(thisUnit);
                 convertedValue = instance.Value;
             }
 
@@ -263,7 +263,7 @@ namespace Ncl.Common.Core.Measurement
             double convertedValue = value;
             if (thisUnit.Equals(unit) == false)
             {
-                var instance = NewInstance(value, unit).Convert(thisUnit);
+                T instance = NewInstance(value, unit).Convert(thisUnit);
                 convertedValue = instance.Value;
             }
 
@@ -311,7 +311,7 @@ namespace Ncl.Common.Core.Measurement
             double convertedValue = value;
             if (thisUnit.Equals(unit) == false)
             {
-                var instance = NewInstance(value, unit).Convert(thisUnit);
+                T instance = NewInstance(value, unit).Convert(thisUnit);
                 convertedValue = instance.Value;
             }
 

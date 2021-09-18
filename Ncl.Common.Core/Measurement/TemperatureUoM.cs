@@ -19,6 +19,6 @@ namespace Ncl.Common.Core.Measurement
         //U.S. customary unit
         [Description("Fahrenheit")]
         [Abbreviation("°F")]
-        Fahrenheit,
+        Fahrenheit
     }
 }

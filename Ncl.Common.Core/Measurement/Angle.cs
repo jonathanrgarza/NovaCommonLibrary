@@ -14,14 +14,14 @@ namespace Ncl.Common.Core.Measurement
         private static readonly IMeasurementConverter<AngleUoM> _converter = new AngleConverter();
 
         /// <summary>
-        ///     Initializes a new instance of <see cref="Temperature"/>.
+        ///     Initializes a new instance of <see cref="Temperature" />.
         /// </summary>
-        public Angle() : base()
+        public Angle()
         {
         }
 
         /// <summary>
-        ///     Initializes a new instance of <see cref="Temperature"/>.
+        ///     Initializes a new instance of <see cref="Temperature" />.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="unit">The unit.</param>
@@ -30,52 +30,49 @@ namespace Ncl.Common.Core.Measurement
         }
 
         /// <summary>
-        ///     Initializes a new instance of <see cref="Temperature"/>.
+        ///     Initializes a new instance of <see cref="Temperature" />.
         /// </summary>
         /// <param name="instance">The instance to copy.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="instance"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="instance" /> is null.</exception>
         public Angle(Angle instance) : base(instance)
         {
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override Angle NewInstance()
         {
             return new Angle();
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override Angle NewInstance(double value, AngleUoM unit)
         {
             return new Angle(value, unit);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override Angle Convert(AngleUoM newUnit)
         {
-            var curUnit = Unit;
+            AngleUoM curUnit = Unit;
             if (curUnit == newUnit)
                 return this;
 
-            var convertedValue = _converter.Convert(Value, curUnit, newUnit);
+            double convertedValue = _converter.Convert(Value, curUnit, newUnit);
             return new Angle(convertedValue, newUnit);
         }
 
         /// <summary>
-        ///     Converts the current <see cref="Angle"/> to degrees.
+        ///     Converts the current <see cref="Angle" /> to degrees.
         /// </summary>
-        /// <param name="constrain">Should the converted value be normalized to [0,360).</param>
+        /// <param name="normalizeValue">Should the converted value be normalized to [0,360).</param>
         /// <returns>A new converted instance</returns>
         public Angle ToDegree(bool normalizeValue)
         {
             const AngleUoM newUnit = AngleUoM.Degree;
-            var curUnit = Unit;
-            var curValue = Value;
-            if (curUnit == newUnit &&
-                (normalizeValue == false || AngleUtility.IsWithinNormalizeDegreeRange(curValue)))
-            {
+            AngleUoM curUnit = Unit;
+            double curValue = Value;
+            if (curUnit == newUnit && (normalizeValue == false || AngleUtility.IsWithinNormalizeDegreeRange(curValue)))
                 return this;
-            }
 
             double convertedValue;
             if (curUnit == newUnit)

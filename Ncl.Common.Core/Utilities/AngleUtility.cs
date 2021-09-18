@@ -39,6 +39,7 @@
         ///     Normalizes the given degree value to be within the range of [0,360).
         /// </summary>
         /// <param name="value">The value to normalize.</param>
+        /// <param name="normalizedValue">The out normalized value.</param>
         /// <returns>True if the value was normalized, false if value was already within the normalize range.</returns>
         public static bool GetNormalizeDegreeValue(double value, out double normalizedValue)
         {

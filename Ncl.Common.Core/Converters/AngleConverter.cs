@@ -9,7 +9,7 @@ namespace Ncl.Common.Core.Converters
     /// </summary>
     public class AngleConverter : IMeasurementConverter<AngleUoM>
     {
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public double Convert(double value, AngleUoM fromUnit, AngleUoM toUnit)
         {
             if (fromUnit == toUnit)
@@ -17,21 +17,19 @@ namespace Ncl.Common.Core.Converters
 
             double convertedValue;
 
-            if (toUnit == AngleUoM.Radian)
+            switch (toUnit)
             {
-                convertedValue = ToRadian(value, fromUnit);
-                return convertedValue;
+                case AngleUoM.Radian:
+                    convertedValue = ToRadian(value, fromUnit);
+                    return convertedValue;
+                case AngleUoM.Degree:
+                    convertedValue = ToDegree(value, fromUnit);
+                    return convertedValue;
+                default:
+                    //Must be a conversion to Revolution
+                    convertedValue = ToRevolution(value, fromUnit);
+                    return convertedValue;
             }
-
-            if (toUnit == AngleUoM.Degree)
-            {
-                convertedValue = ToDegree(value, fromUnit);
-                return convertedValue;
-            }
-
-            //Must be a conversion to Revolution
-            convertedValue = ToRevolution(value, fromUnit);
-            return convertedValue;
         }
 
         /// <summary>
@@ -44,22 +42,20 @@ namespace Ncl.Common.Core.Converters
         {
             double convertedValue;
 
-            if (fromUnit == AngleUoM.Degree)
+            switch (fromUnit)
             {
-                //1° × π/180 = 0.01745rad
-                convertedValue = value * (Math.PI / 180.0);
-                return convertedValue;
+                case AngleUoM.Degree:
+                    //1° × π/180 = 0.01745rad
+                    convertedValue = value * (Math.PI / 180.0);
+                    return convertedValue;
+                case AngleUoM.Revolution:
+                    //1𝞽 × 2π = 6.283rad
+                    convertedValue = value * (2.0 * Math.PI);
+                    return convertedValue;
+                default:
+                    //Must already be same unit.
+                    return value;
             }
-
-            if (fromUnit == AngleUoM.Revolution)
-            {
-                //1𝞽 × 2π = 6.283rad
-                convertedValue = value * (2.0 * Math.PI);
-                return convertedValue;
-            }
-
-            //Must already be same unit.
-            return value;
         }
 
         /// <summary>
@@ -72,21 +68,19 @@ namespace Ncl.Common.Core.Converters
         {
             double convertedValue;
 
-            if (fromUnit == AngleUoM.Radian)
+            switch (fromUnit)
             {
-                //1rad × 180/π = 57.296°
-                convertedValue = value * (180.0 / Math.PI);
-                return convertedValue;
+                case AngleUoM.Radian:
+                    //1rad × 180/π = 57.296°
+                    convertedValue = value * (180.0 / Math.PI);
+                    return convertedValue;
+                case AngleUoM.Revolution:
+                    convertedValue = value * 360.0;
+                    return convertedValue;
+                default:
+                    //Must already be same unit.
+                    return value;
             }
-
-            if (fromUnit == AngleUoM.Revolution)
-            {
-                convertedValue = value * 360.0;
-                return convertedValue;
-            }
-
-            //Must already be same unit.
-            return value;
         }
 
         /// <summary>
@@ -99,21 +93,19 @@ namespace Ncl.Common.Core.Converters
         {
             double convertedValue;
 
-            if (fromUnit == AngleUoM.Degree)
+            switch (fromUnit)
             {
-                convertedValue = value / 360.0;
-                return convertedValue;
+                case AngleUoM.Degree:
+                    convertedValue = value / 360.0;
+                    return convertedValue;
+                case AngleUoM.Radian:
+                    //1rad ÷ 2π = 0.1592𝞽
+                    convertedValue = value / (2.0 * Math.PI);
+                    return convertedValue;
+                default:
+                    //Must already be same unit.
+                    return value;
             }
-
-            if (fromUnit == AngleUoM.Radian)
-            {
-                //1rad ÷ 2π = 0.1592𝞽
-                convertedValue = value / (2.0 * Math.PI);
-                return convertedValue;
-            }
-
-            //Must already be same unit.
-            return value;
         }
     }
 }

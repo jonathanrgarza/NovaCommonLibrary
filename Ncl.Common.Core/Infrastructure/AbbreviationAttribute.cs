@@ -10,25 +10,14 @@ namespace Ncl.Common.Core.Infrastructure
     public class AbbreviationAttribute : Attribute, IEquatable<AbbreviationAttribute>
     {
         /// <summary>
-        ///     Specifies the default value for the <see cref="AbbreviationAttribute"/>, which is an
-        ///     empty string ("").
-        /// </summary>
-        public static readonly AbbreviationAttribute Default = new AbbreviationAttribute();
-
-        /// <summary>
-        ///     Gets the abbreviation.
-        /// </summary>
-        public string Abbreviation { get; }
-
-        /// <summary>
-        ///     Initializes a new instance of <see cref="AbbreviationAttribute"/>.
+        ///     Initializes a new instance of <see cref="AbbreviationAttribute" />.
         /// </summary>
         public AbbreviationAttribute() : this(string.Empty)
         {
         }
 
         /// <summary>
-        ///     Initializes a new instance of <see cref="AbbreviationAttribute"/>.
+        ///     Initializes a new instance of <see cref="AbbreviationAttribute" />.
         /// </summary>
         /// <param name="abbreviation">The abbreviation value.</param>
         public AbbreviationAttribute(string abbreviation)
@@ -36,26 +25,37 @@ namespace Ncl.Common.Core.Infrastructure
             Abbreviation = abbreviation;
         }
 
-        /// <inheritdoc/>
-        public override bool IsDefaultAttribute()
-        {
-            return Equals(Default);
-        }
+        /// <summary>
+        ///     Specifies the default value for the <see cref="AbbreviationAttribute" />, which is an
+        ///     empty string ("").
+        /// </summary>
+        public static AbbreviationAttribute Default { get; } = new AbbreviationAttribute();
 
-        /// <inheritdoc/>
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as AbbreviationAttribute);
-        }
+        /// <summary>
+        ///     Gets the abbreviation.
+        /// </summary>
+        public string Abbreviation { get; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool Equals(AbbreviationAttribute other)
         {
             return other != null &&
                    Abbreviation == other.Abbreviation;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
+        public override bool IsDefaultAttribute()
+        {
+            return Equals(Default);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as AbbreviationAttribute);
+        }
+
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             int hashCode = 1272196887;
