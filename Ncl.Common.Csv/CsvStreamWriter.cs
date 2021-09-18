@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -30,14 +31,66 @@ namespace Ncl.Common.Csv
         /// </summary>
         protected const char DoubleQuoteChar = '"';
 
-        private bool _isDisposed;
-        private IFormatProvider _formatProvider;
-        protected readonly TextWriter _stream;
         protected readonly bool _leaveOpen;
+        protected readonly TextWriter _stream;
         protected int _fieldPosition;
+        private IFormatProvider _formatProvider;
+        protected List<string> _headers;
+
+        private bool _isDisposed;
         protected int _rowsWritten;
         protected char separator = ',';
-        protected List<string> _headers;
+
+        /// <summary>
+        ///     Initializes a new instance of <see cref="CsvStreamWriter" />.
+        /// </summary>
+        /// <param name="stream">The underlying stream to use.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
+        public CsvStreamWriter(TextWriter stream) : this(stream, false)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of <see cref="CsvStreamWriter" />.
+        /// </summary>
+        /// <param name="stream">The underlying stream to use.</param>
+        /// <param name="leaveOpen">
+        ///     Should the given stream be left open when this instance is disposed/closed.
+        /// </param>
+        /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
+        public CsvStreamWriter(TextWriter stream, bool leaveOpen)
+        {
+            _stream = stream ?? throw new ArgumentNullException(nameof(stream));
+            _leaveOpen = leaveOpen;
+            _formatProvider = Thread.CurrentThread.CurrentCulture;
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of <see cref="CsvStreamWriter" />.
+        /// </summary>
+        /// <param name="path">
+        ///     The file path to write to.
+        ///     Will create the file if it does not exist.
+        /// </param>
+        /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
+        public CsvStreamWriter(string path) : this(path, false)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of <see cref="CsvStreamWriter" />.
+        /// </summary>
+        /// <param name="path">
+        ///     The file path to write to.
+        ///     Will create the file if it does not exist.
+        /// </param>
+        /// <param name="append">Should the stream append content to the file.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
+        public CsvStreamWriter(string path, bool append)
+        {
+            _stream = new StreamWriter(path, append);
+            _formatProvider = Thread.CurrentThread.CurrentCulture;
+        }
 
         /// <summary>
         ///     Gets/Sets the format provider.
@@ -83,12 +136,20 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Gets the field position in the current row.
         /// </summary>
-        public int FieldPosition { get => _fieldPosition; protected set => _fieldPosition = value; }
+        public int FieldPosition
+        {
+            get => _fieldPosition;
+            protected set => _fieldPosition = value;
+        }
 
         /// <summary>
         ///     Gets the rows written for the current stream.
         /// </summary>
-        public int RowsWritten { get => _rowsWritten; protected set => _rowsWritten = value; }
+        public int RowsWritten
+        {
+            get => _rowsWritten;
+            protected set => _rowsWritten = value;
+        }
 
         /// <summary>
         ///     Gets if the first row has been written. Special as it can optionally be a header row.
@@ -105,70 +166,27 @@ namespace Ncl.Common.Csv
         /// </summary>
         public IReadOnlyList<string> Headers => _headers?.AsReadOnly();
 
-        /// <summary>
-        ///     Initializes a new instance of <see cref="CsvStreamWriter"/>.
-        /// </summary>
-        /// <param name="stream">The underlying stream to use.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-        public CsvStreamWriter(TextWriter stream) : this(stream, false)
+        /// <inheritdoc />
+        public void Dispose()
         {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
-        ///     Initializes a new instance of <see cref="CsvStreamWriter"/>.
-        /// </summary>
-        /// <param name="stream">The underlying stream to use.</param>
-        /// <param name="leaveOpen">
-        ///     Should the given stream be left open when this instance is disposed/closed.
-        /// </param>
-        /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-        public CsvStreamWriter(TextWriter stream, bool leaveOpen)
-        {
-            _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-            _leaveOpen = leaveOpen;
-            _formatProvider = Thread.CurrentThread.CurrentCulture;
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of <see cref="CsvStreamWriter"/>.
-        /// </summary>
-        /// <param name="path">
-        ///     The file path to write to.
-        ///     Will create the file if it does not exist.
-        /// </param>
-        /// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
-        public CsvStreamWriter(string path) : this(path, false)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of <see cref="CsvStreamWriter"/>.
-        /// </summary>
-        /// <param name="path">
-        ///     The file path to write to.
-        ///     Will create the file if it does not exist.
-        /// </param>
-        /// <param name="append">Should the stream append content to the file.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
-        public CsvStreamWriter(string path, bool append)
-        {
-            _stream = new StreamWriter(path, append);
-            _formatProvider = Thread.CurrentThread.CurrentCulture;
-        }
-
-        /// <summary>
-        ///     Creates a new <see cref="CsvStreamWriter"/> instance using the given stream.
+        ///     Creates a new <see cref="CsvStreamWriter" /> instance using the given stream.
         /// </summary>
         /// <param name="stream">The stream to use.</param>
         /// <returns>The new instance.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
         public static CsvStreamWriter Create(TextWriter stream)
         {
-            var result = TryCreate(stream, out Exception ex, out CsvStreamWriter cvsStream);
+            bool result = TryCreate(stream, out Exception ex, out CsvStreamWriter cvsStream);
             if (result)
                 return cvsStream;
 
-            System.Diagnostics.Debug.Assert(ex != null, "Had a failed result but no exception");
+            Debug.Assert(ex != null, "Had a failed result but no exception");
             if (ex == null)
             {
                 //Shouldn't happen
@@ -179,14 +197,14 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Creates a new <see cref="CsvStreamWriter"/> instance using the given stream.
+        ///     Creates a new <see cref="CsvStreamWriter" /> instance using the given stream.
         /// </summary>
         /// <param name="stream">The stream to use.</param>
-        /// <param name="ex">Out: The <see cref="Exception"/>, if any occurs.</param>
+        /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
         /// <returns>The new instance or null on error.</returns>
         public static CsvStreamWriter Create(TextWriter stream, out Exception ex)
         {
-            var result = TryCreate(stream, out ex, out CsvStreamWriter cvsStream);
+            bool result = TryCreate(stream, out ex, out CsvStreamWriter cvsStream);
 
             if (result)
                 return cvsStream;
@@ -195,10 +213,10 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Tries to create a new <see cref="CsvStreamWriter"/> instance using the given stream.
+        ///     Tries to create a new <see cref="CsvStreamWriter" /> instance using the given stream.
         /// </summary>
         /// <param name="stream">The stream to use.</param>
-        /// <param name="ex">Out: The <see cref="Exception"/>, if any occurs.</param>
+        /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
         /// <param name="cvsStream">Out: The new instance.</param>
         /// <returns>True if a new instance was created, otherwise, false.</returns>
         public static bool TryCreate(TextWriter stream, out Exception ex, out CsvStreamWriter cvsStream)
@@ -221,7 +239,7 @@ namespace Ncl.Common.Csv
 
         public static CsvStreamWriter Create(string path)
         {
-            var result = TryCreate(path, out Exception ex, out CsvStreamWriter cvsStream);
+            bool result = TryCreate(path, out Exception ex, out CsvStreamWriter cvsStream);
             if (result)
                 return cvsStream;
 
@@ -233,7 +251,7 @@ namespace Ncl.Common.Csv
 
         public static CsvStreamWriter Create(string path, out Exception ex)
         {
-            var result = TryCreate(path, out ex, out CsvStreamWriter cvsStream);
+            bool result = TryCreate(path, out ex, out CsvStreamWriter cvsStream);
             if (result)
                 return cvsStream;
             return null;
@@ -259,7 +277,7 @@ namespace Ncl.Common.Csv
 
         public static CsvStreamWriter Create(string path, bool append)
         {
-            var result = TryCreate(path, append, out Exception ex, out CsvStreamWriter cvsStream);
+            bool result = TryCreate(path, append, out Exception ex, out CsvStreamWriter cvsStream);
             if (result)
                 return cvsStream;
 
@@ -271,7 +289,7 @@ namespace Ncl.Common.Csv
 
         public static CsvStreamWriter Create(string path, bool append, out Exception ex)
         {
-            var result = TryCreate(path, append, out ex, out CsvStreamWriter cvsStream);
+            bool result = TryCreate(path, append, out ex, out CsvStreamWriter cvsStream);
             if (result)
                 return cvsStream;
             return null;
@@ -380,13 +398,16 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="string"/> to the stream as a header entry.
-        ///     The <paramref name="header"/> will be escaped, if necessary.
-        ///     If <paramref name="header"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="string" /> to the stream as a header entry.
+        ///     The <paramref name="header" /> will be escaped, if necessary.
+        ///     If <paramref name="header" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="header">The header to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
-        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
+        ///     written.
+        /// </exception>
         public CsvStreamWriter WriteHeader(string header)
         {
             if (header == null)
@@ -406,16 +427,19 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="string"/> to the stream as a header entry asynchronously.
-        ///     The <paramref name="header"/> will be escaped, if necessary.
-        ///     If <paramref name="header"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="string" /> to the stream as a header entry asynchronously.
+        ///     The <paramref name="header" /> will be escaped, if necessary.
+        ///     If <paramref name="header" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="header">The header to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
-        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
+        ///     written.
+        /// </exception>
         public Task<CsvStreamWriter> WriteHeaderAsync(string header)
         {
             if (header == null)
@@ -435,14 +459,17 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="IEnumerable{T}"/> to the stream as the header entries
+        ///     Writes a <see cref="IEnumerable{T}" /> to the stream as the header entries
         ///     then moves to the start of the next row.
         ///     The headers will be escaped, if necessary.
-        ///     If <paramref name="headers"/> is null, nothing is written to the stream.
+        ///     If <paramref name="headers" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="headers">The header row to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
-        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
+        ///     written.
+        /// </exception>
         public CsvStreamWriter WriteHeaderRow(IEnumerable<string> headers)
         {
             if (headers == null)
@@ -456,7 +483,7 @@ namespace Ncl.Common.Csv
                 _headers = new List<string>();
             }
 
-            foreach (var header in headers)
+            foreach (string header in headers)
             {
                 if (header == null)
                     continue;
@@ -469,17 +496,20 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="IEnumerable{T}"/> to the stream as the header entries
+        ///     Writes a <see cref="IEnumerable{T}" /> to the stream as the header entries
         ///     then moves to the start of the next row; asynchronously
         ///     The headers will be escaped, if necessary.
-        ///     If <paramref name="headers"/> is null, nothing is written to the stream.
+        ///     If <paramref name="headers" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="headers">The header row to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
-        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
+        ///     written.
+        /// </exception>
         public async Task<CsvStreamWriter> WriteHeaderRowAsync(IEnumerable<string> headers)
         {
             if (headers == null)
@@ -493,7 +523,7 @@ namespace Ncl.Common.Csv
                 _headers = new List<string>();
             }
 
-            foreach (var header in headers)
+            foreach (string header in headers)
             {
                 if (header == null)
                     continue;
@@ -509,15 +539,18 @@ namespace Ncl.Common.Csv
         ///     Writes headers to the stream as the header entries
         ///     then moves to the start of the next row.
         ///     The headers will be escaped, if necessary.
-        ///     If <paramref name="header"/> and <paramref name="headers"/> is null or empty, nothing is written to the stream.
+        ///     If <paramref name="header" /> and <paramref name="headers" /> is null or empty, nothing is written to the stream.
         /// </summary>
         /// <param name="header">The first header to write.</param>
         /// <param name="headers">The other headers to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
-        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
+        ///     written.
+        /// </exception>
         public CsvStreamWriter WriteHeaderRow(string header, params string[] headers)
         {
-            if (headers == null)
+            if (header == null && headers == null)
                 return this;
 
             if (FirstRowWritten)
@@ -539,7 +572,7 @@ namespace Ncl.Common.Csv
                 return WriteRowEnd();
             }
 
-            foreach (var otherHeader in headers)
+            foreach (string otherHeader in headers)
             {
                 if (otherHeader == null)
                     continue;
@@ -555,18 +588,21 @@ namespace Ncl.Common.Csv
         ///     Writes headers to the stream as the header entries
         ///     then moves to the start of the next row.
         ///     The headers will be escaped, if necessary.
-        ///     If <paramref name="header"/> and <paramref name="headers"/> is null or empty, nothing is written to the stream.
+        ///     If <paramref name="header" /> and <paramref name="headers" /> is null or empty, nothing is written to the stream.
         /// </summary>
         /// <param name="header">The first header to write.</param>
         /// <param name="headers">The other headers to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
-        /// <exception cref="InvalidOperationException"><see cref="FirstRowWritten" /> is true and thus no further headers can be written.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
+        ///     written.
+        /// </exception>
         public async Task<CsvStreamWriter> WriteHeaderRowAsync(string header, params string[] headers)
         {
-            if (headers == null)
+            if (header == null && headers == null)
                 return this;
 
             if (FirstRowWritten)
@@ -580,7 +616,7 @@ namespace Ncl.Common.Csv
             if (header != null)
             {
                 _headers.Add(header);
-                WriteUnescapedEntry(header, true);
+                await WriteUnescapedEntryAsync(header, true);
             }
 
             if (headers == null || headers.Length == 0)
@@ -588,7 +624,7 @@ namespace Ncl.Common.Csv
                 return await WriteRowEndAsync().ConfigureAwait(false);
             }
 
-            foreach (var otherHeader in headers)
+            foreach (string otherHeader in headers)
             {
                 if (otherHeader == null)
                     continue;
@@ -603,7 +639,7 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Writes the row terminating characters to the stream.
         /// </summary>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteRowEnd()
         {
             _stream.Write(NewLine);
@@ -616,7 +652,7 @@ namespace Ncl.Common.Csv
         ///     Writes the row terminating characters to the stream asynchronously.
         /// </summary>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public async Task<CsvStreamWriter> WriteRowEndAsync()
@@ -628,25 +664,25 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="string"/> to the stream as a field entry.
-        ///     The <paramref name="value"/> will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="string" /> to the stream as a field entry.
+        ///     The <paramref name="value" /> will be escaped, if necessary.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(string value)
         {
             return WriteUnescapedEntry(value);
         }
 
         /// <summary>
-        ///     Writes a <see cref="string"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="string" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(string value)
@@ -655,13 +691,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="string"/> to the stream as a field entry.
+        ///     Writes a <see cref="string" /> to the stream as a field entry.
         ///     The resulting string will be escaped, if necessary.
-        ///     If <paramref name="format"/> is null, nothing is written to the stream.
+        ///     If <paramref name="format" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="format">The format to write.</param>
         /// <param name="args">The format arguments.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(string format, params object[] args)
         {
             if (format == null)
@@ -672,14 +708,14 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="string"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="string" /> to the stream as a field entry asynchronously.
         ///     The resulting string will be escaped, if necessary.
-        ///     If <paramref name="format"/> is null, nothing is written to the stream.
+        ///     If <paramref name="format" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="format">The format to write.</param>
         /// <param name="args">The format arguments.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(string format, params object[] args)
@@ -692,12 +728,12 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="object"/> to the stream as a field entry.
-        ///     The <paramref name="value"/> will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="object" /> to the stream as a field entry.
+        ///     The <paramref name="value" /> will be escaped, if necessary.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(object value)
         {
             if (value == null)
@@ -710,13 +746,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="object"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="object" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(object value)
@@ -731,14 +767,14 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="char"/>[] to the stream as a field entry.
-        ///     The <paramref name="buffer"/> will be escaped, if necessary.
-        ///     If <paramref name="buffer"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="char" />[] to the stream as a field entry.
+        ///     The <paramref name="buffer" /> will be escaped, if necessary.
+        ///     If <paramref name="buffer" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="buffer">The buffer to write.</param>
         /// <param name="index">The index to start at.</param>
         /// <param name="count">The number of entries to get.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(char[] buffer, int index, int count)
         {
             //Check index and count ranges
@@ -759,15 +795,15 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a subset of a <see cref="char"/>[] to the stream as a field entry asynchronously.
+        ///     Writes a subset of a <see cref="char" />[] to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="buffer"/> is null, nothing is written to the stream.
+        ///     If <paramref name="buffer" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="buffer">The buffer to write.</param>
         /// <param name="index">The index to start at.</param>
         /// <param name="count">The number of entries to get.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(char[] buffer, int index, int count)
@@ -790,12 +826,12 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="char"/>[] to the stream as a field entry.
-        ///     The <paramref name="buffer"/> will be escaped, if necessary.
-        ///     If <paramref name="buffer"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="char" />[] to the stream as a field entry.
+        ///     The <paramref name="buffer" /> will be escaped, if necessary.
+        ///     If <paramref name="buffer" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="buffer">The buffer to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(char[] buffer)
         {
             //Check index and count ranges
@@ -813,13 +849,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="char"/>[] to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="char" />[] to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="buffer"/> is null, nothing is written to the stream.
+        ///     If <paramref name="buffer" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="buffer">The buffer to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(char[] buffer)
@@ -838,12 +874,12 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="char"/> to the stream as a field entry.
-        ///     The <paramref name="value"/> will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="char" /> to the stream as a field entry.
+        ///     The <paramref name="value" /> will be escaped, if necessary.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(char value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -851,13 +887,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="char"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="char" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(char value)
@@ -867,12 +903,12 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="float"/> to the stream as a field entry.
-        ///     The <paramref name="value"/> will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="float" /> to the stream as a field entry.
+        ///     The <paramref name="value" /> will be escaped, if necessary.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(float value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -880,13 +916,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="float"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="float" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(float value)
@@ -896,12 +932,12 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="bool"/> to the stream as a field entry.
-        ///     The <paramref name="value"/> will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="bool" /> to the stream as a field entry.
+        ///     The <paramref name="value" /> will be escaped, if necessary.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(bool value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -909,13 +945,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="bool"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="bool" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(bool value)
@@ -925,12 +961,12 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="ulong"/> to the stream as a field entry.
-        ///     The <paramref name="value"/> will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="ulong" /> to the stream as a field entry.
+        ///     The <paramref name="value" /> will be escaped, if necessary.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(ulong value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -938,13 +974,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="ulong"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="ulong" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(ulong value)
@@ -954,12 +990,12 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="uint"/> to the stream as a field entry.
-        ///     The <paramref name="value"/> will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="uint" /> to the stream as a field entry.
+        ///     The <paramref name="value" /> will be escaped, if necessary.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(uint value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -967,13 +1003,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="uint"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="uint" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(uint value)
@@ -983,12 +1019,12 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="long"/> to the stream as a field entry.
-        ///     The <paramref name="value"/> will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="long" /> to the stream as a field entry.
+        ///     The <paramref name="value" /> will be escaped, if necessary.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(long value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -996,13 +1032,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="long"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="long" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(long value)
@@ -1012,12 +1048,12 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="int"/> to the stream as a field entry.
-        ///     The <paramref name="value"/> will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="int" /> to the stream as a field entry.
+        ///     The <paramref name="value" /> will be escaped, if necessary.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(int value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1025,13 +1061,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="int"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="int" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(int value)
@@ -1041,12 +1077,12 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="double"/> to the stream as a field entry.
-        ///     The <paramref name="value"/> will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="double" /> to the stream as a field entry.
+        ///     The <paramref name="value" /> will be escaped, if necessary.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(double value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1054,13 +1090,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="double"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="double" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(double value)
@@ -1070,12 +1106,12 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="decimal"/> to the stream as a field entry.
-        ///     The <paramref name="value"/> will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     Writes a <see cref="decimal" /> to the stream as a field entry.
+        ///     The <paramref name="value" /> will be escaped, if necessary.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <returns>The <see cref="CsvStreamWriter"/> instance.</returns>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteField(decimal value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1083,13 +1119,13 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="decimal"/> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="decimal" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
-        ///     If <paramref name="value"/> is null, nothing is written to the stream.
+        ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>
-        ///     A task, with a <see cref="CsvStreamWriter"/> result, that represents 
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
         public Task<CsvStreamWriter> WriteFieldAsync(decimal value)
@@ -1124,6 +1160,7 @@ namespace Ncl.Common.Csv
             {
                 _stream.Write(Separator);
             }
+
             _stream.Write(escapedText);
             _fieldPosition++;
             return this;
@@ -1137,14 +1174,14 @@ namespace Ncl.Common.Csv
         /// </param>
         /// <param name="isHeader">Is the value being written a header.</param>
         /// <returns>
-        ///     A task with this instance as the result and 
+        ///     A task with this instance as the result and
         ///     that represents the asynchronous write operation.
         /// </returns>
         /// <exception cref="ObjectDisposedException">
-        ///     The <see cref="CsvStreamWriter"/> or underlying stream is disposed.
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter"/> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
         /// </exception>
         protected virtual async Task<CsvStreamWriter> WriteUnescapedEntryAsync(string value, bool isHeader = false)
         {
@@ -1166,13 +1203,14 @@ namespace Ncl.Common.Csv
             {
                 await _stream.WriteAsync(Separator).ConfigureAwait(false);
             }
+
             await _stream.WriteAsync(escapedText).ConfigureAwait(false);
             _fieldPosition++;
             return this;
         }
 
         /// <summary>
-        ///     Writes a <see cref="StringBuilder"/> to the text string or stream.
+        ///     Writes a <see cref="StringBuilder" /> to the text string or stream.
         /// </summary>
         /// <param name="buffer">
         ///     The buffer to write. If buffer is null, nothing is written to the text stream.
@@ -1199,6 +1237,7 @@ namespace Ncl.Common.Csv
             {
                 _stream.Write(Separator);
             }
+
             _stream.Write(escapedText);
 
             _fieldPosition++;
@@ -1206,21 +1245,21 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="StringBuilder"/> to the stream asynchronously.
+        ///     Writes a <see cref="StringBuilder" /> to the stream asynchronously.
         /// </summary>
         /// <param name="buffer">
         ///     The buffer to write. If buffer is null, nothing is written to the text stream.
         /// </param>
         /// <param name="isHeader">Is the value being written a header.</param>
         /// <returns>
-        ///     A task with this instance as the result and 
+        ///     A task with this instance as the result and
         ///     that represents the asynchronous write operation.
         /// </returns>
         /// <exception cref="ObjectDisposedException">
-        ///     The <see cref="CsvStreamWriter"/> or underlying stream is disposed.
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter"/> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
         /// </exception>
         protected virtual async Task<CsvStreamWriter> WriteUnescapedEntryAsync(StringBuilder buffer, bool isHeader = false)
         {
@@ -1242,6 +1281,7 @@ namespace Ncl.Common.Csv
             {
                 await _stream.WriteAsync(Separator).ConfigureAwait(false);
             }
+
             await _stream.WriteAsync(escapedText).ConfigureAwait(false);
 
             _fieldPosition++;
@@ -1277,15 +1317,7 @@ namespace Ncl.Common.Csv
         ~CsvStreamWriter()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: false);
-        }
-
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
+            Dispose(false);
         }
     }
 }
