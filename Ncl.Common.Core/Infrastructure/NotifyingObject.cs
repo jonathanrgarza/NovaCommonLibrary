@@ -347,22 +347,16 @@
             if (currentIsNaN && valueIsNaN)
                 return true;
             if (currentIsNaN || valueIsNaN)
-            {
                 return false;
-            }
 
             //Check infinity case
             if (double.IsInfinity(current) || double.IsInfinity(value))
             {
                 if (double.IsPositiveInfinity(current) && double.IsPositiveInfinity(value))
-                {
                     return true;
-                }
 
                 if (double.IsNegativeInfinity(current) && double.IsNegativeInfinity(value))
-                {
                     return true;
-                }
 
                 return false;
             }
@@ -393,9 +387,7 @@
             if (currentIsNaN && valueIsNaN)
                 return true;
             if (currentIsNaN || valueIsNaN)
-            {
                 return false;
-            }
 
             //Check infinity case
             if (float.IsInfinity(current) || float.IsInfinity(value))
