@@ -8,7 +8,7 @@
         //You can make this class's code into a snippet to be used for classes that
         //use the INotifyPropertyChanged interface; if that is preferred over extending from this base class.
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
@@ -16,8 +16,8 @@
         ///     The calling member's name will be used as the parameter, by default.
         /// </summary>
         /// <param name="name">
-        ///     The property's name. 
-        ///     Can specify <see cref="string.Empty"/> or null to signal all properties have changed.
+        ///     The property's name.
+        ///     Can specify <see cref="string.Empty" /> or null to signal all properties have changed.
         /// </param>
         protected void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string name = null)
         {
@@ -45,7 +45,7 @@
 
         /// <summary>
         ///     Sets a field to a given value if its different than the current value.
-        ///     Calls the given <see cref="System.Action"/> when the value is set.
+        ///     Calls the given <see cref="System.Action" /> when the value is set.
         /// </summary>
         /// <typeparam name="T">The field's type.</typeparam>
         /// <param name="current">The reference to the field.</param>
@@ -65,7 +65,8 @@
 
         /// <summary>
         ///     Sets a field to a given value if its different than the current value.
-        ///     Calls the given <see cref="System.Action"/> when the value is set before raising the <see cref="PropertyChanged"/> event.
+        ///     Calls the given <see cref="System.Action" /> when the value is set before raising the
+        ///     <see cref="PropertyChanged" /> event.
         /// </summary>
         /// <typeparam name="T">The field's type.</typeparam>
         /// <param name="current">The reference to the field.</param>
@@ -108,7 +109,7 @@
 
         /// <summary>
         ///     Sets a field to a given value if its different than the current value.
-        ///     Calls the given <see cref="System.Action"/> when the value is set.
+        ///     Calls the given <see cref="System.Action" /> when the value is set.
         /// </summary>
         /// <param name="current">The reference to the field.</param>
         /// <param name="value">The value to set, if different.</param>
@@ -128,7 +129,8 @@
 
         /// <summary>
         ///     Sets a field to a given value if its different than the current value.
-        ///     Calls the given <see cref="System.Action"/> when the value is set before raising the <see cref="PropertyChanged"/> event.
+        ///     Calls the given <see cref="System.Action" /> when the value is set before raising the
+        ///     <see cref="PropertyChanged" /> event.
         /// </summary>
         /// <param name="current">The reference to the field.</param>
         /// <param name="value">The value to set, if different.</param>
@@ -169,7 +171,7 @@
 
         /// <summary>
         ///     Sets a field to a given value if its different than the current value.
-        ///     Calls the given <see cref="System.Action"/> when the value is set.
+        ///     Calls the given <see cref="System.Action" /> when the value is set.
         /// </summary>
         /// <param name="current">The reference to the field.</param>
         /// <param name="value">The value to set, if different.</param>
@@ -189,7 +191,8 @@
 
         /// <summary>
         ///     Sets a field to a given value if its different than the current value.
-        ///     Calls the given <see cref="System.Action"/> when the value is set before raising the <see cref="PropertyChanged"/> event.
+        ///     Calls the given <see cref="System.Action" /> when the value is set before raising the
+        ///     <see cref="PropertyChanged" /> event.
         /// </summary>
         /// <param name="current">The reference to the field.</param>
         /// <param name="value">The value to set, if different.</param>
@@ -230,7 +233,7 @@
 
         /// <summary>
         ///     Sets a field to a given value if its different than the current value.
-        ///     Calls the given <see cref="System.Action"/> when the value is set.
+        ///     Calls the given <see cref="System.Action" /> when the value is set.
         /// </summary>
         /// <param name="current">The reference to the field.</param>
         /// <param name="value">The value to set, if different.</param>
@@ -250,7 +253,8 @@
 
         /// <summary>
         ///     Sets a field to a given value if its different than the current value.
-        ///     Calls the given <see cref="System.Action"/> when the value is set before raising the <see cref="PropertyChanged"/> event.
+        ///     Calls the given <see cref="System.Action" /> when the value is set before raising the
+        ///     <see cref="PropertyChanged" /> event.
         /// </summary>
         /// <param name="current">The reference to the field.</param>
         /// <param name="value">The value to set, if different.</param>
@@ -291,7 +295,7 @@
 
         /// <summary>
         ///     Sets a field to a given value if its different than the current value.
-        ///     Calls the given <see cref="System.Action"/> when the value is set.
+        ///     Calls the given <see cref="System.Action" /> when the value is set.
         /// </summary>
         /// <param name="current">The reference to the field.</param>
         /// <param name="value">The value to set, if different.</param>
@@ -311,7 +315,8 @@
 
         /// <summary>
         ///     Sets a field to a given value if its different than the current value.
-        ///     Calls the given <see cref="System.Action"/> when the value is set before raising the <see cref="PropertyChanged"/> event.
+        ///     Calls the given <see cref="System.Action" /> when the value is set before raising the
+        ///     <see cref="PropertyChanged" /> event.
         /// </summary>
         /// <param name="current">The reference to the field.</param>
         /// <param name="value">The value to set, if different.</param>
@@ -332,8 +337,8 @@
         }
 
         /// <summary>
-        ///     Determines if the <paramref name="current"/> is considered equal to 
-        ///     the <paramref name="value"/> based on precision given by <paramref name="decimals"/> value.
+        ///     Determines if the <paramref name="current" /> is considered equal to
+        ///     the <paramref name="value" /> based on precision given by <paramref name="decimals" /> value.
         /// </summary>
         /// <param name="current">The current value.</param>
         /// <param name="value">The other value to compare against.</param>
@@ -372,8 +377,8 @@
         }
 
         /// <summary>
-        ///     Determines if the <paramref name="current"/> is considered equal to 
-        ///     the <paramref name="value"/> based on precision given by <paramref name="decimals"/> value.
+        ///     Determines if the <paramref name="current" /> is considered equal to
+        ///     the <paramref name="value" /> based on precision given by <paramref name="decimals" /> value.
         /// </summary>
         /// <param name="current">The current value.</param>
         /// <param name="value">The other value to compare against.</param>
@@ -393,14 +398,10 @@
             if (float.IsInfinity(current) || float.IsInfinity(value))
             {
                 if (float.IsPositiveInfinity(current) && float.IsPositiveInfinity(value))
-                {
                     return true;
-                }
 
                 if (float.IsNegativeInfinity(current) && float.IsNegativeInfinity(value))
-                {
                     return true;
-                }
 
                 return false;
             }
@@ -416,8 +417,8 @@
         }
 
         /// <summary>
-        ///     Determines if the <paramref name="current"/> is considered equal to 
-        ///     the <paramref name="value"/> based on precision given by <paramref name="decimals"/> value.
+        ///     Determines if the <paramref name="current" /> is considered equal to
+        ///     the <paramref name="value" /> based on precision given by <paramref name="decimals" /> value.
         /// </summary>
         /// <param name="current">The current value.</param>
         /// <param name="value">The other value to compare against.</param>
@@ -436,8 +437,8 @@
         }
 
         /// <summary>
-        ///     Determines if the <paramref name="current"/> is considered equal to 
-        ///     the <paramref name="value"/> based on precision given by <paramref name="decimals"/> value.
+        ///     Determines if the <paramref name="current" /> is considered equal to
+        ///     the <paramref name="value" /> based on precision given by <paramref name="decimals" /> value.
         /// </summary>
         /// <param name="current">The current value.</param>
         /// <param name="value">The other value to compare against.</param>
