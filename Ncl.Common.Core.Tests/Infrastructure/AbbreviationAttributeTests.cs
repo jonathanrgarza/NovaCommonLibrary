@@ -1,6 +1,7 @@
-﻿using Xunit;
+﻿using Ncl.Common.Core.Infrastructure;
+using Xunit;
 
-namespace Ncl.Common.Core.Infrastructure.Tests
+namespace Ncl.Common.Core.Tests.Infrastructure
 {
     public class AbbreviationAttributeTests
     {

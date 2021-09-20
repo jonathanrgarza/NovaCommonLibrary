@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel;
+using Ncl.Common.Core.Extensions;
 using Ncl.Common.Core.Infrastructure;
 using Xunit;
 
-namespace Ncl.Common.Core.Extensions.Tests
+namespace Ncl.Common.Core.Tests.Extensions
 {
     public class EnumExtensionsTests
     {

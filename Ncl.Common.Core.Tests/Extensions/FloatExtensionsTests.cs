@@ -1,6 +1,7 @@
-﻿using Xunit;
+﻿using Ncl.Common.Core.Extensions;
+using Xunit;
 
-namespace Ncl.Common.Core.Extensions.Tests
+namespace Ncl.Common.Core.Tests.Extensions
 {
     public class FloatExtensionsTests
     {

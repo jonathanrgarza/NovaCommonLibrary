@@ -1,9 +1,10 @@
 ﻿using System;
 using Ncl.Common.Core.Extensions;
 using Ncl.Common.Core.Infrastructure;
+using Ncl.Common.Core.Measurement;
 using Xunit;
 
-namespace Ncl.Common.Core.Measurement.Tests
+namespace Ncl.Common.Core.Tests.Measurement
 {
     public class MeasurementTests
     {

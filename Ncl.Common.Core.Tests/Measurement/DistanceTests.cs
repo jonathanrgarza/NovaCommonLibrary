@@ -1,7 +1,8 @@
 ﻿using System;
+using Ncl.Common.Core.Measurement;
 using Xunit;
 
-namespace Ncl.Common.Core.Measurement.Tests
+namespace Ncl.Common.Core.Tests.Measurement
 {
     public class DistanceTests
     {

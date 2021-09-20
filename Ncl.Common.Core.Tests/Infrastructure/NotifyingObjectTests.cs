@@ -1,13 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Ncl.Common.Core.Infrastructure;
 using Xunit;
 
 // ReSharper disable ExpressionIsAlwaysNull
 
 // ReSharper disable ExplicitCallerInfoArgument
 
-namespace Ncl.Common.Core.Infrastructure.Tests
+namespace Ncl.Common.Core.Tests.Infrastructure
 {
     public class NotifyingObjectTests
     {

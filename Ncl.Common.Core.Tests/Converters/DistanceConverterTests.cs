@@ -1,7 +1,8 @@
+using Ncl.Common.Core.Converters;
 using Ncl.Common.Core.Measurement;
 using Xunit;
 
-namespace Ncl.Common.Core.Converters.Tests
+namespace Ncl.Common.Core.Tests.Converters
 {
     public class DistanceConverterTests
     {

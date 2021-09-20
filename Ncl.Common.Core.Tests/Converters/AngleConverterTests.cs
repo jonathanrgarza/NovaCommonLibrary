@@ -1,11 +1,12 @@
+using Ncl.Common.Core.Converters;
 using Ncl.Common.Core.Measurement;
 using Xunit;
 
-namespace Ncl.Common.Core.Converters.Tests
+namespace Ncl.Common.Core.Tests.Converters
 {
     public class AngleConverterTests
     {
-        private const int precison = 5;
+        private const int Precision = 5;
 
         [Fact]
         public void AngleConverter_ShouldConstructInstance()
@@ -49,7 +50,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.Convert(initialValue, from, to);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Fact]
@@ -63,7 +64,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToRadian(expected, AngleUoM.Radian);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Theory]
@@ -78,7 +79,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToRadian(initialValue, from);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Fact]
@@ -92,7 +93,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToDegree(expected, AngleUoM.Degree);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Theory]
@@ -107,7 +108,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToDegree(initialValue, from);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Fact]
@@ -121,7 +122,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToRevolution(expected, AngleUoM.Revolution);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
 
         [Theory]
@@ -136,7 +137,7 @@ namespace Ncl.Common.Core.Converters.Tests
             double actual = converter.ToRevolution(initialValue, from);
 
             //Assert
-            Assert.Equal(expected, actual, precison);
+            Assert.Equal(expected, actual, Precision);
         }
     }
 }
