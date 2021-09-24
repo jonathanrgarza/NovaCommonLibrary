@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,7 +24,8 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     The exception message for attempting to write a header after the first row.
         /// </summary>
-        protected const string HeaderRowWrittenMsg = "The first row has already been written. Can not write a header entry";
+        protected const string HeaderRowWrittenMsg =
+            "The first row has already been written. Can not write a header entry";
 
         /// <summary>
         ///     The double quote (") character.
@@ -35,21 +35,12 @@ namespace Ncl.Common.Csv
         protected readonly bool _leaveOpen;
         protected readonly TextWriter _stream;
         protected int _fieldPosition;
-        private IFormatProvider _formatProvider;
         protected List<string> _headers;
-
-        private bool _isDisposed;
         protected int _rowsWritten;
         protected char _separator = ',';
 
-        /// <summary>
-        ///     Initializes a new instance of <see cref="CsvStreamWriter" />.
-        /// </summary>
-        /// <param name="stream">The underlying stream to use.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
-        public CsvStreamWriter(TextWriter stream) : this(stream, false)
-        {
-        }
+        private IFormatProvider _formatProvider;
+        private bool _isDisposed;
 
         /// <summary>
         ///     Initializes a new instance of <see cref="CsvStreamWriter" />.
@@ -59,7 +50,7 @@ namespace Ncl.Common.Csv
         ///     Should the given stream be left open when this instance is disposed/closed.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
-        public CsvStreamWriter(TextWriter stream, bool leaveOpen)
+        public CsvStreamWriter(TextWriter stream, bool leaveOpen = false)
         {
             _stream = stream ?? throw new ArgumentNullException(nameof(stream));
             _leaveOpen = leaveOpen;
@@ -73,25 +64,27 @@ namespace Ncl.Common.Csv
         ///     The file path to write to.
         ///     Will create the file if it does not exist.
         /// </param>
-        /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
-        public CsvStreamWriter(string path) : this(path, false)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of <see cref="CsvStreamWriter" />.
-        /// </summary>
-        /// <param name="path">
-        ///     The file path to write to.
-        ///     Will create the file if it does not exist.
-        /// </param>
         /// <param name="append">Should the stream append content to the file.</param>
         /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
-        public CsvStreamWriter(string path, bool append)
+        public CsvStreamWriter(string path, bool append = false)
         {
             _stream = new StreamWriter(path, append);
             _formatProvider = Thread.CurrentThread.CurrentCulture;
         }
+
+        /// <summary>
+        ///     Gets the field position in the current row.
+        /// </summary>
+        public int FieldPosition
+        {
+            get => _fieldPosition;
+            protected set => _fieldPosition = value;
+        }
+
+        /// <summary>
+        ///     Gets if the first row has been written. Special as it can optionally be a header row.
+        /// </summary>
+        public bool FirstRowWritten => _rowsWritten > 0;
 
         /// <summary>
         ///     Gets/Sets the format provider.
@@ -116,6 +109,25 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
+        ///     Gets if the a header row has been written.
+        /// </summary>
+        public bool HeaderRowWritten => _rowsWritten > 0 && (_headers?.Count ?? 0) > 0;
+
+        /// <summary>
+        ///     The headers written by this stream. Default value is null when no headers have been written.
+        /// </summary>
+        public IReadOnlyList<string> Headers => _headers?.AsReadOnly();
+
+        /// <summary>
+        ///     Gets the rows written for the current stream.
+        /// </summary>
+        public int RowsWritten
+        {
+            get => _rowsWritten;
+            protected set => _rowsWritten = value;
+        }
+
+        /// <summary>
         ///     Gets/Sets the separator character.
         /// </summary>
         /// <exception cref="ArgumentException">value is equal to a quotation mark ("), return feed (\r) or newline character (\n).</exception>
@@ -133,39 +145,6 @@ namespace Ncl.Common.Csv
                 _separator = value;
             }
         }
-
-        /// <summary>
-        ///     Gets the field position in the current row.
-        /// </summary>
-        public int FieldPosition
-        {
-            get => _fieldPosition;
-            protected set => _fieldPosition = value;
-        }
-
-        /// <summary>
-        ///     Gets the rows written for the current stream.
-        /// </summary>
-        public int RowsWritten
-        {
-            get => _rowsWritten;
-            protected set => _rowsWritten = value;
-        }
-
-        /// <summary>
-        ///     Gets if the first row has been written. Special as it can optionally be a header row.
-        /// </summary>
-        public bool FirstRowWritten => _rowsWritten > 0;
-
-        /// <summary>
-        ///     Gets if the a header row has been written.
-        /// </summary>
-        public bool HeaderRowWritten => _rowsWritten > 0 && (_headers?.Count ?? 0) > 0;
-
-        /// <summary>
-        ///     The headers written by this stream. Default value is null when no headers have been written.
-        /// </summary>
-        public IReadOnlyList<string> Headers => _headers?.AsReadOnly();
 
         /// <inheritdoc />
         public void Dispose()
@@ -187,7 +166,6 @@ namespace Ncl.Common.Csv
             if (result)
                 return cvsStream;
 
-            Debug.Assert(ex != null, "Had a failed result but no exception");
             if (ex == null)
             {
                 //Shouldn't happen
@@ -325,7 +303,8 @@ namespace Ncl.Common.Csv
                 return value;
 
             bool needsEscaping = value.Any(
-                character => character == '\n' || character == '\r' || character == DoubleQuoteChar || character == Separator);
+                character => character == '\n' || character == '\r' || character == DoubleQuoteChar ||
+                             character == Separator);
 
             if (needsEscaping == false)
                 return value;
@@ -1255,7 +1234,8 @@ namespace Ncl.Common.Csv
         /// <exception cref="InvalidOperationException">
         ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
         /// </exception>
-        protected virtual async Task<CsvStreamWriter> WriteUnescapedEntryAsync(StringBuilder buffer, bool isHeader = false)
+        protected virtual async Task<CsvStreamWriter> WriteUnescapedEntryAsync(StringBuilder buffer,
+            bool isHeader = false)
         {
             if (_isDisposed)
                 throw new ObjectDisposedException(nameof(CsvStreamWriter));
