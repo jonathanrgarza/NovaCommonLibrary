@@ -701,7 +701,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="object" /> to the stream as a field entry.
+        ///     Writes an <see cref="object" /> to the stream as a field entry.
         ///     The <paramref name="value" /> will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -719,7 +719,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="object" /> to the stream as a field entry asynchronously.
+        ///     Writes an <see cref="object" /> to the stream as a field entry asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
