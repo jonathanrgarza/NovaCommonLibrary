@@ -22,10 +22,21 @@ namespace Ncl.Common.Csv
         public const string NewLine = "\r\n";
 
         /// <summary>
+        ///     The default separator character, a comma.
+        /// </summary>
+        public const char DefaultSeparator = ',';
+
+        /// <summary>
         ///     The exception message for attempting to write a header after the first row.
         /// </summary>
         protected const string HeaderRowWrittenMsg =
             "The first row has already been written. Can not write a header entry";
+
+        /// <summary>
+        ///     The exception message when given an invalid separator character.
+        /// </summary>
+        protected const string InvalidSeparatorCharacterMsg =
+            "Separator value can not be a quotation mark (\"), return feed (\\r) or newline character (\\n)";
 
         /// <summary>
         ///     The double quote (") character.
@@ -37,7 +48,7 @@ namespace Ncl.Common.Csv
         protected int _fieldPosition;
         protected List<string> _headers;
         protected int _rowsWritten;
-        protected char _separator = ',';
+        protected char _separator;
 
         private IFormatProvider _formatProvider;
         private bool _isDisposed;
@@ -47,14 +58,29 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="stream">The underlying stream to use.</param>
         /// <param name="leaveOpen">
-        ///     Should the given stream be left open when this instance is disposed/closed.
+        ///     Should the given stream be left open when this instance is disposed/closed. Defaults to false.
+        /// </param>
+        /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
-        public CsvStreamWriter(TextWriter stream, bool leaveOpen = false)
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="separator" /> is a double quote, return feed or a new line character.
+        /// </exception>
+        public CsvStreamWriter(TextWriter stream, bool leaveOpen = false, char separator = DefaultSeparator,
+            IFormatProvider formatProvider = null)
         {
+            if (separator == DoubleQuoteChar || separator == '\r' || separator == '\n')
+            {
+                throw new ArgumentException(InvalidSeparatorCharacterMsg, nameof(separator));
+            }
+
             _stream = stream ?? throw new ArgumentNullException(nameof(stream));
             _leaveOpen = leaveOpen;
-            _formatProvider = Thread.CurrentThread.CurrentCulture;
+            _separator = separator;
+            _formatProvider = formatProvider ?? Thread.CurrentThread.CurrentCulture;
         }
 
         /// <summary>
@@ -65,11 +91,24 @@ namespace Ncl.Common.Csv
         ///     Will create the file if it does not exist.
         /// </param>
         /// <param name="append">Should the stream append content to the file.</param>
+        /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
-        public CsvStreamWriter(string path, bool append = false)
+        public CsvStreamWriter(string path, bool append = false, char separator = DefaultSeparator,
+            IFormatProvider formatProvider = null)
         {
+            if (separator == DoubleQuoteChar || separator == '\r' || separator == '\n')
+            {
+                throw new ArgumentException(InvalidSeparatorCharacterMsg, nameof(separator));
+            }
+
             _stream = new StreamWriter(path, append);
             _formatProvider = Thread.CurrentThread.CurrentCulture;
+            _separator = separator;
+            _formatProvider = formatProvider ?? Thread.CurrentThread.CurrentCulture;
         }
 
         /// <summary>
@@ -134,7 +173,7 @@ namespace Ncl.Common.Csv
         public char Separator
         {
             get => _separator;
-            set
+            protected set
             {
                 if (value == DoubleQuoteChar || value == '\r' || value == '\n')
                 {
