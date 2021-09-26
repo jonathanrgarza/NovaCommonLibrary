@@ -197,11 +197,22 @@ namespace Ncl.Common.Csv
         ///     Creates a new <see cref="CsvStreamWriter" /> instance using the given stream.
         /// </summary>
         /// <param name="stream">The stream to use.</param>
+        /// <param name="leaveOpen">
+        ///     Should the given stream be left open when this instance is disposed/closed. Defaults to false.
+        /// </param>
+        /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
         /// <returns>The new instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
-        public static CsvStreamWriter Create(TextWriter stream)
+        public static CsvStreamWriter Create(TextWriter stream, bool leaveOpen = false,
+            char separator = DefaultSeparator,
+            IFormatProvider formatProvider = null)
         {
-            bool result = TryCreate(stream, out Exception ex, out CsvStreamWriter cvsStream);
+            bool result = TryCreate(stream, leaveOpen, separator, formatProvider, out Exception ex,
+                out CsvStreamWriter cvsStream);
             if (result)
                 return cvsStream;
 
@@ -219,10 +230,20 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="stream">The stream to use.</param>
         /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
+        /// <param name="leaveOpen">
+        ///     Should the given stream be left open when this instance is disposed/closed. Defaults to false.
+        /// </param>
+        /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
         /// <returns>The new instance or null on error.</returns>
-        public static CsvStreamWriter Create(TextWriter stream, out Exception ex)
+        public static CsvStreamWriter Create(TextWriter stream, out Exception ex, bool leaveOpen = false,
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null)
         {
-            bool result = TryCreate(stream, out ex, out CsvStreamWriter cvsStream);
+            bool result = TryCreate(stream, leaveOpen, separator, formatProvider, out ex,
+                out CsvStreamWriter cvsStream);
 
             if (result)
                 return cvsStream;
@@ -235,16 +256,39 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="stream">The stream to use.</param>
         /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
-        /// <param name="cvsStream">Out: The new instance.</param>
+        /// <param name="csvStream">Out: The new instance.</param>
+        /// <param name="leaveOpen">Should the given stream be left open when this instance is disposed/closed.</param>
+        /// <param name="separator">The separator for the CSV stream.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
         /// <returns>True if a new instance was created, otherwise, false.</returns>
-        public static bool TryCreate(TextWriter stream, out Exception ex, out CsvStreamWriter cvsStream)
+        public static bool TryCreate(TextWriter stream, out Exception ex, out CsvStreamWriter csvStream,
+            bool leaveOpen = false, char separator = DefaultSeparator, IFormatProvider formatProvider = null)
+        {
+            return TryCreate(stream, leaveOpen, separator, formatProvider, out ex, out csvStream);
+        }
+
+        /// <summary>
+        ///     Tries to create a new <see cref="CsvStreamWriter" /> instance using the given stream.
+        /// </summary>
+        /// <param name="stream">The stream to use.</param>
+        /// <param name="leaveOpen">Should the given stream be left open when this instance is disposed/closed.</param>
+        /// <param name="separator">The separator for the CSV stream.</param>
+        /// <param name="formatProvider">The format provider for numeric types.</param>
+        /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
+        /// <param name="csvStream">Out: The new instance.</param>
+        /// <returns>True if a new instance was created, otherwise, false.</returns>
+        public static bool TryCreate(TextWriter stream, bool leaveOpen, char separator,
+            IFormatProvider formatProvider, out Exception ex, out CsvStreamWriter csvStream)
         {
             ex = null;
-            cvsStream = null;
+            csvStream = null;
 
             try
             {
-                cvsStream = new CsvStreamWriter(stream);
+                csvStream = new CsvStreamWriter(stream, leaveOpen, separator, formatProvider);
                 return true;
             }
             catch (Exception e)
@@ -255,11 +299,13 @@ namespace Ncl.Common.Csv
             return false;
         }
 
-        public static CsvStreamWriter Create(string path)
+        public static CsvStreamWriter Create(string path, bool append = false,
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null)
         {
-            bool result = TryCreate(path, out Exception ex, out CsvStreamWriter cvsStream);
+            bool result = TryCreate(path, append, separator, formatProvider, out Exception ex,
+                out CsvStreamWriter csvStream);
             if (result)
-                return cvsStream;
+                return csvStream;
 
             if (ex != null)
                 throw ex;
@@ -267,60 +313,30 @@ namespace Ncl.Common.Csv
             return null;
         }
 
-        public static CsvStreamWriter Create(string path, out Exception ex)
+        public static CsvStreamWriter Create(string path, out Exception ex, bool append = false,
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null)
         {
-            bool result = TryCreate(path, out ex, out CsvStreamWriter cvsStream);
+            bool result = TryCreate(path, append, separator, formatProvider, out ex, out CsvStreamWriter csvStream);
             if (result)
-                return cvsStream;
+                return csvStream;
             return null;
         }
 
-        public static bool TryCreate(string path, out Exception ex, out CsvStreamWriter cvsStream)
+        public static bool TryCreate(string path, out Exception ex, out CsvStreamWriter csvStream, bool append = false,
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null)
+        {
+            return TryCreate(path, append, separator, formatProvider, out ex, out csvStream);
+        }
+
+        public static bool TryCreate(string path, bool append, char separator,
+            IFormatProvider formatProvider, out Exception ex, out CsvStreamWriter csvStream)
         {
             ex = null;
-            cvsStream = null;
+            csvStream = null;
 
             try
             {
-                cvsStream = new CsvStreamWriter(path);
-                return true;
-            }
-            catch (Exception e)
-            {
-                ex = e;
-            }
-
-            return false;
-        }
-
-        public static CsvStreamWriter Create(string path, bool append)
-        {
-            bool result = TryCreate(path, append, out Exception ex, out CsvStreamWriter cvsStream);
-            if (result)
-                return cvsStream;
-
-            if (ex != null)
-                throw ex;
-
-            return null;
-        }
-
-        public static CsvStreamWriter Create(string path, bool append, out Exception ex)
-        {
-            bool result = TryCreate(path, append, out ex, out CsvStreamWriter cvsStream);
-            if (result)
-                return cvsStream;
-            return null;
-        }
-
-        public static bool TryCreate(string path, bool append, out Exception ex, out CsvStreamWriter cvsStream)
-        {
-            ex = null;
-            cvsStream = null;
-
-            try
-            {
-                cvsStream = new CsvStreamWriter(path, append);
+                csvStream = new CsvStreamWriter(path, append, separator, formatProvider);
                 return true;
             }
             catch (Exception e)
