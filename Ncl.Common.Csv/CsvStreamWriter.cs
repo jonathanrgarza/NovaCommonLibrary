@@ -90,7 +90,7 @@ namespace Ncl.Common.Csv
         ///     The file path to write to.
         ///     Will create the file if it does not exist.
         /// </param>
-        /// <param name="append">Should the stream append content to the file.</param>
+        /// <param name="append">Should the stream append content to the file. Defaults to false.</param>
         /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
         /// <param name="formatProvider">
         ///     The format provider for numeric types.
@@ -245,10 +245,7 @@ namespace Ncl.Common.Csv
             bool result = TryCreate(stream, leaveOpen, separator, formatProvider, out ex,
                 out CsvStreamWriter cvsStream);
 
-            if (result)
-                return cvsStream;
-
-            return null;
+            return result ? cvsStream : null;
         }
 
         /// <summary>
@@ -263,7 +260,7 @@ namespace Ncl.Common.Csv
         ///     The format provider for numeric types.
         ///     Defaults to null which will result in the Thread's current culture being used.
         /// </param>
-        /// <returns>True if a new instance was created, otherwise, false.</returns>
+        /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
         public static bool TryCreate(TextWriter stream, out Exception ex, out CsvStreamWriter csvStream,
             bool leaveOpen = false, char separator = DefaultSeparator, IFormatProvider formatProvider = null)
         {
@@ -279,7 +276,7 @@ namespace Ncl.Common.Csv
         /// <param name="formatProvider">The format provider for numeric types.</param>
         /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
         /// <param name="csvStream">Out: The new instance.</param>
-        /// <returns>True if a new instance was created, otherwise, false.</returns>
+        /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
         public static bool TryCreate(TextWriter stream, bool leaveOpen, char separator,
             IFormatProvider formatProvider, out Exception ex, out CsvStreamWriter csvStream)
         {
@@ -299,35 +296,97 @@ namespace Ncl.Common.Csv
             return false;
         }
 
+        /// <summary>
+        ///     Creates a new <see cref="CsvStreamWriter" /> instance using the given file path.
+        /// </summary>
+        /// <param name="path">
+        ///     The file path to write to.
+        ///     Will create the file if it does not exist.
+        /// </param>
+        /// <param name="append">Should the stream append content to the file. Defaults to false.</param>
+        /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
+        /// <returns>The new instance of <see cref="CsvStreamWriter" />.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
+        /// <exception cref="Exception">Thrown if an unexpected error occurs.</exception>
         public static CsvStreamWriter Create(string path, bool append = false,
             char separator = DefaultSeparator, IFormatProvider formatProvider = null)
         {
             bool result = TryCreate(path, append, separator, formatProvider, out Exception ex,
                 out CsvStreamWriter csvStream);
+
             if (result)
                 return csvStream;
 
             if (ex != null)
                 throw ex;
 
-            return null;
+            throw new Exception("Unexpected error occured while trying to create a new CsvStreamWriter");
         }
 
+        /// <summary>
+        ///     Creates a new <see cref="CsvStreamWriter" /> instance using the given file path.
+        /// </summary>
+        /// <param name="path">
+        ///     The file path to write to.
+        ///     Will create the file if it does not exist.
+        /// </param>
+        /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
+        /// <param name="append">Should the stream append content to the file. Defaults to false.</param>
+        /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
+        /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
         public static CsvStreamWriter Create(string path, out Exception ex, bool append = false,
             char separator = DefaultSeparator, IFormatProvider formatProvider = null)
         {
             bool result = TryCreate(path, append, separator, formatProvider, out ex, out CsvStreamWriter csvStream);
-            if (result)
-                return csvStream;
-            return null;
+            return result ? csvStream : null;
         }
 
+        /// <summary>
+        ///     Tries to create a new <see cref="CsvStreamWriter" /> instance using the given file path.
+        /// </summary>
+        /// <param name="path">
+        ///     The file path to write to.
+        ///     Will create the file if it does not exist.
+        /// </param>
+        /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
+        /// <param name="csvStream">Out: The new instance of <see cref="CsvStreamWriter" /> or null on error.</param>
+        /// <param name="append">Should the stream append content to the file. Defaults to false.</param>
+        /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
+        /// <returns>True if the instance of <see cref="CsvStreamWriter" /> was created, otherwise, false.</returns>
         public static bool TryCreate(string path, out Exception ex, out CsvStreamWriter csvStream, bool append = false,
             char separator = DefaultSeparator, IFormatProvider formatProvider = null)
         {
             return TryCreate(path, append, separator, formatProvider, out ex, out csvStream);
         }
 
+        /// <summary>
+        ///     Tries to create a new <see cref="CsvStreamWriter" /> instance using the given file path.
+        /// </summary>
+        /// <param name="path">
+        ///     The file path to write to.
+        ///     Will create the file if it does not exist.
+        /// </param>
+        /// <param name="append">Should the stream append content to the file. Defaults to false.</param>
+        /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
+        /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
+        /// <param name="csvStream">Out: The new instance of <see cref="CsvStreamWriter" /> or null on error.</param>
+        /// <returns>True if the instance of <see cref="CsvStreamWriter" /> was created, otherwise, false.</returns>
         public static bool TryCreate(string path, bool append, char separator,
             IFormatProvider formatProvider, out Exception ex, out CsvStreamWriter csvStream)
         {
