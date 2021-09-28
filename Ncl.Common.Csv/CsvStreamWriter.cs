@@ -45,9 +45,7 @@ namespace Ncl.Common.Csv
 
         protected readonly bool _leaveOpen;
         protected readonly TextWriter _stream;
-        protected int _fieldPosition;
         protected List<string> _headers;
-        protected int _rowsWritten;
         protected char _separator;
 
         private IFormatProvider _formatProvider;
@@ -114,16 +112,12 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Gets the field position in the current row.
         /// </summary>
-        public int FieldPosition
-        {
-            get => _fieldPosition;
-            protected set => _fieldPosition = value;
-        }
+        public int FieldPosition { get; protected set; }
 
         /// <summary>
         ///     Gets if the first row has been written. Special as it can optionally be a header row.
         /// </summary>
-        public bool FirstRowWritten => _rowsWritten > 0;
+        public bool FirstRowWritten => RowsWritten > 0;
 
         /// <summary>
         ///     Gets/Sets the format provider.
@@ -150,7 +144,7 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Gets if the a header row has been written.
         /// </summary>
-        public bool HeaderRowWritten => _rowsWritten > 0 && (_headers?.Count ?? 0) > 0;
+        public bool HeaderRowWritten => RowsWritten > 0 && (_headers?.Count ?? 0) > 0;
 
         /// <summary>
         ///     The headers written by this stream. Default value is null when no headers have been written.
@@ -158,13 +152,15 @@ namespace Ncl.Common.Csv
         public IReadOnlyList<string> Headers => _headers?.AsReadOnly();
 
         /// <summary>
+        ///     Gets the maximum field count written for the rows.
+        ///     This property is only updated when a row is finished.
+        /// </summary>
+        public int MaxFieldCount { get; protected set; }
+
+        /// <summary>
         ///     Gets the rows written for the current stream.
         /// </summary>
-        public int RowsWritten
-        {
-            get => _rowsWritten;
-            protected set => _rowsWritten = value;
-        }
+        public int RowsWritten { get; protected set; }
 
         /// <summary>
         ///     Gets/Sets the separator character.
@@ -730,8 +726,9 @@ namespace Ncl.Common.Csv
         public CsvStreamWriter WriteRowEnd()
         {
             _stream.Write(NewLine);
-            _fieldPosition = 0;
-            _rowsWritten++;
+            MaxFieldCount = FieldPosition;
+            FieldPosition = 0;
+            RowsWritten++;
             return this;
         }
 
@@ -745,8 +742,9 @@ namespace Ncl.Common.Csv
         public async Task<CsvStreamWriter> WriteRowEndAsync()
         {
             await _stream.WriteAsync(NewLine).ConfigureAwait(false);
-            _fieldPosition = 0;
-            _rowsWritten++;
+            MaxFieldCount = FieldPosition;
+            FieldPosition = 0;
+            RowsWritten++;
             return this;
         }
 
@@ -1243,13 +1241,13 @@ namespace Ncl.Common.Csv
             if (escapedText == null)
                 return this;
 
-            if (_fieldPosition != 0)
+            if (FieldPosition != 0)
             {
                 _stream.Write(Separator);
             }
 
             _stream.Write(escapedText);
-            _fieldPosition++;
+            FieldPosition++;
             return this;
         }
 
@@ -1278,7 +1276,7 @@ namespace Ncl.Common.Csv
             if (isHeader == false && FirstRowWritten == false && _headers?.Count > 0)
             {
                 //Move to the next row since this is a field entry and the header row isn't complete
-                await WriteRowEndAsync();
+                await WriteRowEndAsync().ConfigureAwait(false);
             }
 
             string escapedText = EscapeField(value);
@@ -1286,13 +1284,13 @@ namespace Ncl.Common.Csv
             if (escapedText == null)
                 return this;
 
-            if (_fieldPosition != 0)
+            if (FieldPosition != 0)
             {
                 await _stream.WriteAsync(Separator).ConfigureAwait(false);
             }
 
             await _stream.WriteAsync(escapedText).ConfigureAwait(false);
-            _fieldPosition++;
+            FieldPosition++;
             return this;
         }
 
@@ -1320,14 +1318,14 @@ namespace Ncl.Common.Csv
             if (escapedText == null)
                 return this;
 
-            if (_fieldPosition != 0)
+            if (FieldPosition != 0)
             {
                 _stream.Write(Separator);
             }
 
             _stream.Write(escapedText);
 
-            _fieldPosition++;
+            FieldPosition++;
             return this;
         }
 
@@ -1365,14 +1363,14 @@ namespace Ncl.Common.Csv
             if (escapedText == null)
                 return this;
 
-            if (_fieldPosition != 0)
+            if (FieldPosition != 0)
             {
                 await _stream.WriteAsync(Separator).ConfigureAwait(false);
             }
 
             await _stream.WriteAsync(escapedText).ConfigureAwait(false);
 
-            _fieldPosition++;
+            FieldPosition++;
             return this;
         }
 
