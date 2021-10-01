@@ -753,6 +753,13 @@ namespace Ncl.Common.Csv
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         public CsvStreamWriter WriteRowEnd()
         {
+            VerifyRowEndIntegrity(out string fieldsToAdd);
+
+            if (fieldsToAdd != null)
+            {
+                _stream.Write(fieldsToAdd);
+            }
+
             _stream.Write(NewLine);
             MaxFieldCount = FieldPosition;
             FieldPosition = 0;
@@ -769,6 +776,13 @@ namespace Ncl.Common.Csv
         /// </returns>
         public async Task<CsvStreamWriter> WriteRowEndAsync()
         {
+            VerifyRowEndIntegrity(out string fieldsToAdd);
+
+            if (fieldsToAdd != null)
+            {
+                await _stream.WriteAsync(fieldsToAdd).ConfigureAwait(false);
+            }
+
             await _stream.WriteAsync(NewLine).ConfigureAwait(false);
             MaxFieldCount = FieldPosition;
             FieldPosition = 0;
@@ -1400,6 +1414,44 @@ namespace Ncl.Common.Csv
 
             FieldPosition++;
             return this;
+        }
+
+        protected virtual void VerifyRowEndIntegrity(out string fieldsToAdd)
+        {
+            fieldsToAdd = null;
+
+            if (IntegrityMode == IntegrityMode.None)
+                return;
+
+            //Perform integrity checks
+
+            //Check that something was written for the first row; else its a failure since the first row can't be empty
+            if (RowsWritten == 0 && FieldPosition == 0)
+                throw new IntegrityViolatedException("Can not write an empty first row");
+
+            //Writing the first row; must be valid since this row determines the field length
+            if (RowsWritten == 0)
+                return;
+
+            if (FieldPosition == MaxFieldCount)
+                return;
+
+            bool isFieldsLessThanPrevious = FieldPosition < MaxFieldCount;
+
+            if (IntegrityMode == IntegrityMode.Strict)
+            {
+                //Throw exception if strict mode
+                string exceptionMessage = isFieldsLessThanPrevious
+                    ? $"Row's field count ({FieldPosition}) is less than the previous row's field count {MaxFieldCount}"
+                    : $"Row's field count ({FieldPosition}) is greater than the previous row's field count {MaxFieldCount}";
+                throw new IntegrityViolatedException(exceptionMessage);
+            }
+
+            if (IntegrityMode != IntegrityMode.Loose || !isFieldsLessThanPrevious)
+                return;
+
+            int difference = MaxFieldCount - FieldPosition;
+            fieldsToAdd = new string(',', difference);
         }
 
         /// <summary>
