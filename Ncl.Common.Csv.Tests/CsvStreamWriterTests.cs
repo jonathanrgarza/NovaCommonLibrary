@@ -262,6 +262,125 @@ namespace Ncl.Common.Csv.Tests
             Assert.IsType<ArgumentException>(actual);
         }
 
+        [Fact]
+        public void Create2_WithNullString_ShouldThrowException()
+        {
+            // Arrange
+            // Act
+            void TestCode()
+            {
+                _ = CsvStreamWriter.Create((string) null);
+            }
+
+            // Assert
+            Assert.Throws<ArgumentNullException>(TestCode);
+        }
+
+        [Fact]
+        public void Create2_WithInvalidSeparator_ShouldThrowException()
+        {
+            // Arrange
+            // Act
+            void TestCode()
+            {
+                _ = CsvStreamWriter.Create((string) null, separator: '\n');
+            }
+
+            // Assert
+            Assert.Throws<ArgumentException>(TestCode);
+        }
+
+        [Fact]
+        public void Create3_WithNullString_ShouldSetExceptionArgument()
+        {
+            // Arrange
+            // Act
+            _ = CsvStreamWriter.Create((string) null, out Exception actual);
+
+            // Assert
+            Assert.IsType<ArgumentNullException>(actual);
+        }
+
+        [Fact]
+        public void Create3_WithInvalidSeparator_ShouldSetExceptionArgument()
+        {
+            // Arrange
+            // Act
+            _ = CsvStreamWriter.Create((string) null, out Exception actual, separator: '\n');
+
+            // Assert
+            Assert.IsType<ArgumentException>(actual);
+        }
+
+        [Fact]
+        public void TryCreate1_WithNullString_ShouldReturnFalse()
+        {
+            // Arrange
+            // Act
+            bool actual = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter _);
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryCreate1_WithNullString_ShouldSetInstanceArgumentToNull()
+        {
+            // Arrange
+            // Act
+            bool _ = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter actual);
+
+            // Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public void TryCreate1_WithNullString_ShouldSetExceptionArgument()
+        {
+            // Arrange
+            // Act
+            bool _ = CsvStreamWriter.TryCreate((string) null, out Exception actual, out CsvStreamWriter _);
+
+            // Assert
+            Assert.IsType<ArgumentNullException>(actual);
+        }
+
+        [Fact]
+        public void TryCreate1_WithInvalidSeparator_ShouldReturnFalse()
+        {
+            // Arrange
+            // Act
+            bool actual = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter _,
+                separator: '\n');
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryCreate1_WithInvalidSeparator_ShouldSetInstanceArgumentToNull()
+        {
+            // Arrange
+            // Act
+            bool _ = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter actual,
+                separator: '\n');
+
+            // Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public void TryCreate1_WithInvalidSeparator_ShouldSetExceptionArgument()
+        {
+            // Arrange
+            // Act
+            bool _ = CsvStreamWriter.TryCreate((string) null, out Exception actual, out CsvStreamWriter _,
+                separator: '\n');
+
+            // Assert
+            Assert.IsType<ArgumentException>(actual);
+        }
+
         private static CsvStreamWriter GetDefaultInstance(IntegrityMode integrityMode = IntegrityMode.Strict)
         {
             return new CsvStreamWriter(GetDefaultStream(), integrityMode: integrityMode);
