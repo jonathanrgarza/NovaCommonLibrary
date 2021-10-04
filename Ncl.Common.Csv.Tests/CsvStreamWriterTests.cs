@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using Xunit;
 
@@ -6,6 +7,11 @@ namespace Ncl.Common.Csv.Tests
 {
     public class CsvStreamWriterTests
     {
+        private const string ValidHeader = "header";
+        private const string NeedsEscapingHeader = "header, more";
+
+        private static readonly CultureInfo _englishUsCulture = new("en-US");
+
         [Fact]
         public void CsvStreamWriter_WithValidArguments_ShouldCreateInstance()
         {
@@ -381,20 +387,110 @@ namespace Ncl.Common.Csv.Tests
             Assert.IsType<ArgumentException>(actual);
         }
 
+        [Fact]
+        public void WriteHeader_WithValidString_ShouldWriteHeader()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteHeader(ValidHeader);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(ValidHeader, actual);
+        }
+        
+        [Fact]
+        public void WriteHeader_WithUnescapedString_ShouldWriteEscapedHeader()
+        {
+            string expected = $"\"{NeedsEscapingHeader}\""; 
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteHeader(NeedsEscapingHeader);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteHeader_WithNullString_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeader(null);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteHeader_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+            csvStream.WriteHeader(ValidHeader);
+            csvStream.WriteRowEnd();
+            
+            // Act
+            void TestCode()
+            {
+                csvStream.WriteHeader(ValidHeader);
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
+        }
+
+        private static string GetString(Stream stream)
+        {
+            long initialPosition = stream.Position;
+
+            //Reset to beginning
+            stream.Position = 0;
+
+            using var streamReader = new StreamReader(stream, leaveOpen: true);
+            string text = streamReader.ReadToEnd();
+
+            stream.Position = initialPosition;
+
+            return text;
+        }
+
         private static CsvStreamWriter GetDefaultInstance(IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            return new CsvStreamWriter(GetDefaultStream(), integrityMode: integrityMode);
+            return new CsvStreamWriter(GetDefaultStream(),
+                formatProvider: _englishUsCulture,
+                integrityMode: integrityMode);
+        }
+
+        private static CsvStreamWriter GetDefaultInstance(out MemoryStream underlyingStream,
+            IntegrityMode integrityMode = IntegrityMode.Strict)
+        {
+            StreamWriter streamWriter = GetDefaultStream(out underlyingStream);
+            return new CsvStreamWriter(streamWriter,
+                formatProvider: _englishUsCulture,
+                integrityMode: integrityMode);
         }
 
         private static StreamWriter GetDefaultStream()
         {
-            return new StreamWriter(new MemoryStream());
+            return new StreamWriter(new MemoryStream()) { AutoFlush = true };
         }
 
         private static StreamWriter GetDefaultStream(out MemoryStream underlyingStream)
         {
             underlyingStream = new MemoryStream();
-            return new StreamWriter(underlyingStream);
+            return new StreamWriter(underlyingStream) { AutoFlush = true };
         }
     }
 }

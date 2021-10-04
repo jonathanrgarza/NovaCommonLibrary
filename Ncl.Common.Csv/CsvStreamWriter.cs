@@ -435,7 +435,7 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value being escaped, if necessary.</param>
         /// <returns>The escaped field value, or the original value.</returns>
-        public virtual string EscapeField(string value)
+        protected virtual string EscapeField(string value)
         {
             if (string.IsNullOrEmpty(value))
                 return value;
@@ -474,7 +474,7 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="buffer">The buffer being escaped, if necessary.</param>
         /// <returns>The escaped field value, or the original value.</returns>
-        public virtual string EscapeField(StringBuilder buffer)
+        protected virtual string EscapeField(StringBuilder buffer)
         {
             if (buffer == null)
                 return null;
@@ -506,6 +506,22 @@ namespace Ncl.Common.Csv
             buffer.Append(DoubleQuoteChar);
 
             return buffer.ToString();
+        }
+
+        /// <summary>
+        ///     Flushes the underlying stream's buffers.
+        /// </summary>
+        public void Flush()
+        {
+            _stream.Flush();
+        }
+
+        /// <summary>
+        ///     Asynchronously flushes the underlying stream's buffers.
+        /// </summary>
+        public Task FlushAsync()
+        {
+            return _stream.FlushAsync();
         }
 
         /// <summary>
