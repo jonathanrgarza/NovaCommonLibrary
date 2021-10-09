@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Ncl.Common.Csv.Tests
@@ -386,6 +387,147 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
+        
+        [Fact]
+        public void HeaderRowWritten_WithHeaderRowWritten_ShouldReturnTrue()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeader(ValidHeader);
+            csvStream.WriteRowEnd();
+            
+            // Assert
+            Assert.True(csvStream.HeaderRowWritten);
+        }
+
+        [Fact]
+        public void HeaderRowWritten_WithHeaderWrittenButRowSame_ShouldReturnFalse()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeader(ValidHeader);
+
+            // Assert
+            Assert.False(csvStream.HeaderRowWritten);
+        }
+        
+        [Fact]
+        public void HeaderRowWritten_WithNoHeaderWrittenAndNextRow_ShouldReturnFalse()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteField(ValidHeader);
+            csvStream.WriteRowEnd();
+
+            // Assert
+            Assert.False(csvStream.HeaderRowWritten);
+        }
+        
+        [Fact]
+        public void HeaderRowWritten_WithNothingWritten_ShouldReturnFalse()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+
+            // Assert
+            Assert.False(csvStream.HeaderRowWritten);
+        }
+
+        [Fact]
+        public void Headers_WithNoHeadersWritten_ShouldBeNull()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+
+            // Assert
+            Assert.Null(csvStream.Headers);
+        }
+        
+        [Fact]
+        public void Headers_WithOneHeaderWritten_ShouldContainOneHeader()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeader(ValidHeader);
+
+            // Assert
+            Assert.NotNull(csvStream.Headers);
+            Assert.Equal(ValidHeader, csvStream.Headers[0]);
+        }
+        
+        [Fact]
+        public void RowsWritten_WithNothingWritten_ShouldReturnZero()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+
+            // Assert
+            Assert.Equal(0, csvStream.RowsWritten);
+        }
+        
+        [Fact]
+        public void RowsWritten_WithARowWritten_ShouldReturnOne()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeader(ValidHeader);
+            csvStream.WriteRowEnd();
+            
+            // Assert
+            Assert.Equal(1, csvStream.RowsWritten);
+        }
+
+        [Fact]
+        public void Flush_WithContentWritten_ShouldWriteContentToUnderlyingStream()
+        {
+            // Arrange
+            using MemoryStream memoryStream = new();
+            using StreamWriter streamWriter = new(memoryStream);
+            using CsvStreamWriter csvStream = new(streamWriter);
+
+            // Act
+            csvStream.WriteHeader(ValidHeader);
+            csvStream.Flush();
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(ValidHeader, actual);
+        }
+        
+        [Fact]
+        public async Task FlushAsync_WithContentWritten_ShouldWriteContentToUnderlyingStream()
+        {
+            // Arrange
+            await using MemoryStream memoryStream = new();
+            await using StreamWriter streamWriter = new(memoryStream);
+            using CsvStreamWriter csvStream = new(streamWriter);
+
+            // Act
+            await csvStream.WriteHeaderAsync(ValidHeader).ConfigureAwait(false);
+            await csvStream.FlushAsync().ConfigureAwait(false);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(ValidHeader, actual);
+        }
 
         [Fact]
         public void WriteHeader_WithValidString_ShouldWriteHeader()
@@ -401,11 +543,11 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(ValidHeader, actual);
         }
-        
+
         [Fact]
         public void WriteHeader_WithUnescapedString_ShouldWriteEscapedHeader()
         {
-            string expected = $"\"{NeedsEscapingHeader}\""; 
+            string expected = $"\"{NeedsEscapingHeader}\"";
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
@@ -417,7 +559,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteHeader_WithNullString_ShouldDoNothing()
         {
@@ -432,7 +574,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteHeader_WithValidHeaderAfterFirstRow_ShouldThrowException()
         {
@@ -440,7 +582,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
             csvStream.WriteHeader(ValidHeader);
             csvStream.WriteRowEnd();
-            
+
             // Act
             void TestCode()
             {
@@ -450,6 +592,89 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<InvalidOperationException>(TestCode);
         }
+
+        [Fact]
+        public async Task WriteHeaderAsync_WithValidString_ShouldWriteHeader()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteHeaderAsync(ValidHeader).ConfigureAwait(false);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(ValidHeader, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeaderAsync_WithUnescapedString_ShouldWriteEscapedHeader()
+        {
+            string expected = $"\"{NeedsEscapingHeader}\"";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteHeaderAsync(NeedsEscapingHeader).ConfigureAwait(false);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeaderAsync_WithNullString_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            await csvStream.WriteHeaderAsync(null).ConfigureAwait(false);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeaderAsync_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+            await csvStream.WriteHeaderAsync(ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteRowEndAsync().ConfigureAwait(false);
+
+            // Act
+            async Task TestCode()
+            {
+                // ReSharper disable once AccessToDisposedClosure
+                await csvStream.WriteHeaderAsync(ValidHeader).ConfigureAwait(false);
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
+        }
+        
+        [Fact]
+        public void WriteHeaderRow_WithValidStrings_ShouldWriteHeaderRow()
+        {
+            string expected = $"{ValidHeader},{ValidHeader}\r\n";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteHeaderRow(new []{ValidHeader, ValidHeader});
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        //Utility functions
 
         private static string GetString(Stream stream)
         {
