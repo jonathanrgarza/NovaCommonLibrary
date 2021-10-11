@@ -604,16 +604,16 @@ namespace Ncl.Common.Csv
 
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
-
-            if (_headers == null)
-            {
-                _headers = new List<string>();
-            }
-
+            
             foreach (string header in headers)
             {
                 if (header == null)
                     continue;
+                
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
 
                 _headers.Add(header);
                 WriteUnescapedEntry(header, true);

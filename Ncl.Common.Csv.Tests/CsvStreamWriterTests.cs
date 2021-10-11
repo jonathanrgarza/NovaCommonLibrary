@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -387,7 +388,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void HeaderRowWritten_WithHeaderRowWritten_ShouldReturnTrue()
         {
@@ -397,7 +398,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             csvStream.WriteHeader(ValidHeader);
             csvStream.WriteRowEnd();
-            
+
             // Assert
             Assert.True(csvStream.HeaderRowWritten);
         }
@@ -414,7 +415,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.False(csvStream.HeaderRowWritten);
         }
-        
+
         [Fact]
         public void HeaderRowWritten_WithNoHeaderWrittenAndNextRow_ShouldReturnFalse()
         {
@@ -428,7 +429,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.False(csvStream.HeaderRowWritten);
         }
-        
+
         [Fact]
         public void HeaderRowWritten_WithNothingWritten_ShouldReturnFalse()
         {
@@ -452,7 +453,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(csvStream.Headers);
         }
-        
+
         [Fact]
         public void Headers_WithOneHeaderWritten_ShouldContainOneHeader()
         {
@@ -466,7 +467,7 @@ namespace Ncl.Common.Csv.Tests
             Assert.NotNull(csvStream.Headers);
             Assert.Equal(ValidHeader, csvStream.Headers[0]);
         }
-        
+
         [Fact]
         public void RowsWritten_WithNothingWritten_ShouldReturnZero()
         {
@@ -478,7 +479,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(0, csvStream.RowsWritten);
         }
-        
+
         [Fact]
         public void RowsWritten_WithARowWritten_ShouldReturnOne()
         {
@@ -488,7 +489,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             csvStream.WriteHeader(ValidHeader);
             csvStream.WriteRowEnd();
-            
+
             // Assert
             Assert.Equal(1, csvStream.RowsWritten);
         }
@@ -510,7 +511,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(ValidHeader, actual);
         }
-        
+
         [Fact]
         public async Task FlushAsync_WithContentWritten_ShouldWriteContentToUnderlyingStream()
         {
@@ -657,7 +658,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
         }
-        
+
         [Fact]
         public void WriteHeaderRow_WithValidStrings_ShouldWriteHeaderRow()
         {
@@ -666,14 +667,44 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            csvStream.WriteHeaderRow(new []{ValidHeader, ValidHeader});
+            csvStream.WriteHeaderRow(new[] { ValidHeader, ValidHeader });
 
             string actual = GetString(memoryStream);
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
+        [Fact]
+        public void WriteHeaders_WithNullEnumerable_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeaderRow((IEnumerable<string>) null);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteHeaders_WithEnumerableWithOnlyANullEntry_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeaderRow(new string[] { null });
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
         //Utility functions
 
         private static string GetString(Stream stream)
