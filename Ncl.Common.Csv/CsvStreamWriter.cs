@@ -604,12 +604,12 @@ namespace Ncl.Common.Csv
 
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
-            
+
             foreach (string header in headers)
             {
                 if (header == null)
                     continue;
-                
+
                 if (_headers == null)
                 {
                     _headers = new List<string>();
@@ -618,6 +618,9 @@ namespace Ncl.Common.Csv
                 _headers.Add(header);
                 WriteUnescapedEntry(header, true);
             }
+
+            if (_headers == null)
+                return this;
 
             return WriteRowEnd();
         }
@@ -645,19 +648,22 @@ namespace Ncl.Common.Csv
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
 
-            if (_headers == null)
-            {
-                _headers = new List<string>();
-            }
-
             foreach (string header in headers)
             {
                 if (header == null)
                     continue;
 
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
+
                 _headers.Add(header);
                 await WriteUnescapedEntryAsync(header, true).ConfigureAwait(false);
             }
+
+            if (_headers == null)
+                return this;
 
             return await WriteRowEndAsync().ConfigureAwait(false);
         }
@@ -683,20 +689,24 @@ namespace Ncl.Common.Csv
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
 
-            if (_headers == null)
-            {
-                _headers = new List<string>();
-            }
-
             if (header != null)
             {
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
+
                 _headers.Add(header);
                 WriteUnescapedEntry(header, true);
-            }
 
-            if (headers == null || headers.Length == 0)
+                if (headers == null || headers.Length == 0)
+                {
+                    return WriteRowEnd();
+                }
+            }
+            else if (headers.Length == 0)
             {
-                return WriteRowEnd();
+                return this;
             }
 
             foreach (string otherHeader in headers)
@@ -704,9 +714,17 @@ namespace Ncl.Common.Csv
                 if (otherHeader == null)
                     continue;
 
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
+
                 _headers.Add(otherHeader);
                 WriteUnescapedEntry(otherHeader, true);
             }
+
+            if (_headers == null)
+                return this;
 
             return WriteRowEnd();
         }
@@ -735,20 +753,25 @@ namespace Ncl.Common.Csv
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
 
-            if (_headers == null)
-            {
-                _headers = new List<string>();
-            }
 
             if (header != null)
             {
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
+
                 _headers.Add(header);
                 await WriteUnescapedEntryAsync(header, true);
-            }
 
-            if (headers == null || headers.Length == 0)
+                if (headers == null || headers.Length == 0)
+                {
+                    return await WriteRowEndAsync().ConfigureAwait(false);
+                }
+            }
+            else if (headers.Length == 0)
             {
-                return await WriteRowEndAsync().ConfigureAwait(false);
+                return this;
             }
 
             foreach (string otherHeader in headers)
@@ -756,9 +779,17 @@ namespace Ncl.Common.Csv
                 if (otherHeader == null)
                     continue;
 
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
+
                 _headers.Add(otherHeader);
                 await WriteUnescapedEntryAsync(otherHeader, true).ConfigureAwait(false);
             }
+
+            if (_headers == null)
+                return this;
 
             return await WriteRowEndAsync().ConfigureAwait(false);
         }
