@@ -704,7 +704,7 @@ namespace Ncl.Common.Csv
                     return WriteRowEnd();
                 }
             }
-            else if (headers.Length == 0)
+            else if (headers.Length == 0 || headers.Length == 1 && headers[0] == null)
             {
                 return this;
             }
@@ -769,7 +769,7 @@ namespace Ncl.Common.Csv
                     return await WriteRowEndAsync().ConfigureAwait(false);
                 }
             }
-            else if (headers.Length == 0)
+            else if (headers.Length == 0 || headers.Length == 1 && headers[0] == null)
             {
                 return this;
             }

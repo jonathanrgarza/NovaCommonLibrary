@@ -866,6 +866,21 @@ namespace Ncl.Common.Csv.Tests
         }
         
         [Fact]
+        public void WriteHeaderRow2_WithNullStringValues_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeaderRow(null, (string)null);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
         public void WriteHeaderRow2_WithThreeNullValues_ShouldDoNothing()
         {
             const int expected = 0;
@@ -970,6 +985,22 @@ namespace Ncl.Common.Csv.Tests
 
             // Act
             await csvStream.WriteHeaderRowAsync(null, null).ConfigureAwait(false);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task WriteHeaderRowAsync2_WithNullStringValues_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            // Act
+            await csvStream.WriteHeaderRowAsync(null, (string)null).ConfigureAwait(false);
             int actual = csvStream.FieldPosition;
 
             // Assert
