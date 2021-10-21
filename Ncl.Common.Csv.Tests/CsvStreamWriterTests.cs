@@ -10,10 +10,12 @@ namespace Ncl.Common.Csv.Tests
     public class CsvStreamWriterTests
     {
         private const string ValidHeader = "header";
-        private const string NeedsEscapingHeader = "header, more";
+        private const string NeedsEscapingHeader = "header,\" more";
+        private const string NeedsEscapingHeaderExpected = "\"header,\"\" more\"";
 
         private const string ValidField = "field";
-        private const string NeedsEscapingField = "field, more";
+        private const string NeedsEscapingField = "field,\" more";
+        private const string NeedsEscapingFieldExpected = "\"field,\"\" more\"";
 
         private const string SimpleFormat = "{0}";
 
@@ -553,7 +555,7 @@ namespace Ncl.Common.Csv.Tests
         [Fact]
         public void WriteHeader_WithUnescapedString_ShouldWriteEscapedHeader()
         {
-            string expected = $"\"{NeedsEscapingHeader}\"";
+            const string expected = NeedsEscapingHeaderExpected;
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
@@ -617,7 +619,7 @@ namespace Ncl.Common.Csv.Tests
         [Fact]
         public async Task WriteHeaderAsync_WithUnescapedString_ShouldWriteEscapedHeader()
         {
-            string expected = $"\"{NeedsEscapingHeader}\"";
+            const string expected = NeedsEscapingHeaderExpected;
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
@@ -1280,7 +1282,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteField_WithValidFieldValue_ShouldWriteField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1296,7 +1298,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteField_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\"";
+            const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1328,7 +1330,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldAsync_WithValidFieldValue_ShouldWriteField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1344,7 +1346,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldAsync_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\"";
+            const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1376,7 +1378,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteField2_WithValidFieldValue_ShouldWriteField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1392,7 +1394,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteField2_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\"";
+            const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1424,7 +1426,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldAsync2_WithValidFieldValue_ShouldWriteField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1440,7 +1442,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldAsync2_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\"";
+            const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1472,7 +1474,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteField3_WithValidFieldValue_ShouldWriteField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1504,7 +1506,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteField3_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\"";
+            const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1536,7 +1538,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldAsync3_WithValidFieldValue_ShouldWriteField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1568,7 +1570,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldAsync3_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\"";
+            const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -1600,7 +1602,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteField4_WithValidFieldValue_ShouldWriteField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
             char[] charArray = ValidField.ToCharArray();
 
@@ -1617,7 +1619,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteField4_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\"";
+            const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
             char[] charArray = NeedsEscapingField.ToCharArray();
 
@@ -1684,7 +1686,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldAsync4_WithValidFieldValue_ShouldWriteField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
             char[] charArray = ValidField.ToCharArray();
 
@@ -1701,7 +1703,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldAsync4_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\"";
+            const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
             char[] charArray = NeedsEscapingField.ToCharArray();
 
@@ -1768,7 +1770,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteField5_WithValidFieldValue_ShouldWriteField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
             char[] charArray = ValidField.ToCharArray();
 
@@ -1785,7 +1787,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteField5_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\"";
+            const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
             char[] charArray = NeedsEscapingField.ToCharArray();
 
@@ -1835,7 +1837,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldAsync5_WithValidFieldValue_ShouldWriteField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
             char[] charArray = ValidField.ToCharArray();
 
@@ -1852,7 +1854,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldAsync5_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\"";
+            const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
             char[] charArray = NeedsEscapingField.ToCharArray();
 
@@ -2238,7 +2240,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteFields_WithFieldValuesNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\",\"{NeedsEscapingField}\"";
+            string expected = $"{NeedsEscapingFieldExpected},{NeedsEscapingFieldExpected}";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -2302,7 +2304,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldsAsync_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\",\"{NeedsEscapingField}\"";
+            string expected = $"{NeedsEscapingFieldExpected},{NeedsEscapingFieldExpected}";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -2366,7 +2368,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteFields2_WithFieldValuesNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\",\"{NeedsEscapingField}\"";
+            string expected = $"{NeedsEscapingFieldExpected},{NeedsEscapingFieldExpected}";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -2430,7 +2432,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteFields2_WithValidFirstStringAndNullStringValue_ShouldWriteOneField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -2462,7 +2464,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldsAsync2_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\",\"{NeedsEscapingField}\"";
+            string expected = $"{NeedsEscapingFieldExpected},{NeedsEscapingFieldExpected}";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -2526,7 +2528,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldsAsync2_WithValidFirstStringAndNullStringValue_ShouldWriteOneField()
         {
             // Arrange
-            string expected = $"{ValidField}";
+            const string expected = ValidField;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -2558,7 +2560,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteFieldRow_WithFieldValuesNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\",\"{NeedsEscapingField}\"\r\n";
+            string expected = $"{NeedsEscapingFieldExpected},{NeedsEscapingFieldExpected}\r\n";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -2622,7 +2624,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldRowAsync_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\",\"{NeedsEscapingField}\"\r\n";
+            string expected = $"{NeedsEscapingFieldExpected},{NeedsEscapingFieldExpected}\r\n";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -2686,7 +2688,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteFieldRow2_WithFieldValuesNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\",\"{NeedsEscapingField}\"\r\n";
+            string expected = $"{NeedsEscapingFieldExpected},{NeedsEscapingFieldExpected}\r\n";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
@@ -2782,7 +2784,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldRowAsync2_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
-            string expected = $"\"{NeedsEscapingField}\",\"{NeedsEscapingField}\"\r\n";
+            string expected = $"{NeedsEscapingFieldExpected},{NeedsEscapingFieldExpected}\r\n";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
