@@ -15,6 +15,8 @@ namespace Ncl.Common.Csv.Tests
         private const string ValidField = "field";
         private const string NeedsEscapingField = "field, more";
 
+        private const string SimpleFormat = "{0}";
+
         private static readonly CultureInfo _englishUsCulture = new("en-US");
 
         [Fact]
@@ -1365,6 +1367,852 @@ namespace Ncl.Common.Csv.Tests
             await csvStream.WriteFieldAsync((string) null);
 
             int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField2_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            string expected = $"{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField(SimpleFormat, ValidField);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteField2_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
+        {
+            // Arrange
+            string expected = $"\"{NeedsEscapingField}\"";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField(SimpleFormat, NeedsEscapingField);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteField2_WithNullValue_ShouldDoNothing()
+        {
+            // Arrange
+            const int expected = 0;
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteField(null, null);
+
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync2_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            string expected = $"{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync(SimpleFormat, ValidField);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync2_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
+        {
+            // Arrange
+            string expected = $"\"{NeedsEscapingField}\"";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync(SimpleFormat, NeedsEscapingField);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync2_WithNullValue_ShouldDoNothing()
+        {
+            // Arrange
+            const int expected = 0;
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            await csvStream.WriteFieldAsync(null, null);
+
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField3_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            string expected = $"{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField((object)ValidField);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField3_WithValidFormattableFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField((object)1);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteField3_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
+        {
+            // Arrange
+            string expected = $"\"{NeedsEscapingField}\"";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField((object)NeedsEscapingField);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteField3_WithNullValue_ShouldDoNothing()
+        {
+            // Arrange
+            const int expected = 0;
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteField((object)null);
+
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync3_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            string expected = $"{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync((object)ValidField);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task WriteFieldAsync3_WithValidFormattableFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync((object)1);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync3_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
+        {
+            // Arrange
+            string expected = $"\"{NeedsEscapingField}\"";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync((object)NeedsEscapingField);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync3_WithNullValue_ShouldDoNothing()
+        {
+            // Arrange
+            const int expected = 0;
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            await csvStream.WriteFieldAsync((object)null);
+
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField4_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            string expected = $"{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+
+            // Act
+            csvStream.WriteField(charArray, 0, charArray.Length);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteField4_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
+        {
+            // Arrange
+            string expected = $"\"{NeedsEscapingField}\"";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = NeedsEscapingField.ToCharArray();
+
+            // Act
+            csvStream.WriteField(charArray, 0, charArray.Length);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteField4_WithNullValue_ShouldDoNothing()
+        {
+            // Arrange
+            const int expected = 0;
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteField(null, 0, 0);
+
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField4_WithInvalidIndex_ShouldThrowArgumentOutOfRangeException()
+        {
+            void TestCode()
+            {
+                // Arrange
+                using CsvStreamWriter csvStream = GetDefaultInstance();
+                
+                //Act
+                char[] charArray = NeedsEscapingField.ToCharArray();
+                csvStream.WriteField(charArray, -1, charArray.Length);
+            }
+
+            // Assert
+            Assert.Throws<ArgumentOutOfRangeException>(TestCode);
+        }
+        
+        [Fact]
+        public void WriteField4_WithInvalidCount_ShouldThrowArgumentOutOfRangeException()
+        {
+            void TestCode()
+            {
+                // Arrange
+                using CsvStreamWriter csvStream = GetDefaultInstance();
+                
+                //Act
+                char[] charArray = NeedsEscapingField.ToCharArray();
+                csvStream.WriteField(charArray, 0, charArray.Length + 1);
+            }
+
+            // Assert
+            Assert.Throws<ArgumentOutOfRangeException>(TestCode);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync4_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            string expected = $"{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+
+            // Act
+            await csvStream.WriteFieldAsync(charArray, 0, charArray.Length);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync4_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
+        {
+            // Arrange
+            string expected = $"\"{NeedsEscapingField}\"";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = NeedsEscapingField.ToCharArray();
+
+            // Act
+            await csvStream.WriteFieldAsync(charArray, 0, charArray.Length);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync4_WithNullValue_ShouldDoNothing()
+        {
+            // Arrange
+            const int expected = 0;
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            await csvStream.WriteFieldAsync(null, 0, 0);
+
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task WriteFieldAsync4_WithInvalidIndex_ShouldThrowArgumentOutOfRangeException()
+        {
+            async Task TestCode()
+            {
+                // Arrange
+                using CsvStreamWriter csvStream = GetDefaultInstance();
+                
+                //Act
+                char[] charArray = NeedsEscapingField.ToCharArray();
+                await csvStream.WriteFieldAsync(charArray, -1, charArray.Length);
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(TestCode);
+        }
+        
+        [Fact]
+        public async Task WriteFieldAsync4_WithInvalidCount_ShouldThrowArgumentOutOfRangeException()
+        {
+            async Task TestCode()
+            {
+                // Arrange
+                using CsvStreamWriter csvStream = GetDefaultInstance();
+                
+                //Act
+                char[] charArray = NeedsEscapingField.ToCharArray();
+                await csvStream.WriteFieldAsync(charArray, 0, charArray.Length + 1);
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(TestCode);
+        }
+        
+        [Fact]
+        public void WriteField5_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            string expected = $"{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+
+            // Act
+            csvStream.WriteField(charArray);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteField5_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
+        {
+            // Arrange
+            string expected = $"\"{NeedsEscapingField}\"";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = NeedsEscapingField.ToCharArray();
+
+            // Act
+            csvStream.WriteField(charArray);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteField5_WithNullValue_ShouldDoNothing()
+        {
+            // Arrange
+            const int expected = 0;
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteField((char[]) null);
+
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField5_WithEmptyFieldValue_ShouldWriteEmptyField()
+        {
+            // Arrange
+            string expected = string.Empty;
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = string.Empty.ToCharArray();
+
+            // Act
+            csvStream.WriteField(charArray);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync5_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            string expected = $"{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+
+            // Act
+            await csvStream.WriteFieldAsync(charArray);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync5_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
+        {
+            // Arrange
+            string expected = $"\"{NeedsEscapingField}\"";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = NeedsEscapingField.ToCharArray();
+
+            // Act
+            await csvStream.WriteFieldAsync(charArray);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync5_WithNullValue_ShouldDoNothing()
+        {
+            // Arrange
+            const int expected = 0;
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            await csvStream.WriteFieldAsync((char[]) null);
+
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task WriteFieldAsync5_WithEmptyFieldValue_ShouldWriteEmptyField()
+        {
+            // Arrange
+            string expected = string.Empty;
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = string.Empty.ToCharArray();
+
+            // Act
+            await csvStream.WriteFieldAsync(charArray);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField6_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "a";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField('a');
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteField6_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
+        {
+            // Arrange
+            const string expected = "\",\"";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField(',');
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync6_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "a";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync('a');
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync6_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
+        {
+            // Arrange
+            const string expected = "\",\"";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync(',');
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField7_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1.5";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField(1.5f);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync7_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1.5";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync(1.5f);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField8_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "True";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField(true);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync8_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "True";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync(true);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField9_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField(1ul);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync9_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync(1ul);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField10_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField(1u);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync10_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync(1u);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField11_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField(1L);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync11_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync(1L);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField12_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField(1);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync12_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync(1);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField13_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1.5";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField(1.5);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync13_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1.5";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync(1.5);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField14_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1.5";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteField((decimal)1.5);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync14_WithValidFieldValue_ShouldWriteField()
+        {
+            // Arrange
+            const string expected = "1.5";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteFieldAsync((decimal)1.5);
+
+            string actual = GetString(memoryStream);
 
             // Assert
             Assert.Equal(expected, actual);
