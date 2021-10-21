@@ -554,7 +554,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="string" /> to the stream as a header entry asynchronously.
+        ///     Writes a <see cref="string" /> to the stream as a header entry; asynchronously.
         ///     The <paramref name="header" /> will be escaped, if necessary.
         ///     If <paramref name="header" /> is null, nothing is written to the stream.
         /// </summary>
@@ -586,7 +586,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="IEnumerable{T}" /> to the stream as the header entries
+        ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the header entries
         ///     then moves to the start of the next row.
         ///     The headers will be escaped, if necessary.
         ///     If <paramref name="headers" /> is null, nothing is written to the stream.
@@ -627,7 +627,7 @@ namespace Ncl.Common.Csv
 
         /// <summary>
         ///     Writes a <see cref="IEnumerable{T}" /> to the stream as the header entries
-        ///     then moves to the start of the next row; asynchronously
+        ///     then moves to the start of the next row; asynchronously.
         ///     The headers will be escaped, if necessary.
         ///     If <paramref name="headers" /> is null, nothing is written to the stream.
         /// </summary>
@@ -672,7 +672,8 @@ namespace Ncl.Common.Csv
         ///     Writes headers to the stream as the header entries
         ///     then moves to the start of the next row.
         ///     The headers will be escaped, if necessary.
-        ///     If <paramref name="header" /> and <paramref name="headers" /> is null or empty, nothing is written to the stream.
+        ///     If <paramref name="header" /> and <paramref name="headers" /> is null or empty,
+        ///     nothing is written to the stream.
         /// </summary>
         /// <param name="header">The first header to write.</param>
         /// <param name="headers">The other headers to write.</param>
@@ -731,7 +732,7 @@ namespace Ncl.Common.Csv
 
         /// <summary>
         ///     Writes headers to the stream as the header entries
-        ///     then moves to the start of the next row.
+        ///     then moves to the start of the next row; asynchronously.
         ///     The headers will be escaped, if necessary.
         ///     If <paramref name="header" /> and <paramref name="headers" /> is null or empty, nothing is written to the stream.
         /// </summary>
@@ -765,14 +766,10 @@ namespace Ncl.Common.Csv
                 await WriteUnescapedEntryAsync(header, true);
 
                 if (headers == null || headers.Length == 0)
-                {
                     return await WriteRowEndAsync().ConfigureAwait(false);
-                }
             }
             else if (headers.Length == 0 || headers.Length == 1 && headers[0] == null)
-            {
                 return this;
-            }
 
             foreach (string otherHeader in headers)
             {
@@ -815,7 +812,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes the row terminating characters to the stream asynchronously.
+        ///     Writes the row terminating characters to the stream; asynchronously.
         /// </summary>
         /// <returns>
         ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
@@ -850,7 +847,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="string" /> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="string" /> to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -882,7 +879,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="string" /> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="string" /> to the stream as a field entry; asynchronously.
         ///     The resulting string will be escaped, if necessary.
         ///     If <paramref name="format" /> is null, nothing is written to the stream.
         /// </summary>
@@ -920,7 +917,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes an <see cref="object" /> to the stream as a field entry asynchronously.
+        ///     Writes an <see cref="object" /> to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -969,7 +966,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a subset of a <see cref="char" />[] to the stream as a field entry asynchronously.
+        ///     Writes a subset of a <see cref="char" />[] to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="buffer" /> is null, nothing is written to the stream.
         /// </summary>
@@ -1023,7 +1020,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="char" />[] to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="char" />[] to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="buffer" /> is null, nothing is written to the stream.
         /// </summary>
@@ -1061,7 +1058,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="char" /> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="char" /> to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -1090,7 +1087,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="float" /> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="float" /> to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -1119,7 +1116,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="bool" /> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="bool" /> to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -1148,7 +1145,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="ulong" /> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="ulong" /> to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -1177,7 +1174,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="uint" /> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="uint" /> to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -1206,7 +1203,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="long" /> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="long" /> to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -1235,7 +1232,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="int" /> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="int" /> to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -1264,7 +1261,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="double" /> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="double" /> to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -1293,7 +1290,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Writes a <see cref="decimal" /> to the stream as a field entry asynchronously.
+        ///     Writes a <see cref="decimal" /> to the stream as a field entry; asynchronously.
         ///     The value will be escaped, if necessary.
         ///     If <paramref name="value" /> is null, nothing is written to the stream.
         /// </summary>
@@ -1306,6 +1303,291 @@ namespace Ncl.Common.Csv
         {
             string valueStr = value.ToString(_formatProvider);
             return WriteUnescapedEntryAsync(valueStr);
+        }
+        
+        /// <summary>
+        ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the field entries.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="fields" /> is null or contains all null entries,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        public CsvStreamWriter WriteFields(IEnumerable<string> fields)
+        {
+            if (fields == null)
+                return this;
+
+            foreach (string fieldEntry in fields)
+            {
+                if (fieldEntry == null)
+                    continue;
+
+                WriteUnescapedEntry(fieldEntry);
+            }
+
+            return this;
+        }
+        
+        /// <summary>
+        ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the field entries; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="fields" /> is null or contains all null entries,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        public async Task<CsvStreamWriter> WriteFieldsAsync(IEnumerable<string> fields)
+        {
+            if (fields == null)
+                return this;
+
+            foreach (string fieldEntry in fields)
+            {
+                if (fieldEntry == null)
+                    continue;
+
+                await WriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
+            }
+
+            return this;
+        }
+        
+        /// <summary>
+        ///     Writes multiple <see cref="string"/> fields to the stream as field entities.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="field" /> and <see cref="fields"/> is null, nothing is written to the stream.
+        /// </summary>
+        /// <param name="field">The value to write.</param>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        public CsvStreamWriter WriteFields(string field, params string[] fields)
+        {
+            if (field == null && fields == null)
+                return this;
+
+            if (field != null)
+            {
+                WriteUnescapedEntry(field);
+                
+                if (IsEmptyArray(fields))
+                    return this;
+            }
+            else if (IsEmptyArray(fields))
+                return this;
+
+            foreach (string fieldEntry in fields)
+            {
+                if (fieldEntry == null)
+                    continue;
+
+                WriteUnescapedEntry(fieldEntry);
+            }
+
+            return this;
+        }
+        
+        /// <summary>
+        ///     Writes multiple <see cref="string"/> fields to the stream as field entities; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="field" /> and <see cref="fields"/> is null,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="field">The value to write.</param>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        public async Task<CsvStreamWriter> WriteFieldsAsync(string field, params string[] fields)
+        {
+            if (field == null && fields == null)
+                return this;
+
+            if (field != null)
+            {
+                await WriteUnescapedEntryAsync(field).ConfigureAwait(false);
+                
+                if (IsEmptyArray(fields))
+                    return this;
+            }
+            else if (IsEmptyArray(fields))
+                return this;
+
+            foreach (string fieldEntry in fields)
+            {
+                if (fieldEntry == null)
+                    continue;
+
+                await WriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
+            }
+
+            return this;
+        }
+        
+        /// <summary>
+        ///     Writes an <see cref="IEnumerable{T}"/> to the stream as field entries
+        ///     then moves to the start of the next row.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="fields" /> is null or contains all null entries,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        public CsvStreamWriter WriteFieldRow(IEnumerable<string> fields)
+        {
+            if (fields == null)
+                return this;
+
+            bool wroteEntry = false;
+            foreach (string fieldEntry in fields)
+            {
+                if (fieldEntry == null)
+                    continue;
+
+                WriteUnescapedEntry(fieldEntry);
+                wroteEntry = true;
+            }
+
+            if (wroteEntry)
+            {
+                WriteRowEnd();
+            }
+            
+            return this;
+        }
+        
+        /// <summary>
+        ///     Writes an <see cref="IEnumerable{T}"/> to the stream as field entries
+        ///     then moves to the start of the next row; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="fields" /> is null or contains all null entries,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        public async Task<CsvStreamWriter> WriteFieldRowAsync(IEnumerable<string> fields)
+        {
+            if (fields == null)
+                return this;
+
+            bool wroteEntry = false;
+            foreach (string fieldEntry in fields)
+            {
+                if (fieldEntry == null)
+                    continue;
+
+                await WriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
+                wroteEntry = true;
+            }
+
+            if (wroteEntry)
+            {
+                await WriteRowEndAsync().ConfigureAwait(false);
+            }
+
+            return this;
+        }
+        
+        /// <summary>
+        ///     Writes multiple <see cref="string"/> fields to the stream as field entries
+        ///     then moves to the start of the next row.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="field" /> and <see cref="fields"/> is null, nothing is written to the stream.
+        /// </summary>
+        /// <param name="field">The value to write.</param>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        public CsvStreamWriter WriteFieldRow(string field, params string[] fields)
+        {
+            if (field == null && fields == null)
+                return this;
+
+            bool wroteEntry = false;
+            if (field != null)
+            {
+                WriteUnescapedEntry(field);
+                wroteEntry = true;
+
+                if (IsEmptyArray(fields))
+                {
+                    WriteRowEnd();
+                    return this;
+                }
+            }
+            else if (IsEmptyArray(fields))
+                return this;
+
+            foreach (string fieldEntry in fields)
+            {
+                if (fieldEntry == null)
+                    continue;
+
+                WriteUnescapedEntry(fieldEntry);
+                wroteEntry = true;
+            }
+
+            if (wroteEntry)
+            {
+                WriteRowEnd();
+            }
+
+            return this;
+        }
+        
+        /// <summary>
+        ///     Writes multiple <see cref="string"/> fields to the stream as field entries
+        ///     then moves to the start of the next row; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="field" /> and <see cref="fields"/> is null, nothing is written to the stream.
+        /// </summary>
+        /// <param name="field">The value to write.</param>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        public async Task<CsvStreamWriter> WriteFieldRowAsync(string field, params string[] fields)
+        {
+            if (field == null && fields == null)
+                return this;
+
+            bool wroteEntry = false;
+            if (field != null)
+            {
+                await WriteUnescapedEntryAsync(field).ConfigureAwait(false);
+                wroteEntry = true;
+
+                if (IsEmptyArray(fields))
+                {
+                    await WriteRowEndAsync().ConfigureAwait(false);
+                    return this;
+                }
+            }
+            else if (IsEmptyArray(fields))
+                return this;
+
+            foreach (string fieldEntry in fields)
+            {
+                if (fieldEntry == null)
+                    continue;
+
+                await WriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
+                wroteEntry = true;
+            }
+
+            if (wroteEntry)
+            {
+                await WriteRowEndAsync().ConfigureAwait(false);
+            }
+
+            return this;
         }
 
         /// <summary>
@@ -1499,6 +1781,17 @@ namespace Ncl.Common.Csv
 
             int difference = MaxFieldCount - FieldPosition;
             fieldsToAdd = new string(',', difference);
+        }
+
+        /// <summary>
+        ///     Checks if an array is considered empty.
+        /// </summary>
+        /// <param name="array">The array to check.</param>
+        /// <typeparam name="T">The type for the array.</typeparam>
+        /// <returns>True if the array is considered empty, otherwise, false.</returns>
+        protected bool IsEmptyArray<T>(T[] array) where T : class
+        {
+            return array == null || array.Length == 0 || array.Length == 1 && array[0] == null;
         }
 
         /// <summary>

@@ -12,6 +12,8 @@ namespace Ncl.Common.Csv.Tests
         private const string ValidHeader = "header";
         private const string NeedsEscapingHeader = "header, more";
 
+        private const string ValidField = "field";
+
         private static readonly CultureInfo _englishUsCulture = new("en-US");
 
         [Fact]
@@ -1038,6 +1040,126 @@ namespace Ncl.Common.Csv.Tests
 
             // Assert
             await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
+        }
+        
+        [Fact]
+        public void WriteRowEnd_WithUnmatchedFieldsAndStrictMode_ShouldThrowIntegrityException()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(IntegrityMode.Strict);
+
+            // Act
+            csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
+            csvStream.WriteField(ValidField);
+            
+            // Act
+            void TestCode()
+            {
+                csvStream.WriteRowEnd();
+            }
+
+            // Assert
+            Assert.Throws<IntegrityViolatedException>(TestCode);
+        }
+        
+        [Fact]
+        public void WriteRowEnd_WithUnmatchedFieldsAndLooseMode_ShouldFillMissingComma()
+        {
+            // Arrange
+            string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},\r\n";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.Loose);
+
+            // Act
+            csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
+            csvStream.WriteField(ValidField);
+            
+            // Act
+            csvStream.WriteRowEnd();
+            
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteRowEnd_WithUnmatchedFieldsAndNoneMode_ShouldOnlyWriteRowEnd()
+        {
+            // Arrange
+            string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField}\r\n";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.None);
+
+            // Act
+            csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
+            csvStream.WriteField(ValidField);
+            
+            // Act
+            csvStream.WriteRowEnd();
+            
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteRowEnd_WithMatchedFieldsAndStrictMode_ShouldWriteRowEnd()
+        {
+            // Arrange
+            string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},{ValidField}\r\n";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.Strict);
+
+            // Act
+            csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
+            csvStream.WriteFields(ValidField, ValidField);
+            
+            // Act
+            csvStream.WriteRowEnd();
+            
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteRowEnd_WithMatchedFieldsAndLooseMode_ShouldWriteRowEnd()
+        {
+            // Arrange
+            string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},{ValidField}\r\n";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.Loose);
+
+            // Act
+            csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
+            csvStream.WriteFields(ValidField, ValidField);
+            
+            // Act
+            csvStream.WriteRowEnd();
+            
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteRowEnd_WithMatchedFieldsAndNoneMode_ShouldWriteRowEnd()
+        {
+            // Arrange
+            string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},{ValidField}\r\n";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.None);
+
+            // Act
+            csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
+            csvStream.WriteFields(ValidField, ValidField);
+            
+            // Act
+            csvStream.WriteRowEnd();
+            
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
         }
 
         //Utility functions
