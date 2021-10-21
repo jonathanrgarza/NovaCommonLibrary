@@ -836,7 +836,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteHeaderRow2_WithValidValueAndSecondNullValueAndValidValue_ShouldWriteHeaderRow()
         {
@@ -852,7 +852,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteHeaderRow2_WithNullValues_ShouldDoNothing()
         {
@@ -867,7 +867,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteHeaderRow2_WithNullStringValues_ShouldDoNothing()
         {
@@ -876,13 +876,13 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            csvStream.WriteHeaderRow(null, (string)null);
+            csvStream.WriteHeaderRow(null, (string) null);
             int actual = csvStream.FieldPosition;
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteHeaderRow2_WithThreeNullValues_ShouldDoNothing()
         {
@@ -962,7 +962,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task WriteHeaderRowAsync2_WithValidValueAndSecondNullValueAndValidValue_ShouldWriteHeaderRow()
         {
@@ -993,7 +993,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task WriteHeaderRowAsync2_WithNullStringValues_ShouldDoNothing()
         {
@@ -1002,13 +1002,13 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeaderRowAsync(null, (string)null).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(null, (string) null).ConfigureAwait(false);
             int actual = csvStream.FieldPosition;
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task WriteHeaderRowAsync2_WithThreeNullValues_ShouldDoNothing()
         {
@@ -1041,17 +1041,17 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
         }
-        
+
         [Fact]
         public void WriteRowEnd_WithUnmatchedFieldsAndStrictMode_ShouldThrowIntegrityException()
         {
             // Arrange
             // ReSharper disable once RedundantArgumentDefaultValue
             using CsvStreamWriter csvStream = GetDefaultInstance(IntegrityMode.Strict);
-            
+
             csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
             csvStream.WriteField(ValidField);
-            
+
             // Act
             void TestCode()
             {
@@ -1061,45 +1061,45 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<IntegrityViolatedException>(TestCode);
         }
-        
+
         [Fact]
         public void WriteRowEnd_WithUnmatchedFieldsAndLooseMode_ShouldFillMissingComma()
         {
             // Arrange
             string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},\r\n";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.Loose);
-            
+
             csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
             csvStream.WriteField(ValidField);
-            
+
             // Act
             csvStream.WriteRowEnd();
-            
+
             string actual = GetString(memoryStream);
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteRowEnd_WithUnmatchedFieldsAndNoneMode_ShouldOnlyWriteRowEnd()
         {
             // Arrange
             string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField}\r\n";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.None);
-            
+
             csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
             csvStream.WriteField(ValidField);
-            
+
             // Act
             csvStream.WriteRowEnd();
-            
+
             string actual = GetString(memoryStream);
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteRowEnd_WithMatchedFieldsAndStrictMode_ShouldWriteRowEnd()
         {
@@ -1107,57 +1107,173 @@ namespace Ncl.Common.Csv.Tests
             string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},{ValidField}\r\n";
             // ReSharper disable once RedundantArgumentDefaultValue
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.Strict);
-            
+
             csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
             csvStream.WriteFields(ValidField, ValidField);
-            
+
             // Act
             csvStream.WriteRowEnd();
-            
+
             string actual = GetString(memoryStream);
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteRowEnd_WithMatchedFieldsAndLooseMode_ShouldWriteRowEnd()
         {
             // Arrange
             string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},{ValidField}\r\n";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.Loose);
-            
+
             csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
             csvStream.WriteFields(ValidField, ValidField);
-            
+
             // Act
             csvStream.WriteRowEnd();
-            
+
             string actual = GetString(memoryStream);
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteRowEnd_WithMatchedFieldsAndNoneMode_ShouldWriteRowEnd()
         {
             // Arrange
             string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},{ValidField}\r\n";
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.None);
-            
+
             csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
             csvStream.WriteFields(ValidField, ValidField);
-            
+
             // Act
             csvStream.WriteRowEnd();
-            
+
             string actual = GetString(memoryStream);
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
+        [Fact]
+        public async Task WriteRowEndAsync_WithUnmatchedFieldsAndStrictMode_ShouldThrowIntegrityException()
+        {
+            // Arrange
+            // ReSharper disable once RedundantArgumentDefaultValue
+            using CsvStreamWriter csvStream = GetDefaultInstance(IntegrityMode.Strict);
+
+            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader);
+            await csvStream.WriteFieldAsync(ValidField);
+
+            // Act
+            void TestCode()
+            {
+                csvStream.WriteRowEnd();
+            }
+
+            // Assert
+            Assert.Throws<IntegrityViolatedException>(TestCode);
+        }
+
+        [Fact]
+        public async Task WriteRowEndAsync_WithUnmatchedFieldsAndLooseMode_ShouldFillMissingComma()
+        {
+            // Arrange
+            string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},\r\n";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.Loose);
+
+            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader);
+            await csvStream.WriteFieldAsync(ValidField);
+
+            // Act
+            await csvStream.WriteRowEndAsync();
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteRowEndAsync_WithUnmatchedFieldsAndNoneMode_ShouldOnlyWriteRowEnd()
+        {
+            // Arrange
+            string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField}\r\n";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.None);
+
+            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader);
+            await csvStream.WriteFieldAsync(ValidField);
+
+            // Act
+            await csvStream.WriteRowEndAsync();
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteRowEndAsync_WithMatchedFieldsAndStrictMode_ShouldWriteRowEnd()
+        {
+            // Arrange
+            string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},{ValidField}\r\n";
+            // ReSharper disable once RedundantArgumentDefaultValue
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.Strict);
+
+            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader);
+            await csvStream.WriteFieldsAsync(ValidField, ValidField);
+
+            // Act
+            await csvStream.WriteRowEndAsync();
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteRowEndAsync_WithMatchedFieldsAndLooseMode_ShouldWriteRowEnd()
+        {
+            // Arrange
+            string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},{ValidField}\r\n";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.Loose);
+
+            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader);
+            await csvStream.WriteFieldsAsync(ValidField, ValidField);
+
+            // Act
+            await csvStream.WriteRowEndAsync();
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteRowEndAsync_WithMatchedFieldsAndNoneMode_ShouldWriteRowEnd()
+        {
+            // Arrange
+            string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},{ValidField}\r\n";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.None);
+
+            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader);
+            await csvStream.WriteFieldsAsync(ValidField, ValidField);
+
+            // Act
+            await csvStream.WriteRowEndAsync();
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
         [Fact]
         public void WriteField_WithValidFieldValue_ShouldWriteField()
         {
@@ -1173,7 +1289,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteField_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
@@ -1189,7 +1305,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteField_WithNullValue_ShouldDoNothing()
         {
@@ -1198,16 +1314,16 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            csvStream.WriteField((string)null);
+            csvStream.WriteField((string) null);
 
             int actual = csvStream.FieldPosition;
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
-        public async Task WriteField2_WithValidFieldValue_ShouldWriteField()
+        public async Task WriteFieldAsync_WithValidFieldValue_ShouldWriteField()
         {
             // Arrange
             string expected = $"{ValidField}";
@@ -1221,9 +1337,9 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
-        public async Task WriteField2_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
+        public async Task WriteFieldAsync_WithFieldValueNeedingEscaping_ShouldWriteEscapedField()
         {
             // Arrange
             string expected = $"\"{NeedsEscapingField}\"";
@@ -1237,16 +1353,16 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
-        public async Task WriteField2_WithNullValue_ShouldDoNothing()
+        public async Task WriteFieldAsync_WithNullValue_ShouldDoNothing()
         {
             // Arrange
             const int expected = 0;
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteFieldAsync((string)null);
+            await csvStream.WriteFieldAsync((string) null);
 
             int actual = csvStream.FieldPosition;
 
