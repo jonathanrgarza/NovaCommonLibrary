@@ -605,6 +605,193 @@ namespace Ncl.Common.Csv
 
             return WriteUnescapedEntryAsync(header, true);
         }
+        
+        /// <summary>
+        ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the header entries.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="headers" /> is null or contains all null entries,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="headers">The values to write.</param>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
+        ///     written.
+        /// </exception>
+        public CsvStreamWriter WriteHeaders(IEnumerable<string> headers)
+        {
+            if (headers == null)
+                return this;
+            
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+
+            foreach (string headerEntry in headers)
+            {
+                if (headerEntry == null)
+                    continue;
+                
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
+
+                WriteUnescapedEntry(headerEntry);
+            }
+
+            return this;
+        }
+        
+        /// <summary>
+        ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the header entries; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="headers" /> is null or contains all null entries,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="headers">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        /// </exception>
+        public async Task<CsvStreamWriter> WriteHeadersAsync(IEnumerable<string> headers)
+        {
+            if (headers == null)
+                return this;
+            
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+
+            foreach (string headerEntry in headers)
+            {
+                if (headerEntry == null)
+                    continue;
+                
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
+
+                await WriteUnescapedEntryAsync(headerEntry).ConfigureAwait(false);
+            }
+
+            return this;
+        }
+        
+        /// <summary>
+        ///     Writes multiple <see cref="string"/> fields to the stream as header entities.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="header" /> and <see cref="headers"/> is null, nothing is written to the stream.
+        /// </summary>
+        /// <param name="header">The value to write.</param>
+        /// <param name="headers">The values to write.</param>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
+        ///     written.
+        /// </exception>
+        public CsvStreamWriter WriteHeaders(string header, params string[] headers)
+        {
+            if (header == null && headers == null)
+                return this;
+            
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+
+            if (header != null)
+            {
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
+                
+                WriteUnescapedEntry(header, true);
+                
+                if (IsEmptyArray(headers))
+                    return this;
+            }
+            else if (IsEmptyArray(headers))
+                return this;
+
+            foreach (string headerEntry in headers)
+            {
+                if (headerEntry == null)
+                    continue;
+
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
+                
+                WriteUnescapedEntry(headerEntry);
+            }
+
+            return this;
+        }
+        
+        /// <summary>
+        ///     Writes multiple <see cref="string"/> fields to the stream as header entities; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="header" /> and <see cref="headers"/> is null,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="header">The value to write.</param>
+        /// <param name="headers">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        /// </exception>
+        public async Task<CsvStreamWriter> WriteHeadersAsync(string header, params string[] headers)
+        {
+            if (header == null && headers == null)
+                return this;
+            
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+
+            if (header != null)
+            {
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
+                
+                await WriteUnescapedEntryAsync(header).ConfigureAwait(false);
+                
+                if (IsEmptyArray(headers))
+                    return this;
+            }
+            else if (IsEmptyArray(headers))
+                return this;
+
+            foreach (string fieldEntry in headers)
+            {
+                if (fieldEntry == null)
+                    continue;
+                
+                if (_headers == null)
+                {
+                    _headers = new List<string>();
+                }
+
+                await WriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
+            }
+
+            return this;
+        }
 
         /// <summary>
         ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the header entries
@@ -1528,7 +1715,7 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Writes multiple <see cref="string"/> fields to the stream as field entities; asynchronously.
         ///     The values will be escaped, if necessary.
-        ///     If <paramref name="field" /> and <see cref="fields"/> is null,
+        ///     If <paramref name="field" /> and <see cref="fields" /> is null,
         ///     nothing is written to the stream.
         /// </summary>
         /// <param name="field">The value to write.</param>

@@ -755,7 +755,387 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
         }
+        
+        [Fact]
+        public void WriteHeaders_WithValidStrings_ShouldWriteHeaderEntries()
+        {
+            string expected = $"{ValidHeader},{ValidHeader}";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
+            // Act
+            csvStream.WriteHeaders(new[] { ValidHeader, ValidHeader });
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteHeaders_WithNullEnumerable_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeaders((IEnumerable<string>) null);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteHeaders_WithEnumerableWithOnlyANullEntry_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeaders(new string[] { null });
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteHeaders_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+            csvStream.WriteHeaderRow(new[] { ValidHeader, ValidHeader });
+
+            // Act
+            void TestCode()
+            {
+                csvStream.WriteHeaders(new[] { ValidHeader, ValidHeader });
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync_WithValidStrings_ShouldWriteHeaderEntries()
+        {
+            string expected = $"{ValidHeader},{ValidHeader}";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteHeadersAsync(new[] { ValidHeader, ValidHeader }).ConfigureAwait(false);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync_WithNullEnumerable_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            await csvStream.WriteHeadersAsync((IEnumerable<string>) null).ConfigureAwait(false);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync_WithEnumerableWithOnlyANullEntry_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            await csvStream.WriteHeadersAsync(new string[] { null }).ConfigureAwait(false);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+            await csvStream.WriteHeaderRowAsync(new[] { ValidHeader, ValidHeader }).ConfigureAwait(false);
+
+            // Act
+            async Task TestCode()
+            {
+                // ReSharper disable once AccessToDisposedClosure
+                await csvStream.WriteHeadersAsync(new[] { ValidHeader, ValidHeader }).ConfigureAwait(false);
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
+        }
+
+        [Fact]
+        public void WriteHeaders2_WithValidStrings_ShouldWriteHeaderEntries()
+        {
+            string expected = $"{ValidHeader},{ValidHeader}";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteHeaders(ValidHeader, ValidHeader);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteHeaders2_WithFirstNullValueAndValidValue_ShouldWriteHeaderEntries()
+        {
+            string expected = $"{ValidHeader}";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteHeaders(null, ValidHeader);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteHeaders2_WithValidValueAndSecondNullValue_ShouldWriteHeaderEntries()
+        {
+            string expected = $"{ValidHeader}";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteHeaders(ValidHeader);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteHeaders2_WithValidValueAndSecondNullValueAndValidValue_ShouldWriteHeaderEntries()
+        {
+            string expected = $"{ValidHeader},{ValidHeader}";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            csvStream.WriteHeaders(ValidHeader, null, ValidHeader);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteHeaders2_WithNullValues_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeaders(null, null);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteHeaders2_WithNullStringValues_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeaders(null, (string) null);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteHeaders2_WithThreeNullValues_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.WriteHeaders(null, null, null);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void WriteHeaders2_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+            csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
+
+            // Act
+            void TestCode()
+            {
+                csvStream.WriteHeaders(ValidHeader, ValidHeader);
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync2_WithValidStrings_ShouldWriteHeaderEntries()
+        {
+            string expected = $"{ValidHeader},{ValidHeader}";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteHeadersAsync(ValidHeader, ValidHeader).ConfigureAwait(false);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync2_WithFirstNullValueAndValidValue_ShouldWriteHeaderEntries()
+        {
+            string expected = $"{ValidHeader}";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteHeadersAsync(null, ValidHeader).ConfigureAwait(false);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync2_WithValidValueAndSecondNullValue_ShouldWriteHeaderEntries()
+        {
+            string expected = $"{ValidHeader}";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteHeadersAsync(ValidHeader).ConfigureAwait(false);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync2_WithValidValueAndSecondNullValueAndValidValue_ShouldWriteHeaderEntries()
+        {
+            string expected = $"{ValidHeader},{ValidHeader}";
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            // Act
+            await csvStream.WriteHeadersAsync(ValidHeader, null, ValidHeader).ConfigureAwait(false);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync2_WithNullValues_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            await csvStream.WriteHeadersAsync(null, null).ConfigureAwait(false);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync2_WithNullStringValues_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            await csvStream.WriteHeadersAsync(null, (string) null).ConfigureAwait(false);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync2_WithThreeNullValues_ShouldDoNothing()
+        {
+            const int expected = 0;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            await csvStream.WriteHeadersAsync(null, null, null).ConfigureAwait(false);
+            int actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteHeadersAsync2_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        {
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader).ConfigureAwait(false);
+
+            // Act
+            async Task TestCode()
+            {
+                // ReSharper disable once AccessToDisposedClosure
+                await csvStream.WriteHeadersAsync(ValidHeader, ValidHeader).ConfigureAwait(false);
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
+        }
+        
         [Fact]
         public void WriteHeaderRow_WithValidStrings_ShouldWriteHeaderRow()
         {
