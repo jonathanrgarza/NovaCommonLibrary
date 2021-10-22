@@ -42,30 +42,14 @@ namespace Ncl.Common.Csv
         ///     The double quote (") character.
         /// </summary>
         protected const char DoubleQuoteChar = '"';
-        
+
         protected const int DefaultBufferSize = 1024;
 
         private static volatile Encoding _utf8NoBom;
-        
-        /// <summary>
-        ///     Represents the default encoding for a stream.
-        /// </summary>
-        protected static Encoding Utf8NoBom
-        {
-            get
-            {
-                if (_utf8NoBom != null) 
-                    return _utf8NoBom;
-                
-                var noBom = new UTF8Encoding(false, true);
-                Thread.MemoryBarrier();
-                _utf8NoBom = noBom;
-                return _utf8NoBom;
-            }
-        }
 
         protected readonly bool _leaveOpen;
         protected readonly TextWriter _stream;
+        protected bool _autoFlush;
         protected List<string> _headers;
         protected char _separator;
 
@@ -91,11 +75,11 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
         /// <exception cref="ArgumentException">
-        ///     the <paramref name="stream"/> is not writable -or-
+        ///     the <paramref name="stream" /> is not writable -or-
         ///     <paramref name="separator" /> is a double quote, return feed or a new line character.
         /// </exception>
-        public CsvStreamWriter(Stream stream, Encoding encoding = null, bool leaveOpen = false, 
-            char separator = DefaultSeparator, IFormatProvider formatProvider = null, 
+        public CsvStreamWriter(Stream stream, Encoding encoding = null, bool leaveOpen = false,
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
             if (separator == DoubleQuoteChar || separator == '\r' || separator == '\n')
@@ -117,7 +101,7 @@ namespace Ncl.Common.Csv
             _formatProvider = formatProvider ?? Thread.CurrentThread.CurrentCulture;
             IntegrityMode = integrityMode;
         }
-        
+
         /// <summary>
         ///     Initializes a new instance of <see cref="CsvStreamWriter" />.
         /// </summary>
@@ -135,8 +119,8 @@ namespace Ncl.Common.Csv
         /// <exception cref="ArgumentException">
         ///     <paramref name="separator" /> is a double quote, return feed or a new line character.
         /// </exception>
-        public CsvStreamWriter(TextWriter stream, bool leaveOpen = false, 
-            char separator = DefaultSeparator, IFormatProvider formatProvider = null, 
+        public CsvStreamWriter(TextWriter stream, bool leaveOpen = false,
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
             if (separator == DoubleQuoteChar || separator == '\r' || separator == '\n')
@@ -184,15 +168,15 @@ namespace Ncl.Common.Csv
         /// <exception cref="T:System.IO.PathTooLongException">
         ///     The specified path, file name, or both exceed the system-defined maximum length.
         /// </exception>
-        public CsvStreamWriter(string path, bool append = false, Encoding encoding = null, 
-            char separator = DefaultSeparator, IFormatProvider formatProvider = null, 
+        public CsvStreamWriter(string path, bool append = false, Encoding encoding = null,
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
             if (separator == DoubleQuoteChar || separator == '\r' || separator == '\n')
             {
                 throw new ArgumentException(InvalidSeparatorCharacterMsg, nameof(separator));
             }
-            
+
             if (encoding == null)
             {
                 encoding = Utf8NoBom;
@@ -203,6 +187,32 @@ namespace Ncl.Common.Csv
             _separator = separator;
             _formatProvider = formatProvider ?? Thread.CurrentThread.CurrentCulture;
             IntegrityMode = integrityMode;
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether the underlying stream will flush its buffer
+        ///     after every call to a write operation.
+        /// </summary>
+        /// <returns>
+        ///     <see langword="true" /> to force the underlying stream to flush its buffer;
+        ///     otherwise, <see langword="false" />.
+        /// </returns>
+        public bool AutoFlush
+        {
+            get => _autoFlush || ((_stream as StreamWriter)?.AutoFlush ?? false);
+            set
+            {
+                var streamWriter = _stream as StreamWriter;
+                if (streamWriter == null && _autoFlush == value)
+                    return;
+
+                if (streamWriter != null)
+                {
+                    streamWriter.AutoFlush = value;
+                }
+
+                _autoFlush = value;
+            }
         }
 
         /// <summary>
@@ -282,6 +292,23 @@ namespace Ncl.Common.Csv
             }
         }
 
+        /// <summary>
+        ///     Represents the default encoding for a stream.
+        /// </summary>
+        protected static Encoding Utf8NoBom
+        {
+            get
+            {
+                if (_utf8NoBom != null)
+                    return _utf8NoBom;
+
+                var noBom = new UTF8Encoding(false, true);
+                Thread.MemoryBarrier();
+                _utf8NoBom = noBom;
+                return _utf8NoBom;
+            }
+        }
+
         /// <inheritdoc />
         public void Dispose()
         {
@@ -310,14 +337,14 @@ namespace Ncl.Common.Csv
         /// <returns>The new instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
         /// <exception cref="ArgumentException">
-        ///     the <paramref name="stream"/> is not writable -or-
+        ///     the <paramref name="stream" /> is not writable -or-
         ///     <paramref name="separator" /> is a double quote, return feed or a new line character.
         /// </exception>
         public static CsvStreamWriter Create(Stream stream, Encoding encoding = null, bool leaveOpen = false,
-            char separator = DefaultSeparator, IFormatProvider formatProvider = null, 
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            bool result = TryCreate(stream, encoding, leaveOpen, separator, formatProvider, integrityMode, 
+            bool result = TryCreate(stream, encoding, leaveOpen, separator, formatProvider, integrityMode,
                 out Exception ex, out CsvStreamWriter cvsStream);
             if (result)
                 return cvsStream;
@@ -350,7 +377,7 @@ namespace Ncl.Common.Csv
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>The new instance or null on error.</returns>
-        public static CsvStreamWriter Create(Stream stream, out Exception ex, Encoding encoding = null, 
+        public static CsvStreamWriter Create(Stream stream, out Exception ex, Encoding encoding = null,
             bool leaveOpen = false, char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
@@ -379,10 +406,10 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
         public static bool TryCreate(Stream stream, out Exception ex, out CsvStreamWriter csvStream,
-            Encoding encoding = null, bool leaveOpen = false, char separator = DefaultSeparator, 
+            Encoding encoding = null, bool leaveOpen = false, char separator = DefaultSeparator,
             IFormatProvider formatProvider = null, IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            return TryCreate(stream, encoding, leaveOpen, separator, formatProvider, integrityMode, 
+            return TryCreate(stream, encoding, leaveOpen, separator, formatProvider, integrityMode,
                 out ex, out csvStream);
         }
 
@@ -423,7 +450,7 @@ namespace Ncl.Common.Csv
 
             return false;
         }
-        
+
         /// <summary>
         ///     Creates a new <see cref="CsvStreamWriter" /> instance using the given stream.
         /// </summary>
@@ -443,10 +470,10 @@ namespace Ncl.Common.Csv
         ///     <paramref name="separator" /> is a double quote, return feed or a new line character.
         /// </exception>
         public static CsvStreamWriter Create(TextWriter stream, bool leaveOpen = false,
-            char separator = DefaultSeparator, IFormatProvider formatProvider = null, 
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            bool result = TryCreate(stream, leaveOpen, separator, formatProvider, integrityMode, 
+            bool result = TryCreate(stream, leaveOpen, separator, formatProvider, integrityMode,
                 out Exception ex, out CsvStreamWriter cvsStream);
             if (result)
                 return cvsStream;
@@ -475,7 +502,7 @@ namespace Ncl.Common.Csv
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>The new instance or null on error.</returns>
-        public static CsvStreamWriter Create(TextWriter stream, out Exception ex, bool leaveOpen = false, 
+        public static CsvStreamWriter Create(TextWriter stream, out Exception ex, bool leaveOpen = false,
             char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
@@ -500,10 +527,10 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
         public static bool TryCreate(TextWriter stream, out Exception ex, out CsvStreamWriter csvStream,
-            bool leaveOpen = false, char separator = DefaultSeparator, 
+            bool leaveOpen = false, char separator = DefaultSeparator,
             IFormatProvider formatProvider = null, IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            return TryCreate(stream, leaveOpen, separator, formatProvider, integrityMode, 
+            return TryCreate(stream, leaveOpen, separator, formatProvider, integrityMode,
                 out ex, out csvStream);
         }
 
@@ -580,7 +607,7 @@ namespace Ncl.Common.Csv
             Encoding encoding = null, char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            bool result = TryCreate(path, append, encoding, separator, formatProvider, integrityMode, 
+            bool result = TryCreate(path, append, encoding, separator, formatProvider, integrityMode,
                 out Exception ex, out CsvStreamWriter csvStream);
 
             if (result)
@@ -671,7 +698,7 @@ namespace Ncl.Common.Csv
         /// <param name="csvStream">Out: The new instance of <see cref="CsvStreamWriter" /> or null on error.</param>
         /// <returns>True if the instance of <see cref="CsvStreamWriter" /> was created, otherwise, false.</returns>
         public static bool TryCreate(string path, bool append, Encoding encoding, char separator,
-            IFormatProvider formatProvider, IntegrityMode integrityMode, 
+            IFormatProvider formatProvider, IntegrityMode integrityMode,
             out Exception ex, out CsvStreamWriter csvStream)
         {
             ex = null;
@@ -778,7 +805,7 @@ namespace Ncl.Common.Csv
         {
             if (_isDisposed)
                 throw new ObjectDisposedException(nameof(CsvStreamWriter));
-            
+
             _stream.Flush();
         }
 
@@ -795,7 +822,7 @@ namespace Ncl.Common.Csv
         {
             if (_isDisposed)
                 throw new ObjectDisposedException(nameof(CsvStreamWriter));
-            
+
             return _stream.FlushAsync();
         }
 
@@ -865,7 +892,7 @@ namespace Ncl.Common.Csv
 
             return WriteUnescapedEntryAsync(header, true);
         }
-        
+
         /// <summary>
         ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the header entries.
         ///     The values will be escaped, if necessary.
@@ -882,7 +909,7 @@ namespace Ncl.Common.Csv
         {
             if (headers == null)
                 return this;
-            
+
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
 
@@ -890,7 +917,7 @@ namespace Ncl.Common.Csv
             {
                 if (headerEntry == null)
                     continue;
-                
+
                 if (_headers == null)
                 {
                     _headers = new List<string>();
@@ -901,7 +928,7 @@ namespace Ncl.Common.Csv
 
             return this;
         }
-        
+
         /// <summary>
         ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the header entries; asynchronously.
         ///     The values will be escaped, if necessary.
@@ -924,7 +951,7 @@ namespace Ncl.Common.Csv
         {
             if (headers == null)
                 return this;
-            
+
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
 
@@ -932,7 +959,7 @@ namespace Ncl.Common.Csv
             {
                 if (headerEntry == null)
                     continue;
-                
+
                 if (_headers == null)
                 {
                     _headers = new List<string>();
@@ -943,11 +970,11 @@ namespace Ncl.Common.Csv
 
             return this;
         }
-        
+
         /// <summary>
-        ///     Writes multiple <see cref="string"/> fields to the stream as header entities.
+        ///     Writes multiple <see cref="string" /> fields to the stream as header entities.
         ///     The values will be escaped, if necessary.
-        ///     If <paramref name="header" /> and <see cref="headers"/> is null, nothing is written to the stream.
+        ///     If <paramref name="header" /> and <see cref="headers" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="header">The value to write.</param>
         /// <param name="headers">The values to write.</param>
@@ -960,7 +987,7 @@ namespace Ncl.Common.Csv
         {
             if (header == null && headers == null)
                 return this;
-            
+
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
 
@@ -970,9 +997,9 @@ namespace Ncl.Common.Csv
                 {
                     _headers = new List<string>();
                 }
-                
+
                 WriteUnescapedEntry(header, true);
-                
+
                 if (IsEmptyArray(headers))
                     return this;
             }
@@ -988,17 +1015,17 @@ namespace Ncl.Common.Csv
                 {
                     _headers = new List<string>();
                 }
-                
+
                 WriteUnescapedEntry(headerEntry);
             }
 
             return this;
         }
-        
+
         /// <summary>
-        ///     Writes multiple <see cref="string"/> fields to the stream as header entities; asynchronously.
+        ///     Writes multiple <see cref="string" /> fields to the stream as header entities; asynchronously.
         ///     The values will be escaped, if necessary.
-        ///     If <paramref name="header" /> and <see cref="headers"/> is null,
+        ///     If <paramref name="header" /> and <see cref="headers" /> is null,
         ///     nothing is written to the stream.
         /// </summary>
         /// <param name="header">The value to write.</param>
@@ -1018,7 +1045,7 @@ namespace Ncl.Common.Csv
         {
             if (header == null && headers == null)
                 return this;
-            
+
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
 
@@ -1028,9 +1055,9 @@ namespace Ncl.Common.Csv
                 {
                     _headers = new List<string>();
                 }
-                
+
                 await WriteUnescapedEntryAsync(header).ConfigureAwait(false);
-                
+
                 if (IsEmptyArray(headers))
                     return this;
             }
@@ -1041,7 +1068,7 @@ namespace Ncl.Common.Csv
             {
                 if (fieldEntry == null)
                     continue;
-                
+
                 if (_headers == null)
                 {
                     _headers = new List<string>();
@@ -1279,7 +1306,7 @@ namespace Ncl.Common.Csv
         {
             if (_isDisposed)
                 throw new ObjectDisposedException(nameof(CsvStreamWriter));
-            
+
             VerifyRowEndIntegrity(out string fieldsToAdd);
 
             if (fieldsToAdd != null)
@@ -1291,6 +1318,7 @@ namespace Ncl.Common.Csv
             MaxFieldCount = FieldPosition;
             FieldPosition = 0;
             RowsWritten++;
+            PerformAutoFlushIfNecessary();
             return this;
         }
 
@@ -1311,7 +1339,7 @@ namespace Ncl.Common.Csv
         {
             if (_isDisposed)
                 throw new ObjectDisposedException(nameof(CsvStreamWriter));
-            
+
             VerifyRowEndIntegrity(out string fieldsToAdd);
 
             if (fieldsToAdd != null)
@@ -1323,6 +1351,7 @@ namespace Ncl.Common.Csv
             MaxFieldCount = FieldPosition;
             FieldPosition = 0;
             RowsWritten++;
+            await PerformAutoFlushIfNecessaryAsync().ConfigureAwait(false);
             return this;
         }
 
@@ -1880,7 +1909,7 @@ namespace Ncl.Common.Csv
             string valueStr = value.ToString(_formatProvider);
             return WriteUnescapedEntryAsync(valueStr);
         }
-        
+
         /// <summary>
         ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the field entries.
         ///     The values will be escaped, if necessary.
@@ -1904,7 +1933,7 @@ namespace Ncl.Common.Csv
 
             return this;
         }
-        
+
         /// <summary>
         ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the field entries; asynchronously.
         ///     The values will be escaped, if necessary.
@@ -1937,11 +1966,11 @@ namespace Ncl.Common.Csv
 
             return this;
         }
-        
+
         /// <summary>
-        ///     Writes multiple <see cref="string"/> fields to the stream as field entities.
+        ///     Writes multiple <see cref="string" /> fields to the stream as field entities.
         ///     The values will be escaped, if necessary.
-        ///     If <paramref name="field" /> and <see cref="fields"/> is null, nothing is written to the stream.
+        ///     If <paramref name="field" /> and <see cref="fields" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="field">The value to write.</param>
         /// <param name="fields">The values to write.</param>
@@ -1954,7 +1983,7 @@ namespace Ncl.Common.Csv
             if (field != null)
             {
                 WriteUnescapedEntry(field);
-                
+
                 if (IsEmptyArray(fields))
                     return this;
             }
@@ -1971,9 +2000,9 @@ namespace Ncl.Common.Csv
 
             return this;
         }
-        
+
         /// <summary>
-        ///     Writes multiple <see cref="string"/> fields to the stream as field entities; asynchronously.
+        ///     Writes multiple <see cref="string" /> fields to the stream as field entities; asynchronously.
         ///     The values will be escaped, if necessary.
         ///     If <paramref name="field" /> and <see cref="fields" /> is null,
         ///     nothing is written to the stream.
@@ -1998,7 +2027,7 @@ namespace Ncl.Common.Csv
             if (field != null)
             {
                 await WriteUnescapedEntryAsync(field).ConfigureAwait(false);
-                
+
                 if (IsEmptyArray(fields))
                     return this;
             }
@@ -2015,9 +2044,9 @@ namespace Ncl.Common.Csv
 
             return this;
         }
-        
+
         /// <summary>
-        ///     Writes an <see cref="IEnumerable{T}"/> to the stream as field entries
+        ///     Writes an <see cref="IEnumerable{T}" /> to the stream as field entries
         ///     then moves to the start of the next row.
         ///     The values will be escaped, if necessary.
         ///     If <paramref name="fields" /> is null or contains all null entries,
@@ -2044,12 +2073,12 @@ namespace Ncl.Common.Csv
             {
                 WriteRowEnd();
             }
-            
+
             return this;
         }
-        
+
         /// <summary>
-        ///     Writes an <see cref="IEnumerable{T}"/> to the stream as field entries
+        ///     Writes an <see cref="IEnumerable{T}" /> to the stream as field entries
         ///     then moves to the start of the next row; asynchronously.
         ///     The values will be escaped, if necessary.
         ///     If <paramref name="fields" /> is null or contains all null entries,
@@ -2088,12 +2117,12 @@ namespace Ncl.Common.Csv
 
             return this;
         }
-        
+
         /// <summary>
-        ///     Writes multiple <see cref="string"/> fields to the stream as field entries
+        ///     Writes multiple <see cref="string" /> fields to the stream as field entries
         ///     then moves to the start of the next row.
         ///     The values will be escaped, if necessary.
-        ///     If <paramref name="field" /> and <see cref="fields"/> is null, nothing is written to the stream.
+        ///     If <paramref name="field" /> and <see cref="fields" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="field">The value to write.</param>
         /// <param name="fields">The values to write.</param>
@@ -2134,12 +2163,12 @@ namespace Ncl.Common.Csv
 
             return this;
         }
-        
+
         /// <summary>
-        ///     Writes multiple <see cref="string"/> fields to the stream as field entries
+        ///     Writes multiple <see cref="string" /> fields to the stream as field entries
         ///     then moves to the start of the next row; asynchronously.
         ///     The values will be escaped, if necessary.
-        ///     If <paramref name="field" /> and <see cref="fields"/> is null, nothing is written to the stream.
+        ///     If <paramref name="field" /> and <see cref="fields" /> is null, nothing is written to the stream.
         /// </summary>
         /// <param name="field">The value to write.</param>
         /// <param name="fields">The values to write.</param>
@@ -2221,7 +2250,9 @@ namespace Ncl.Common.Csv
             }
 
             _stream.Write(escapedText);
+            
             FieldPosition++;
+            PerformAutoFlushIfNecessary();
             return this;
         }
 
@@ -2264,7 +2295,9 @@ namespace Ncl.Common.Csv
             }
 
             await _stream.WriteAsync(escapedText).ConfigureAwait(false);
+            
             FieldPosition++;
+            await PerformAutoFlushIfNecessaryAsync().ConfigureAwait(false);
             return this;
         }
 
@@ -2303,6 +2336,7 @@ namespace Ncl.Common.Csv
             _stream.Write(escapedText);
 
             FieldPosition++;
+            PerformAutoFlushIfNecessary();
             return this;
         }
 
@@ -2348,11 +2382,12 @@ namespace Ncl.Common.Csv
             await _stream.WriteAsync(escapedText).ConfigureAwait(false);
 
             FieldPosition++;
+            await PerformAutoFlushIfNecessaryAsync().ConfigureAwait(false);
             return this;
         }
 
         /// <summary>
-        ///     Verifies that the current row is valid based on current <see cref="IntegrityMode"/>.
+        ///     Verifies that the current row is valid based on current <see cref="IntegrityMode" />.
         /// </summary>
         /// <param name="fieldsToAdd">The out fields to add to match field count for previous row.</param>
         /// <exception cref="IntegrityViolatedException">
@@ -2395,6 +2430,47 @@ namespace Ncl.Common.Csv
 
             int difference = MaxFieldCount - FieldPosition;
             fieldsToAdd = new string(',', difference);
+        }
+
+        /// <summary>
+        ///     Performs a Flush if necessary.
+        /// </summary>
+        protected void PerformAutoFlushIfNecessary()
+        {
+            if (AutoFlush == false)
+                return;
+
+            if (!(_stream is StreamWriter streamWriter))
+            {
+                Flush();
+                return;
+            }
+
+            if (streamWriter.AutoFlush)
+                return;
+
+            streamWriter.AutoFlush = true;
+        }
+
+        /// <summary>
+        ///     Performs a Flush if necessary; asynchronously.
+        /// </summary>
+        protected async Task PerformAutoFlushIfNecessaryAsync()
+        {
+            if (AutoFlush == false)
+                return;
+
+            if (!(_stream is StreamWriter streamWriter))
+            {
+                await FlushAsync().ConfigureAwait(false);
+                return;
+            }
+
+            if (streamWriter.AutoFlush)
+                return;
+
+            //Will result in a flush.
+            streamWriter.AutoFlush = true;
         }
 
         /// <summary>

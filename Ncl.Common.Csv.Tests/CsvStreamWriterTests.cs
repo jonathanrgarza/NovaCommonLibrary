@@ -780,10 +780,102 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
+        
+        [Fact]
+        public void AutoFlush_WithSameValue_ShouldDoNothing()
+        {
+            const string expected = ValidHeader;
+            // Arrange
+            using StringWriter stringWriter = new();
+            using CsvStreamWriter csvStream = new(stringWriter);
+            csvStream.AutoFlush = true;
+
+            // Act
+            csvStream.AutoFlush = true;
+            csvStream.WriteHeader(ValidHeader);
+
+            string actual = stringWriter.ToString();
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void AutoFlush_WithTrueSettingAndContentWritten_ShouldWriteContentToUnderlyingStream()
+        {
+            const string expected = ValidHeader;
+            // Arrange
+            using MemoryStream memoryStream = new();
+            using CsvStreamWriter csvStream = new(memoryStream);
+
+            // Act
+            csvStream.AutoFlush = true;
+            csvStream.WriteHeader(ValidHeader);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void AutoFlush_WithFalseSettingAndContentWritten_ShouldNotWriteContentToUnderlyingStream()
+        {
+            const string expected = "";
+            // Arrange
+            using MemoryStream memoryStream = new();
+            using CsvStreamWriter csvStream = new(memoryStream);
+
+            // Act
+            csvStream.AutoFlush = false;
+            csvStream.WriteHeader(ValidHeader);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task AutoFlush_WithTrueSettingAndAsyncContentWritten_ShouldWriteContentToUnderlyingStream()
+        {
+            const string expected = ValidHeader;
+            // Arrange
+            await using MemoryStream memoryStream = new();
+            using CsvStreamWriter csvStream = new(memoryStream);
+
+            // Act
+            csvStream.AutoFlush = true;
+            await csvStream.WriteHeaderAsync(ValidHeader);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task AutoFlush_WithFalseSettingAndAsyncContentWritten_ShouldNotWriteContentToUnderlyingStream()
+        {
+            const string expected = "";
+            // Arrange
+            await using MemoryStream memoryStream = new();
+            using CsvStreamWriter csvStream = new(memoryStream);
+
+            // Act
+            csvStream.AutoFlush = false;
+            await csvStream.WriteHeaderAsync(ValidHeader);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
 
         [Fact]
         public void Flush_WithContentWritten_ShouldWriteContentToUnderlyingStream()
         {
+            const string expected = ValidHeader;
             // Arrange
             using MemoryStream memoryStream = new();
             using StreamWriter streamWriter = new(memoryStream);
@@ -796,7 +888,7 @@ namespace Ncl.Common.Csv.Tests
             string actual = GetString(memoryStream);
 
             // Assert
-            Assert.Equal(ValidHeader, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -821,6 +913,7 @@ namespace Ncl.Common.Csv.Tests
         [Fact]
         public async Task FlushAsync_WithContentWritten_ShouldWriteContentToUnderlyingStream()
         {
+            const string expected = ValidHeader;
             // Arrange
             await using MemoryStream memoryStream = new();
             await using StreamWriter streamWriter = new(memoryStream);
@@ -833,7 +926,7 @@ namespace Ncl.Common.Csv.Tests
             string actual = GetString(memoryStream);
 
             // Assert
-            Assert.Equal(ValidHeader, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -858,6 +951,7 @@ namespace Ncl.Common.Csv.Tests
         [Fact]
         public void WriteHeader_WithValidString_ShouldWriteHeader()
         {
+            const string expected = ValidHeader;
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
@@ -867,7 +961,7 @@ namespace Ncl.Common.Csv.Tests
             string actual = GetString(memoryStream);
 
             // Assert
-            Assert.Equal(ValidHeader, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
