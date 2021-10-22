@@ -1776,7 +1776,7 @@ namespace Ncl.Common.Csv
                 throw new IntegrityViolatedException(exceptionMessage);
             }
 
-            if (IntegrityMode != IntegrityMode.Loose || !isFieldsLessThanPrevious)
+            if (!isFieldsLessThanPrevious)
                 return;
 
             int difference = MaxFieldCount - FieldPosition;

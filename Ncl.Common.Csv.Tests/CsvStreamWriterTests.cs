@@ -1067,7 +1067,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void WriteRowEnd_WithUnmatchedFieldsAndLooseMode_ShouldFillMissingComma()
+        public void WriteRowEnd_WithUnmatchedAndLessFieldsAndLooseMode_ShouldFillMissingComma()
         {
             // Arrange
             string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},\r\n";
@@ -1075,6 +1075,25 @@ namespace Ncl.Common.Csv.Tests
 
             csvStream.WriteHeaderRow(ValidHeader, ValidHeader);
             csvStream.WriteField(ValidField);
+
+            // Act
+            csvStream.WriteRowEnd();
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteRowEnd_WithUnmatchedAndMoreFieldsAndLooseMode_ShouldWriteField()
+        {
+            // Arrange
+            string expected = $"{ValidHeader}\r\n{ValidField},{ValidField}\r\n";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.Loose);
+
+            csvStream.WriteHeaderRow(ValidHeader);
+            csvStream.WriteFields(ValidField, ValidField);
 
             // Act
             csvStream.WriteRowEnd();
@@ -1183,7 +1202,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public async Task WriteRowEndAsync_WithUnmatchedFieldsAndLooseMode_ShouldFillMissingComma()
+        public async Task WriteRowEndAsync_WithUnmatchedAndLessFieldsAndLooseMode_ShouldFillMissingComma()
         {
             // Arrange
             string expected = $"{ValidHeader},{ValidHeader}\r\n{ValidField},\r\n";
@@ -1191,6 +1210,25 @@ namespace Ncl.Common.Csv.Tests
 
             await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader);
             await csvStream.WriteFieldAsync(ValidField);
+
+            // Act
+            await csvStream.WriteRowEndAsync();
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task WriteRowEndAsync_WithUnmatchedAndMoreFieldsAndLooseMode_ShouldWriteField()
+        {
+            // Arrange
+            string expected = $"{ValidHeader}\r\n{ValidField},{ValidField}\r\n";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream, IntegrityMode.Loose);
+
+            await csvStream.WriteHeaderRowAsync(ValidHeader);
+            await csvStream.WriteFieldsAsync(ValidField, ValidField);
 
             // Act
             await csvStream.WriteRowEndAsync();
@@ -1325,6 +1363,42 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
+        
+        [Fact]
+        public void WriteField_WithValidFieldValueAndUnfinishedHeaderRow_ShouldWriteRowEndAndField()
+        {
+            // Arrange
+            string expected = $"{ValidHeader}\r\n{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            csvStream.WriteHeader(ValidHeader);
+            
+            // Act
+            csvStream.WriteField(ValidField);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField_WithValidHeaderButStreamDisposed_ShouldThrowException()
+        {
+            //Act
+            void TestCode()
+            {
+                // Arrange
+                CsvStreamWriter csvStream = GetDefaultInstance();
+                csvStream.Dispose();
+                
+                //Act
+                csvStream.WriteField(ValidField);
+            }
+
+            // Assert
+            Assert.Throws<ObjectDisposedException>(TestCode);
+        }
 
         [Fact]
         public async Task WriteFieldAsync_WithValidFieldValue_ShouldWriteField()
@@ -1372,6 +1446,42 @@ namespace Ncl.Common.Csv.Tests
 
             // Assert
             Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task WriteFieldAsync_WithValidFieldValueAndUnfinishedHeaderRow_ShouldWriteRowEndAndField()
+        {
+            // Arrange
+            string expected = $"{ValidHeader}\r\n{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+
+            await csvStream.WriteHeaderAsync(ValidHeader);
+            
+            // Act
+            await csvStream.WriteFieldAsync(ValidField);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task WriteFieldAsync_WithValidHeaderButStreamDisposed_ShouldThrowException()
+        {
+            //Act
+            async Task TestCode()
+            {
+                // Arrange
+                CsvStreamWriter csvStream = GetDefaultInstance();
+                csvStream.Dispose();
+                
+                //Act
+                await csvStream.WriteFieldAsync(ValidField);
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
         }
 
         [Fact]
