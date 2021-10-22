@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -20,6 +21,7 @@ namespace Ncl.Common.Csv.Tests
         private const string SimpleFormat = "{0}";
 
         private static readonly CultureInfo _englishUsCulture = new("en-US");
+        private static readonly CultureInfo _spanishCulture = new("es-ES");
 
         [Fact]
         public void CsvStreamWriter_WithValidArguments_ShouldCreateInstance()
@@ -502,6 +504,56 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
+        public void FormatProvider_WithNullValue_ShouldSetToThreadsCurrentCulture()
+        {
+            IFormatProvider expected = Thread.CurrentThread.CurrentCulture;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+            csvStream.FormatProvider = expected.Equals(_englishUsCulture) ? _spanishCulture : _englishUsCulture;
+            
+            // Act
+            csvStream.FormatProvider = null;
+            
+            IFormatProvider actual = csvStream.FormatProvider;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void FormatProvider_WithSameValue_ShouldRemainSameValue()
+        {
+            IFormatProvider expected = _englishUsCulture;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+
+            // Act
+            csvStream.FormatProvider = _englishUsCulture;
+            
+            IFormatProvider actual = csvStream.FormatProvider;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void FormatProvider_WithValue_ShouldSetToValue()
+        {
+            IFormatProvider expected = _englishUsCulture;
+            // Arrange
+            using CsvStreamWriter csvStream = GetDefaultInstance();
+            csvStream.FormatProvider = _spanishCulture;
+            
+            // Act
+            csvStream.FormatProvider = _englishUsCulture;
+            
+            IFormatProvider actual = csvStream.FormatProvider;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void Flush_WithContentWritten_ShouldWriteContentToUnderlyingStream()
         {
             // Arrange
@@ -517,6 +569,25 @@ namespace Ncl.Common.Csv.Tests
 
             // Assert
             Assert.Equal(ValidHeader, actual);
+        }
+        
+        [Fact]
+        public void Flush_WithDisposedStream_ShouldThrowException()
+        {
+            void TestCode()
+            {
+                // Arrange
+                CsvStreamWriter csvStream = GetDefaultInstance();
+                
+                csvStream.Dispose();
+                csvStream.Dispose(); //Twice to cover Dispose
+
+                // Act
+                csvStream.Flush();
+            }
+
+            // Assert
+            Assert.Throws<ObjectDisposedException>(TestCode);
         }
 
         [Fact]
@@ -535,6 +606,25 @@ namespace Ncl.Common.Csv.Tests
 
             // Assert
             Assert.Equal(ValidHeader, actual);
+        }
+        
+        [Fact]
+        public async Task FlushAsync_WithDisposedStream_ShouldThrowException()
+        {
+            async Task TestCode()
+            {
+                // Arrange
+                CsvStreamWriter csvStream = GetDefaultInstance();
+                
+                csvStream.Dispose();
+                csvStream.Dispose(); //Twice to cover Dispose
+                
+                // Act
+                await csvStream.FlushAsync().ConfigureAwait(false);
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
         }
 
         [Fact]
@@ -1047,6 +1137,41 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
+        public void WriteRowEnd_WithNoFieldsWritten_ShouldThrowIntegrityException()
+        {
+            // Arrange
+            // ReSharper disable once RedundantArgumentDefaultValue
+            using CsvStreamWriter csvStream = GetDefaultInstance(IntegrityMode.Strict);
+
+            // Act
+            void TestCode()
+            {
+                csvStream.WriteRowEnd();
+            }
+
+            // Assert
+            Assert.Throws<IntegrityViolatedException>(TestCode);
+        }
+        
+        [Fact]
+        public void WriteRowEnd_WithDisposedStream_ShouldThrowException()
+        {
+            // Act
+            void TestCode()
+            {
+                // Arrange
+                CsvStreamWriter csvStream = GetDefaultInstance();
+                csvStream.Dispose();
+                
+                //Act
+                csvStream.WriteRowEnd();
+            }
+
+            // Assert
+            Assert.Throws<ObjectDisposedException>(TestCode);
+        }
+        
+        [Fact]
         public void WriteRowEnd_WithUnmatchedFieldsAndStrictMode_ShouldThrowIntegrityException()
         {
             // Arrange
@@ -1179,6 +1304,42 @@ namespace Ncl.Common.Csv.Tests
 
             // Assert
             Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task WriteRowEndAsync_WithNoFieldsWritten_ShouldThrowIntegrityException()
+        {
+            // Act
+            async Task TestCode()
+            {
+                // Arrange
+                // ReSharper disable once RedundantArgumentDefaultValue
+                using CsvStreamWriter csvStream = GetDefaultInstance(IntegrityMode.Strict);
+                
+                // Act
+                await csvStream.WriteRowEndAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<IntegrityViolatedException>(TestCode);
+        }
+        
+        [Fact]
+        public async Task WriteRowEndAsync_WithDisposedStream_ShouldThrowException()
+        {
+            // Act
+            async Task TestCode()
+            {
+                // Arrange
+                CsvStreamWriter csvStream = GetDefaultInstance();
+                csvStream.Dispose();
+                
+                //Act
+                await csvStream.WriteRowEndAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
         }
 
         [Fact]
