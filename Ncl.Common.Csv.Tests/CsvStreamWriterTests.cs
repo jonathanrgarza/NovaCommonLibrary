@@ -27,7 +27,7 @@ namespace Ncl.Common.Csv.Tests
         public void CsvStreamWriter_WithValidArguments_ShouldCreateInstance()
         {
             // Arrange
-            using var stream = new StreamWriter(new MemoryStream());
+            using var stream = new MemoryStream();
 
             // Act
             var actual = new CsvStreamWriter(stream);
@@ -44,7 +44,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamWriter((TextWriter) null);
+                _ = new CsvStreamWriter((Stream) null);
             }
 
             // Assert
@@ -55,7 +55,7 @@ namespace Ncl.Common.Csv.Tests
         public void CsvStreamWriter_WithInvalidSeparator_ShouldThrowException()
         {
             // Arrange
-            using StreamWriter stream = GetDefaultStream();
+            using MemoryStream stream = GetDefaultStream();
 
             // Act
             void TestCode()
@@ -68,7 +68,51 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void CsvStreamWriter1_WithNullString_ShouldThrowException()
+        public void CsvStreamWriter1_WithValidArguments_ShouldCreateInstance()
+        {
+            // Arrange
+            using var stream = new StreamWriter(new MemoryStream());
+
+            // Act
+            var actual = new CsvStreamWriter(stream);
+
+            // Assert
+            Assert.NotNull(actual);
+        }
+
+        [Fact]
+        public void CsvStreamWriter1_WithNullStream_ShouldThrowException()
+        {
+            // Arrange
+
+            // Act
+            void TestCode()
+            {
+                _ = new CsvStreamWriter((TextWriter) null);
+            }
+
+            // Assert
+            Assert.Throws<ArgumentNullException>(TestCode);
+        }
+
+        [Fact]
+        public void CsvStreamWriter1_WithInvalidSeparator_ShouldThrowException()
+        {
+            // Arrange
+            using StreamWriter stream = GetDefaultStreamWriter();
+
+            // Act
+            void TestCode()
+            {
+                _ = new CsvStreamWriter(stream, separator: '\n');
+            }
+
+            // Assert
+            Assert.Throws<ArgumentException>(TestCode);
+        }
+
+        [Fact]
+        public void CsvStreamWriter2_WithNullString_ShouldThrowException()
         {
             // Arrange
             // Act
@@ -82,7 +126,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void CsvStreamWriter1_WithInvalidSeparator_ShouldThrowException()
+        public void CsvStreamWriter2_WithInvalidSeparator_ShouldThrowException()
         {
             // Arrange
             // Act
@@ -99,7 +143,7 @@ namespace Ncl.Common.Csv.Tests
         public void Create_WithValidArguments_ShouldReturnInstance()
         {
             // Arrange
-            using StreamWriter stream = GetDefaultStream();
+            using Stream stream = GetDefaultStream();
 
             // Act
             var actual = CsvStreamWriter.Create(stream);
@@ -115,7 +159,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamWriter.Create((TextWriter) null);
+                _ = CsvStreamWriter.Create((Stream) null);
             }
 
             // Assert
@@ -129,7 +173,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamWriter.Create((TextWriter) null, separator: '\n');
+                _ = CsvStreamWriter.Create((Stream) null, separator: '\n');
             }
 
             // Assert
@@ -140,7 +184,7 @@ namespace Ncl.Common.Csv.Tests
         public void Create1_WithValidArguments_ShouldReturnInstance()
         {
             // Arrange
-            using StreamWriter stream = GetDefaultStream();
+            using Stream stream = GetDefaultStream();
 
             // Act
             var actual = CsvStreamWriter.Create(stream, out Exception _);
@@ -154,7 +198,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            _ = CsvStreamWriter.Create((TextWriter) null, out Exception actual);
+            _ = CsvStreamWriter.Create((Stream) null, out Exception actual);
 
             // Assert
             Assert.IsType<ArgumentNullException>(actual);
@@ -165,7 +209,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            _ = CsvStreamWriter.Create((TextWriter) null, out Exception actual, separator: '\n');
+            _ = CsvStreamWriter.Create((Stream) null, out Exception actual, separator: '\n');
 
             // Assert
             Assert.IsType<ArgumentException>(actual);
@@ -175,7 +219,7 @@ namespace Ncl.Common.Csv.Tests
         public void TryCreate_WithValidArguments_ShouldReturnTrue()
         {
             // Arrange
-            using StreamWriter stream = GetDefaultStream();
+            using Stream stream = GetDefaultStream();
 
             // Act
             bool actual = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter _);
@@ -188,7 +232,7 @@ namespace Ncl.Common.Csv.Tests
         public void TryCreate_WithValidArguments_ShouldSetInstanceArgument()
         {
             // Arrange
-            using StreamWriter stream = GetDefaultStream();
+            using Stream stream = GetDefaultStream();
 
             // Act
             bool _ = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter actual);
@@ -201,7 +245,7 @@ namespace Ncl.Common.Csv.Tests
         public void TryCreate_WithValidArguments_ShouldSetExceptionArgumentToNull()
         {
             // Arrange
-            using StreamWriter stream = GetDefaultStream();
+            using Stream stream = GetDefaultStream();
 
             // Act
             bool _ = CsvStreamWriter.TryCreate(stream, out Exception actual, out CsvStreamWriter _);
@@ -215,7 +259,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            bool actual = CsvStreamWriter.TryCreate((TextWriter) null, out Exception _, out CsvStreamWriter _);
+            bool actual = CsvStreamWriter.TryCreate((Stream) null, out Exception _, out CsvStreamWriter _);
 
             // Assert
             Assert.False(actual);
@@ -226,7 +270,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            bool _ = CsvStreamWriter.TryCreate((TextWriter) null, out Exception _, out CsvStreamWriter actual);
+            bool _ = CsvStreamWriter.TryCreate((Stream) null, out Exception _, out CsvStreamWriter actual);
 
             // Assert
             Assert.Null(actual);
@@ -237,7 +281,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            bool _ = CsvStreamWriter.TryCreate((TextWriter) null, out Exception actual, out CsvStreamWriter _);
+            bool _ = CsvStreamWriter.TryCreate((Stream) null, out Exception actual, out CsvStreamWriter _);
 
             // Assert
             Assert.IsType<ArgumentNullException>(actual);
@@ -248,7 +292,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            bool actual = CsvStreamWriter.TryCreate((TextWriter) null, out Exception _, out CsvStreamWriter _,
+            bool actual = CsvStreamWriter.TryCreate((Stream) null, out Exception _, out CsvStreamWriter _,
                 separator: '\n');
 
             // Assert
@@ -260,7 +304,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            bool _ = CsvStreamWriter.TryCreate((TextWriter) null, out Exception _, out CsvStreamWriter actual,
+            bool _ = CsvStreamWriter.TryCreate((Stream) null, out Exception _, out CsvStreamWriter actual,
                 separator: '\n');
 
             // Assert
@@ -272,21 +316,34 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            bool _ = CsvStreamWriter.TryCreate((TextWriter) null, out Exception actual, out CsvStreamWriter _,
+            bool _ = CsvStreamWriter.TryCreate((Stream) null, out Exception actual, out CsvStreamWriter _,
                 separator: '\n');
 
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
+        
+        [Fact]
+        public void Create2_WithValidArguments_ShouldReturnInstance()
+        {
+            // Arrange
+            using StreamWriter stream = GetDefaultStreamWriter();
+
+            // Act
+            var actual = CsvStreamWriter.Create(stream);
+
+            // Assert
+            Assert.NotNull(actual);
+        }
 
         [Fact]
-        public void Create2_WithNullString_ShouldThrowException()
+        public void Create2_WithNullStream_ShouldThrowException()
         {
             // Arrange
             // Act
             void TestCode()
             {
-                _ = CsvStreamWriter.Create((string) null);
+                _ = CsvStreamWriter.Create((TextWriter) null);
             }
 
             // Assert
@@ -300,7 +357,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamWriter.Create((string) null, separator: '\n');
+                _ = CsvStreamWriter.Create((TextWriter) null, separator: '\n');
             }
 
             // Assert
@@ -308,11 +365,24 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Create3_WithNullString_ShouldSetExceptionArgument()
+        public void Create3_WithValidArguments_ShouldReturnInstance()
+        {
+            // Arrange
+            using StreamWriter stream = GetDefaultStreamWriter();
+
+            // Act
+            var actual = CsvStreamWriter.Create(stream, out Exception _);
+
+            // Assert
+            Assert.NotNull(actual);
+        }
+
+        [Fact]
+        public void Create3_WithNullStream_ShouldSetExceptionArgument()
         {
             // Arrange
             // Act
-            _ = CsvStreamWriter.Create((string) null, out Exception actual);
+            _ = CsvStreamWriter.Create((TextWriter) null, out Exception actual);
 
             // Assert
             Assert.IsType<ArgumentNullException>(actual);
@@ -323,40 +393,79 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            _ = CsvStreamWriter.Create((string) null, out Exception actual, separator: '\n');
+            _ = CsvStreamWriter.Create((TextWriter) null, out Exception actual, separator: '\n');
 
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
 
         [Fact]
-        public void TryCreate1_WithNullString_ShouldReturnFalse()
+        public void TryCreate1_WithValidArguments_ShouldReturnTrue()
         {
             // Arrange
+            using StreamWriter stream = GetDefaultStreamWriter();
+
             // Act
-            bool actual = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter _);
+            bool actual = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter _);
 
             // Assert
-            Assert.False(actual);
+            Assert.True(actual);
         }
 
         [Fact]
-        public void TryCreate1_WithNullString_ShouldSetInstanceArgumentToNull()
+        public void TryCreate1_WithValidArguments_ShouldSetInstanceArgument()
         {
             // Arrange
+            using StreamWriter stream = GetDefaultStreamWriter();
+
             // Act
-            bool _ = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter actual);
+            bool _ = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter actual);
+
+            // Assert
+            Assert.NotNull(actual);
+        }
+
+        [Fact]
+        public void TryCreate1_WithValidArguments_ShouldSetExceptionArgumentToNull()
+        {
+            // Arrange
+            using StreamWriter stream = GetDefaultStreamWriter();
+
+            // Act
+            bool _ = CsvStreamWriter.TryCreate(stream, out Exception actual, out CsvStreamWriter _);
 
             // Assert
             Assert.Null(actual);
         }
 
         [Fact]
-        public void TryCreate1_WithNullString_ShouldSetExceptionArgument()
+        public void TryCreate1_WithNullStream_ShouldReturnFalse()
         {
             // Arrange
             // Act
-            bool _ = CsvStreamWriter.TryCreate((string) null, out Exception actual, out CsvStreamWriter _);
+            bool actual = CsvStreamWriter.TryCreate((TextWriter) null, out Exception _, out CsvStreamWriter _);
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryCreate1_WithNullStream_ShouldSetInstanceArgumentToNull()
+        {
+            // Arrange
+            // Act
+            bool _ = CsvStreamWriter.TryCreate((TextWriter) null, out Exception _, out CsvStreamWriter actual);
+
+            // Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public void TryCreate1_WithNullStream_ShouldSetExceptionArgument()
+        {
+            // Arrange
+            // Act
+            bool _ = CsvStreamWriter.TryCreate((TextWriter) null, out Exception actual, out CsvStreamWriter _);
 
             // Assert
             Assert.IsType<ArgumentNullException>(actual);
@@ -367,7 +476,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            bool actual = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter _,
+            bool actual = CsvStreamWriter.TryCreate((TextWriter) null, out Exception _, out CsvStreamWriter _,
                 separator: '\n');
 
             // Assert
@@ -379,7 +488,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            bool _ = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter actual,
+            bool _ = CsvStreamWriter.TryCreate((TextWriter) null, out Exception _, out CsvStreamWriter actual,
                 separator: '\n');
 
             // Assert
@@ -388,6 +497,125 @@ namespace Ncl.Common.Csv.Tests
 
         [Fact]
         public void TryCreate1_WithInvalidSeparator_ShouldSetExceptionArgument()
+        {
+            // Arrange
+            // Act
+            bool _ = CsvStreamWriter.TryCreate((TextWriter) null, out Exception actual, out CsvStreamWriter _,
+                separator: '\n');
+
+            // Assert
+            Assert.IsType<ArgumentException>(actual);
+        }
+
+        [Fact]
+        public void Create3_WithNullString_ShouldThrowException()
+        {
+            // Arrange
+            // Act
+            void TestCode()
+            {
+                _ = CsvStreamWriter.Create((string) null);
+            }
+
+            // Assert
+            Assert.Throws<ArgumentNullException>(TestCode);
+        }
+
+        [Fact]
+        public void Create3_WithInvalidSeparator_ShouldThrowException()
+        {
+            // Arrange
+            // Act
+            void TestCode()
+            {
+                _ = CsvStreamWriter.Create((string) null, separator: '\n');
+            }
+
+            // Assert
+            Assert.Throws<ArgumentException>(TestCode);
+        }
+
+        [Fact]
+        public void Create4_WithNullString_ShouldSetExceptionArgument()
+        {
+            // Arrange
+            // Act
+            _ = CsvStreamWriter.Create((string) null, out Exception actual);
+
+            // Assert
+            Assert.IsType<ArgumentNullException>(actual);
+        }
+
+        [Fact]
+        public void Create4_WithInvalidSeparator_ShouldSetExceptionArgument()
+        {
+            // Arrange
+            // Act
+            _ = CsvStreamWriter.Create((string) null, out Exception actual, separator: '\n');
+
+            // Assert
+            Assert.IsType<ArgumentException>(actual);
+        }
+
+        [Fact]
+        public void TryCreate2_WithNullString_ShouldReturnFalse()
+        {
+            // Arrange
+            // Act
+            bool actual = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter _);
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryCreate2_WithNullString_ShouldSetInstanceArgumentToNull()
+        {
+            // Arrange
+            // Act
+            bool _ = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter actual);
+
+            // Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public void TryCreate2_WithNullString_ShouldSetExceptionArgument()
+        {
+            // Arrange
+            // Act
+            bool _ = CsvStreamWriter.TryCreate((string) null, out Exception actual, out CsvStreamWriter _);
+
+            // Assert
+            Assert.IsType<ArgumentNullException>(actual);
+        }
+
+        [Fact]
+        public void TryCreate2_WithInvalidSeparator_ShouldReturnFalse()
+        {
+            // Arrange
+            // Act
+            bool actual = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter _,
+                separator: '\n');
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryCreate2_WithInvalidSeparator_ShouldSetInstanceArgumentToNull()
+        {
+            // Arrange
+            // Act
+            bool _ = CsvStreamWriter.TryCreate((string) null, out Exception _, out CsvStreamWriter actual,
+                separator: '\n');
+
+            // Assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public void TryCreate2_WithInvalidSeparator_ShouldSetExceptionArgument()
         {
             // Arrange
             // Act
@@ -510,16 +738,16 @@ namespace Ncl.Common.Csv.Tests
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
             csvStream.FormatProvider = expected.Equals(_englishUsCulture) ? _spanishCulture : _englishUsCulture;
-            
+
             // Act
             csvStream.FormatProvider = null;
-            
+
             IFormatProvider actual = csvStream.FormatProvider;
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void FormatProvider_WithSameValue_ShouldRemainSameValue()
         {
@@ -529,13 +757,13 @@ namespace Ncl.Common.Csv.Tests
 
             // Act
             csvStream.FormatProvider = _englishUsCulture;
-            
+
             IFormatProvider actual = csvStream.FormatProvider;
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void FormatProvider_WithValue_ShouldSetToValue()
         {
@@ -543,10 +771,10 @@ namespace Ncl.Common.Csv.Tests
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
             csvStream.FormatProvider = _spanishCulture;
-            
+
             // Act
             csvStream.FormatProvider = _englishUsCulture;
-            
+
             IFormatProvider actual = csvStream.FormatProvider;
 
             // Assert
@@ -570,7 +798,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(ValidHeader, actual);
         }
-        
+
         [Fact]
         public void Flush_WithDisposedStream_ShouldThrowException()
         {
@@ -578,7 +806,7 @@ namespace Ncl.Common.Csv.Tests
             {
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
-                
+
                 csvStream.Dispose();
                 csvStream.Dispose(); //Twice to cover Dispose
 
@@ -607,7 +835,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(ValidHeader, actual);
         }
-        
+
         [Fact]
         public async Task FlushAsync_WithDisposedStream_ShouldThrowException()
         {
@@ -615,10 +843,10 @@ namespace Ncl.Common.Csv.Tests
             {
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
-                
+
                 csvStream.Dispose();
                 csvStream.Dispose(); //Twice to cover Dispose
-                
+
                 // Act
                 await csvStream.FlushAsync().ConfigureAwait(false);
             }
@@ -755,7 +983,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
         }
-        
+
         [Fact]
         public void WriteHeaders_WithValidStrings_ShouldWriteHeaderEntries()
         {
@@ -1135,7 +1363,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
         }
-        
+
         [Fact]
         public void WriteHeaderRow_WithValidStrings_ShouldWriteHeaderRow()
         {
@@ -1532,7 +1760,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<IntegrityViolatedException>(TestCode);
         }
-        
+
         [Fact]
         public void WriteRowEnd_WithDisposedStream_ShouldThrowException()
         {
@@ -1542,7 +1770,7 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
                 csvStream.Dispose();
-                
+
                 //Act
                 csvStream.WriteRowEnd();
             }
@@ -1550,7 +1778,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<ObjectDisposedException>(TestCode);
         }
-        
+
         [Fact]
         public void WriteRowEnd_WithUnmatchedFieldsAndStrictMode_ShouldThrowIntegrityException()
         {
@@ -1589,7 +1817,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteRowEnd_WithUnmatchedAndMoreFieldsAndLooseMode_ShouldWriteField()
         {
@@ -1685,7 +1913,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task WriteRowEndAsync_WithNoFieldsWritten_ShouldThrowIntegrityException()
         {
@@ -1695,7 +1923,7 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 // ReSharper disable once RedundantArgumentDefaultValue
                 using CsvStreamWriter csvStream = GetDefaultInstance(IntegrityMode.Strict);
-                
+
                 // Act
                 await csvStream.WriteRowEndAsync();
             }
@@ -1703,7 +1931,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             await Assert.ThrowsAsync<IntegrityViolatedException>(TestCode);
         }
-        
+
         [Fact]
         public async Task WriteRowEndAsync_WithDisposedStream_ShouldThrowException()
         {
@@ -1713,7 +1941,7 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
                 csvStream.Dispose();
-                
+
                 //Act
                 await csvStream.WriteRowEndAsync();
             }
@@ -1760,7 +1988,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task WriteRowEndAsync_WithUnmatchedAndMoreFieldsAndLooseMode_ShouldWriteField()
         {
@@ -1904,7 +2132,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteField_WithValidFieldValueAndUnfinishedHeaderRow_ShouldWriteRowEndAndField()
         {
@@ -1913,7 +2141,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             csvStream.WriteHeader(ValidHeader);
-            
+
             // Act
             csvStream.WriteField(ValidField);
 
@@ -1922,7 +2150,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteField_WithValidHeaderButStreamDisposed_ShouldThrowException()
         {
@@ -1932,7 +2160,7 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
                 csvStream.Dispose();
-                
+
                 //Act
                 csvStream.WriteField(ValidField);
             }
@@ -1988,7 +2216,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task WriteFieldAsync_WithValidFieldValueAndUnfinishedHeaderRow_ShouldWriteRowEndAndField()
         {
@@ -1997,7 +2225,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             await csvStream.WriteHeaderAsync(ValidHeader);
-            
+
             // Act
             await csvStream.WriteFieldAsync(ValidField);
 
@@ -2006,7 +2234,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task WriteFieldAsync_WithValidHeaderButStreamDisposed_ShouldThrowException()
         {
@@ -2016,7 +2244,7 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
                 csvStream.Dispose();
-                
+
                 //Act
                 await csvStream.WriteFieldAsync(ValidField);
             }
@@ -3190,7 +3418,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteFieldRow_WithValidFieldValues_ShouldWriteField()
         {
@@ -3538,21 +3766,26 @@ namespace Ncl.Common.Csv.Tests
         private static CsvStreamWriter GetDefaultInstance(out MemoryStream underlyingStream,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            StreamWriter streamWriter = GetDefaultStream(out underlyingStream);
+            StreamWriter streamWriter = GetDefaultStreamWriter(out underlyingStream);
             return new CsvStreamWriter(streamWriter,
                 formatProvider: _englishUsCulture,
                 integrityMode: integrityMode);
         }
 
-        private static StreamWriter GetDefaultStream()
+        private static StreamWriter GetDefaultStreamWriter()
         {
-            return new StreamWriter(new MemoryStream()) { AutoFlush = true };
+            return new StreamWriter(GetDefaultStream()) { AutoFlush = true };
         }
 
-        private static StreamWriter GetDefaultStream(out MemoryStream underlyingStream)
+        private static StreamWriter GetDefaultStreamWriter(out MemoryStream underlyingStream)
         {
-            underlyingStream = new MemoryStream();
+            underlyingStream = GetDefaultStream();
             return new StreamWriter(underlyingStream) { AutoFlush = true };
+        }
+
+        private static MemoryStream GetDefaultStream()
+        {
+            return new MemoryStream();
         }
     }
 }

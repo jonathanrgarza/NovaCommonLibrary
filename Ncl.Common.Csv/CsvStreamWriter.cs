@@ -42,6 +42,27 @@ namespace Ncl.Common.Csv
         ///     The double quote (") character.
         /// </summary>
         protected const char DoubleQuoteChar = '"';
+        
+        protected const int DefaultBufferSize = 1024;
+
+        private static volatile Encoding _utf8NoBom;
+        
+        /// <summary>
+        ///     Represents the default encoding for a stream.
+        /// </summary>
+        protected static Encoding Utf8NoBom
+        {
+            get
+            {
+                if (_utf8NoBom != null) 
+                    return _utf8NoBom;
+                
+                var noBom = new UTF8Encoding(false, true);
+                Thread.MemoryBarrier();
+                _utf8NoBom = noBom;
+                return _utf8NoBom;
+            }
+        }
 
         protected readonly bool _leaveOpen;
         protected readonly TextWriter _stream;
@@ -51,6 +72,52 @@ namespace Ncl.Common.Csv
         private IFormatProvider _formatProvider;
         private bool _isDisposed;
 
+        /// <summary>
+        ///     Initializes a new instance of <see cref="CsvStreamWriter" />.
+        /// </summary>
+        /// <param name="stream">The underlying stream to use.</param>
+        /// <param name="encoding">
+        ///     The encoding to use.
+        ///     A null value will result in the default encoding being used. Defaults to null.
+        /// </param>
+        /// <param name="leaveOpen">
+        ///     Should the given stream be left open when this instance is disposed/closed. Defaults to false.
+        /// </param>
+        /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
+        /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
+        /// <exception cref="ArgumentException">
+        ///     the <paramref name="stream"/> is not writable -or-
+        ///     <paramref name="separator" /> is a double quote, return feed or a new line character.
+        /// </exception>
+        public CsvStreamWriter(Stream stream, Encoding encoding = null, bool leaveOpen = false, 
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null, 
+            IntegrityMode integrityMode = IntegrityMode.Strict)
+        {
+            if (separator == DoubleQuoteChar || separator == '\r' || separator == '\n')
+            {
+                throw new ArgumentException(InvalidSeparatorCharacterMsg, nameof(separator));
+            }
+
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+
+            if (encoding == null)
+            {
+                encoding = Utf8NoBom;
+            }
+
+            _stream = new StreamWriter(stream, encoding, DefaultBufferSize, leaveOpen);
+            _leaveOpen = leaveOpen;
+            _separator = separator;
+            _formatProvider = formatProvider ?? Thread.CurrentThread.CurrentCulture;
+            IntegrityMode = integrityMode;
+        }
+        
         /// <summary>
         ///     Initializes a new instance of <see cref="CsvStreamWriter" />.
         /// </summary>
@@ -68,8 +135,9 @@ namespace Ncl.Common.Csv
         /// <exception cref="ArgumentException">
         ///     <paramref name="separator" /> is a double quote, return feed or a new line character.
         /// </exception>
-        public CsvStreamWriter(TextWriter stream, bool leaveOpen = false, char separator = DefaultSeparator,
-            IFormatProvider formatProvider = null, IntegrityMode integrityMode = IntegrityMode.Strict)
+        public CsvStreamWriter(TextWriter stream, bool leaveOpen = false, 
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null, 
+            IntegrityMode integrityMode = IntegrityMode.Strict)
         {
             if (separator == DoubleQuoteChar || separator == '\r' || separator == '\n')
             {
@@ -91,6 +159,10 @@ namespace Ncl.Common.Csv
         ///     Will create the file if it does not exist.
         /// </param>
         /// <param name="append">Should the stream append content to the file. Defaults to false.</param>
+        /// <param name="encoding">
+        ///     The encoding to use.
+        ///     A null value will result in the default encoding being used. Defaults to null.
+        /// </param>
         /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
         /// <param name="formatProvider">
         ///     The format provider for numeric types.
@@ -98,15 +170,35 @@ namespace Ncl.Common.Csv
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
-        public CsvStreamWriter(string path, bool append = false, char separator = DefaultSeparator,
-            IFormatProvider formatProvider = null, IntegrityMode integrityMode = IntegrityMode.Strict)
+        /// <exception cref="T:System.IO.IOException">
+        ///     <paramref name="path" /> includes an incorrect or invalid syntax for file name,
+        ///     directory name, or volume label syntax.
+        /// </exception>
+        /// <exception cref="T:System.Security.SecurityException">
+        ///     The caller does not have the required permission.
+        /// </exception>
+        /// <exception cref="T:System.UnauthorizedAccessException">Access is denied.</exception>
+        /// <exception cref="T:System.IO.DirectoryNotFoundException">
+        ///     The specified path is invalid (for example, it is on an unmapped drive).
+        /// </exception>
+        /// <exception cref="T:System.IO.PathTooLongException">
+        ///     The specified path, file name, or both exceed the system-defined maximum length.
+        /// </exception>
+        public CsvStreamWriter(string path, bool append = false, Encoding encoding = null, 
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null, 
+            IntegrityMode integrityMode = IntegrityMode.Strict)
         {
             if (separator == DoubleQuoteChar || separator == '\r' || separator == '\n')
             {
                 throw new ArgumentException(InvalidSeparatorCharacterMsg, nameof(separator));
             }
+            
+            if (encoding == null)
+            {
+                encoding = Utf8NoBom;
+            }
 
-            _stream = new StreamWriter(path, append);
+            _stream = new StreamWriter(path, append, encoding);
             _formatProvider = Thread.CurrentThread.CurrentCulture;
             _separator = separator;
             _formatProvider = formatProvider ?? Thread.CurrentThread.CurrentCulture;
@@ -202,6 +294,10 @@ namespace Ncl.Common.Csv
         ///     Creates a new <see cref="CsvStreamWriter" /> instance using the given stream.
         /// </summary>
         /// <param name="stream">The stream to use.</param>
+        /// <param name="encoding">
+        ///     The encoding to use.
+        ///     A null value will result in the default encoding being used. Defaults to null.
+        /// </param>
         /// <param name="leaveOpen">
         ///     Should the given stream be left open when this instance is disposed/closed. Defaults to false.
         /// </param>
@@ -213,12 +309,145 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>The new instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
-        public static CsvStreamWriter Create(TextWriter stream, bool leaveOpen = false,
-            char separator = DefaultSeparator,
+        /// <exception cref="ArgumentException">
+        ///     the <paramref name="stream"/> is not writable -or-
+        ///     <paramref name="separator" /> is a double quote, return feed or a new line character.
+        /// </exception>
+        public static CsvStreamWriter Create(Stream stream, Encoding encoding = null, bool leaveOpen = false,
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null, 
+            IntegrityMode integrityMode = IntegrityMode.Strict)
+        {
+            bool result = TryCreate(stream, encoding, leaveOpen, separator, formatProvider, integrityMode, 
+                out Exception ex, out CsvStreamWriter cvsStream);
+            if (result)
+                return cvsStream;
+
+            if (ex == null)
+            {
+                //Shouldn't happen
+                ex = new Exception("An unknown error has occurred");
+            }
+
+            throw ex;
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="CsvStreamWriter" /> instance using the given stream.
+        /// </summary>
+        /// <param name="stream">The stream to use.</param>
+        /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
+        /// <param name="encoding">
+        ///     The encoding to use.
+        ///     A null value will result in the default encoding being used. Defaults to null.
+        /// </param>
+        /// <param name="leaveOpen">
+        ///     Should the given stream be left open when this instance is disposed/closed. Defaults to false.
+        /// </param>
+        /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
+        /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
+        /// <returns>The new instance or null on error.</returns>
+        public static CsvStreamWriter Create(Stream stream, out Exception ex, Encoding encoding = null, 
+            bool leaveOpen = false, char separator = DefaultSeparator, IFormatProvider formatProvider = null,
+            IntegrityMode integrityMode = IntegrityMode.Strict)
+        {
+            bool result = TryCreate(stream, encoding, leaveOpen, separator, formatProvider, integrityMode, out ex,
+                out CsvStreamWriter cvsStream);
+
+            return result ? cvsStream : null;
+        }
+
+        /// <summary>
+        ///     Tries to create a new <see cref="CsvStreamWriter" /> instance using the given stream.
+        /// </summary>
+        /// <param name="stream">The stream to use.</param>
+        /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
+        /// <param name="csvStream">Out: The new instance.</param>
+        /// <param name="encoding">
+        ///     The encoding to use.
+        ///     A null value will result in the default encoding being used. Defaults to null.
+        /// </param>
+        /// <param name="leaveOpen">Should the given stream be left open when this instance is disposed/closed.</param>
+        /// <param name="separator">The separator for the CSV stream.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
+        /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
+        /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
+        public static bool TryCreate(Stream stream, out Exception ex, out CsvStreamWriter csvStream,
+            Encoding encoding = null, bool leaveOpen = false, char separator = DefaultSeparator, 
             IFormatProvider formatProvider = null, IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            bool result = TryCreate(stream, leaveOpen, separator, formatProvider, integrityMode, out Exception ex,
-                out CsvStreamWriter cvsStream);
+            return TryCreate(stream, encoding, leaveOpen, separator, formatProvider, integrityMode, 
+                out ex, out csvStream);
+        }
+
+        /// <summary>
+        ///     Tries to create a new <see cref="CsvStreamWriter" /> instance using the given stream.
+        /// </summary>
+        /// <param name="stream">The stream to use.</param>
+        /// <param name="encoding">
+        ///     The encoding to use.
+        ///     A null value will result in the default encoding being used.
+        /// </param>
+        /// <param name="leaveOpen">Should the given stream be left open when this instance is disposed/closed.</param>
+        /// <param name="separator">The separator for the CSV stream.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     A null value will result in the Thread's current culture being used.
+        /// </param>
+        /// <param name="integrityMode">The integrity mode for this stream.</param>
+        /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
+        /// <param name="csvStream">Out: The new instance.</param>
+        /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
+        public static bool TryCreate(Stream stream, Encoding encoding, bool leaveOpen, char separator,
+            IFormatProvider formatProvider, IntegrityMode integrityMode, out Exception ex,
+            out CsvStreamWriter csvStream)
+        {
+            ex = null;
+            csvStream = null;
+
+            try
+            {
+                csvStream = new CsvStreamWriter(stream, encoding, leaveOpen, separator, formatProvider, integrityMode);
+                return true;
+            }
+            catch (Exception e)
+            {
+                ex = e;
+            }
+
+            return false;
+        }
+        
+        /// <summary>
+        ///     Creates a new <see cref="CsvStreamWriter" /> instance using the given stream.
+        /// </summary>
+        /// <param name="stream">The stream to use.</param>
+        /// <param name="leaveOpen">
+        ///     Should the given stream be left open when this instance is disposed/closed. Defaults to false.
+        /// </param>
+        /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
+        /// <param name="formatProvider">
+        ///     The format provider for numeric types.
+        ///     Defaults to null which will result in the Thread's current culture being used.
+        /// </param>
+        /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
+        /// <returns>The new instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="separator" /> is a double quote, return feed or a new line character.
+        /// </exception>
+        public static CsvStreamWriter Create(TextWriter stream, bool leaveOpen = false,
+            char separator = DefaultSeparator, IFormatProvider formatProvider = null, 
+            IntegrityMode integrityMode = IntegrityMode.Strict)
+        {
+            bool result = TryCreate(stream, leaveOpen, separator, formatProvider, integrityMode, 
+                out Exception ex, out CsvStreamWriter cvsStream);
             if (result)
                 return cvsStream;
 
@@ -246,7 +475,7 @@ namespace Ncl.Common.Csv
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>The new instance or null on error.</returns>
-        public static CsvStreamWriter Create(TextWriter stream, out Exception ex, bool leaveOpen = false,
+        public static CsvStreamWriter Create(TextWriter stream, out Exception ex, bool leaveOpen = false, 
             char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
@@ -271,10 +500,11 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
         public static bool TryCreate(TextWriter stream, out Exception ex, out CsvStreamWriter csvStream,
-            bool leaveOpen = false, char separator = DefaultSeparator, IFormatProvider formatProvider = null,
-            IntegrityMode integrityMode = IntegrityMode.Strict)
+            bool leaveOpen = false, char separator = DefaultSeparator, 
+            IFormatProvider formatProvider = null, IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            return TryCreate(stream, leaveOpen, separator, formatProvider, integrityMode, out ex, out csvStream);
+            return TryCreate(stream, leaveOpen, separator, formatProvider, integrityMode, 
+                out ex, out csvStream);
         }
 
         /// <summary>
@@ -319,6 +549,10 @@ namespace Ncl.Common.Csv
         ///     Will create the file if it does not exist.
         /// </param>
         /// <param name="append">Should the stream append content to the file. Defaults to false.</param>
+        /// <param name="encoding">
+        ///     The encoding to use.
+        ///     A null value will result in the default encoding being used. Defaults to null.
+        /// </param>
         /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
         /// <param name="formatProvider">
         ///     The format provider for numeric types.
@@ -327,13 +561,27 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>The new instance of <see cref="CsvStreamWriter" />.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
+        /// <exception cref="T:System.IO.IOException">
+        ///     <paramref name="path" /> includes an incorrect or invalid syntax for file name,
+        ///     directory name, or volume label syntax.
+        /// </exception>
+        /// <exception cref="T:System.Security.SecurityException">
+        ///     The caller does not have the required permission.
+        /// </exception>
+        /// <exception cref="T:System.UnauthorizedAccessException">Access is denied.</exception>
+        /// <exception cref="T:System.IO.DirectoryNotFoundException">
+        ///     The specified path is invalid (for example, it is on an unmapped drive).
+        /// </exception>
+        /// <exception cref="T:System.IO.PathTooLongException">
+        ///     The specified path, file name, or both exceed the system-defined maximum length.
+        /// </exception>
         /// <exception cref="Exception">Thrown if an unexpected error occurs.</exception>
         public static CsvStreamWriter Create(string path, bool append = false,
-            char separator = DefaultSeparator, IFormatProvider formatProvider = null,
+            Encoding encoding = null, char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            bool result = TryCreate(path, append, separator, formatProvider, integrityMode, out Exception ex,
-                out CsvStreamWriter csvStream);
+            bool result = TryCreate(path, append, encoding, separator, formatProvider, integrityMode, 
+                out Exception ex, out CsvStreamWriter csvStream);
 
             if (result)
                 return csvStream;
@@ -353,6 +601,10 @@ namespace Ncl.Common.Csv
         /// </param>
         /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
         /// <param name="append">Should the stream append content to the file. Defaults to false.</param>
+        /// <param name="encoding">
+        ///     The encoding to use.
+        ///     A null value will result in the default encoding being used. Defaults to null.
+        /// </param>
         /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
         /// <param name="formatProvider">
         ///     The format provider for numeric types.
@@ -361,10 +613,10 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
         public static CsvStreamWriter Create(string path, out Exception ex, bool append = false,
-            char separator = DefaultSeparator, IFormatProvider formatProvider = null,
+            Encoding encoding = null, char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            bool result = TryCreate(path, append, separator, formatProvider, integrityMode, out ex,
+            bool result = TryCreate(path, append, encoding, separator, formatProvider, integrityMode, out ex,
                 out CsvStreamWriter csvStream);
             return result ? csvStream : null;
         }
@@ -379,6 +631,10 @@ namespace Ncl.Common.Csv
         /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
         /// <param name="csvStream">Out: The new instance of <see cref="CsvStreamWriter" /> or null on error.</param>
         /// <param name="append">Should the stream append content to the file. Defaults to false.</param>
+        /// <param name="encoding">
+        ///     The encoding to use.
+        ///     A null value will result in the default encoding being used. Defaults to null.
+        /// </param>
         /// <param name="separator">The separator for the CSV stream. Defaults to a comma character.</param>
         /// <param name="formatProvider">
         ///     The format provider for numeric types.
@@ -387,10 +643,10 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>True if the instance of <see cref="CsvStreamWriter" /> was created, otherwise, false.</returns>
         public static bool TryCreate(string path, out Exception ex, out CsvStreamWriter csvStream, bool append = false,
-            char separator = DefaultSeparator, IFormatProvider formatProvider = null,
+            Encoding encoding = null, char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
         {
-            return TryCreate(path, append, separator, formatProvider, integrityMode, out ex, out csvStream);
+            return TryCreate(path, append, encoding, separator, formatProvider, integrityMode, out ex, out csvStream);
         }
 
         /// <summary>
@@ -401,6 +657,10 @@ namespace Ncl.Common.Csv
         ///     Will create the file if it does not exist.
         /// </param>
         /// <param name="append">Should the stream append content to the file.</param>
+        /// <param name="encoding">
+        ///     The encoding to use.
+        ///     A null value will result in the default encoding being used.
+        /// </param>
         /// <param name="separator">The separator for the CSV stream.</param>
         /// <param name="formatProvider">
         ///     The format provider for numeric types.
@@ -410,16 +670,16 @@ namespace Ncl.Common.Csv
         /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
         /// <param name="csvStream">Out: The new instance of <see cref="CsvStreamWriter" /> or null on error.</param>
         /// <returns>True if the instance of <see cref="CsvStreamWriter" /> was created, otherwise, false.</returns>
-        public static bool TryCreate(string path, bool append, char separator,
-            IFormatProvider formatProvider, IntegrityMode integrityMode, out Exception ex,
-            out CsvStreamWriter csvStream)
+        public static bool TryCreate(string path, bool append, Encoding encoding, char separator,
+            IFormatProvider formatProvider, IntegrityMode integrityMode, 
+            out Exception ex, out CsvStreamWriter csvStream)
         {
             ex = null;
             csvStream = null;
 
             try
             {
-                csvStream = new CsvStreamWriter(path, append, separator, formatProvider, integrityMode);
+                csvStream = new CsvStreamWriter(path, append, encoding, separator, formatProvider, integrityMode);
                 return true;
             }
             catch (Exception e)
