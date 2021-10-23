@@ -10,7 +10,7 @@ namespace Ncl.Common.Csv
 {
     /// <summary>
     ///     A CSV stream writer.
-    ///     Handles escaping fields.
+    ///     Handles escaping fields/headers.
     /// </summary>
     public class CsvStreamWriter : IDisposable
     {
@@ -284,10 +284,11 @@ namespace Ncl.Common.Csv
         public int RowsWritten { get; protected set; }
 
         /// <summary>
-        ///     Gets/Sets the separator character.
+        ///     Gets the separator character.
         /// </summary>
         /// <exception cref="ArgumentException">
-        ///     value is equal to a quotation mark ("), return feed (\r) or newline character (\n).
+        ///     <paramref name="value"/> is equal to a double quotation mark ("),
+        ///     return feed (\r) or newline character (\n).
         /// </exception>
         public char Separator
         {
