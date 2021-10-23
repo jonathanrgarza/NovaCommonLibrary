@@ -43,8 +43,14 @@ namespace Ncl.Common.Csv
         /// </summary>
         protected const char DoubleQuoteChar = '"';
 
+        /// <summary>
+        ///     The default buffer size for any StreamWriter instance.
+        /// </summary>
         protected const int DefaultBufferSize = 1024;
 
+        /// <summary>
+        ///     The default encoding for any StreamWriter instance.
+        /// </summary>
         private static volatile Encoding _utf8NoBom;
 
         protected readonly bool _leaveOpen;
@@ -293,7 +299,7 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
-        ///     Represents the default encoding for a stream.
+        ///     Gets the default encoding for a stream.
         /// </summary>
         protected static Encoding Utf8NoBom
         {
@@ -2250,7 +2256,7 @@ namespace Ncl.Common.Csv
             }
 
             _stream.Write(escapedText);
-            
+
             FieldPosition++;
             PerformAutoFlushIfNecessary();
             return this;
@@ -2295,7 +2301,7 @@ namespace Ncl.Common.Csv
             }
 
             await _stream.WriteAsync(escapedText).ConfigureAwait(false);
-            
+
             FieldPosition++;
             await PerformAutoFlushIfNecessaryAsync().ConfigureAwait(false);
             return this;
