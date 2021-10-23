@@ -2506,6 +2506,8 @@ namespace Ncl.Common.Csv
                 _stream.Dispose();
             }
 
+            _headers = null;
+
             _isDisposed = true;
         }
 
