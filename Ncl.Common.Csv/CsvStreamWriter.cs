@@ -346,7 +346,7 @@ namespace Ncl.Common.Csv
         ///     Defaults to null which will result in the Thread's current culture being used.
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
-        /// <returns>The new instance.</returns>
+        /// <returns>The new instance of <see cref="CsvStreamWriter" />.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
         /// <exception cref="ArgumentException">
         ///     the <paramref name="stream" /> is not writable -or-
@@ -388,7 +388,7 @@ namespace Ncl.Common.Csv
         ///     Defaults to null which will result in the Thread's current culture being used.
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
-        /// <returns>The new instance or null on error.</returns>
+        /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
         public static CsvStreamWriter Create(Stream stream, out Exception ex, Encoding encoding = null,
             bool leaveOpen = false, char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
@@ -416,7 +416,7 @@ namespace Ncl.Common.Csv
         ///     Defaults to null which will result in the Thread's current culture being used.
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
-        /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
+        /// <returns>True if the instance of <see cref="CsvStreamWriter" /> was created, otherwise, false.</returns>
         public static bool TryCreate(Stream stream, out Exception ex, out CsvStreamWriter csvStream,
             Encoding encoding = null, bool leaveOpen = false, char separator = DefaultSeparator,
             IFormatProvider formatProvider = null, IntegrityMode integrityMode = IntegrityMode.Strict)
@@ -442,7 +442,7 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream.</param>
         /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
         /// <param name="csvStream">Out: The new instance.</param>
-        /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
+        /// <returns>True if the instance of <see cref="CsvStreamWriter" /> was created, otherwise, false.</returns>
         public static bool TryCreate(Stream stream, Encoding encoding, bool leaveOpen, char separator,
             IFormatProvider formatProvider, IntegrityMode integrityMode, out Exception ex,
             out CsvStreamWriter csvStream)
@@ -476,7 +476,7 @@ namespace Ncl.Common.Csv
         ///     Defaults to null which will result in the Thread's current culture being used.
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
-        /// <returns>The new instance.</returns>
+        /// <returns>The new instance of <see cref="CsvStreamWriter" />.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="stream" /> is null.</exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="separator" /> is a double quote, return feed or a new line character.
@@ -513,7 +513,7 @@ namespace Ncl.Common.Csv
         ///     Defaults to null which will result in the Thread's current culture being used.
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
-        /// <returns>The new instance or null on error.</returns>
+        /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
         public static CsvStreamWriter Create(TextWriter stream, out Exception ex, bool leaveOpen = false,
             char separator = DefaultSeparator, IFormatProvider formatProvider = null,
             IntegrityMode integrityMode = IntegrityMode.Strict)
@@ -537,7 +537,7 @@ namespace Ncl.Common.Csv
         ///     Defaults to null which will result in the Thread's current culture being used.
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
-        /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
+        /// <returns>True if the instance of <see cref="CsvStreamWriter" /> was created, otherwise, false.</returns>
         public static bool TryCreate(TextWriter stream, out Exception ex, out CsvStreamWriter csvStream,
             bool leaveOpen = false, char separator = DefaultSeparator,
             IFormatProvider formatProvider = null, IntegrityMode integrityMode = IntegrityMode.Strict)
@@ -559,7 +559,7 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream.</param>
         /// <param name="ex">Out: The <see cref="Exception" />, if any occurs.</param>
         /// <param name="csvStream">Out: The new instance.</param>
-        /// <returns>The new instance of <see cref="CsvStreamWriter" /> or null on error.</returns>
+        /// <returns>True if the instance of <see cref="CsvStreamWriter" /> was created, otherwise, false.</returns>
         public static bool TryCreate(TextWriter stream, bool leaveOpen, char separator,
             IFormatProvider formatProvider, IntegrityMode integrityMode, out Exception ex,
             out CsvStreamWriter csvStream)
