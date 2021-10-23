@@ -36,7 +36,7 @@ namespace Ncl.Common.Csv
         ///     The exception message when given an invalid separator character.
         /// </summary>
         protected const string InvalidSeparatorCharacterMsg =
-            "Separator value can not be a quotation mark (\"), return feed (\\r) or newline character (\\n)";
+            "Separator value can not be a double quotation mark (\"), return feed (\\r) or newline character (\\n)";
 
         /// <summary>
         ///     The double quote (") character.
