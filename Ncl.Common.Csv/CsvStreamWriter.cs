@@ -160,6 +160,10 @@ namespace Ncl.Common.Csv
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="path" /> is empty -or-
+        ///     <paramref name="path" /> contains the name of a system device (com1, com2, and so on).
+        /// </exception>
         /// <exception cref="T:System.IO.IOException">
         ///     <paramref name="path" /> includes an incorrect or invalid syntax for file name,
         ///     directory name, or volume label syntax.
@@ -282,7 +286,9 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Gets/Sets the separator character.
         /// </summary>
-        /// <exception cref="ArgumentException">value is equal to a quotation mark ("), return feed (\r) or newline character (\n).</exception>
+        /// <exception cref="ArgumentException">
+        ///     value is equal to a quotation mark ("), return feed (\r) or newline character (\n).
+        /// </exception>
         public char Separator
         {
             get => _separator;
@@ -290,8 +296,7 @@ namespace Ncl.Common.Csv
             {
                 if (value == DoubleQuoteChar || value == '\r' || value == '\n')
                 {
-                    throw new ArgumentException(
-                        "Separator value can not be a quotation mark (\"), return feed (\\r) or newline character (\\n)");
+                    throw new ArgumentException(InvalidSeparatorCharacterMsg);
                 }
 
                 _separator = value;
@@ -594,6 +599,10 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>The new instance of <see cref="CsvStreamWriter" />.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="path" /> is empty -or-
+        ///     <paramref name="path" /> contains the name of a system device (com1, com2, and so on).
+        /// </exception>
         /// <exception cref="T:System.IO.IOException">
         ///     <paramref name="path" /> includes an incorrect or invalid syntax for file name,
         ///     directory name, or volume label syntax.
@@ -1244,7 +1253,8 @@ namespace Ncl.Common.Csv
         ///     Writes headers to the stream as the header entries
         ///     then moves to the start of the next row; asynchronously.
         ///     The headers will be escaped, if necessary.
-        ///     If <paramref name="header" /> and <paramref name="headers" /> is null or empty, nothing is written to the stream.
+        ///     If <paramref name="header" /> and <paramref name="headers" /> is null or empty,
+        ///     nothing is written to the stream.
         /// </summary>
         /// <param name="header">The first header to write.</param>
         /// <param name="headers">The other headers to write.</param>
