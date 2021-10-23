@@ -160,6 +160,10 @@ namespace Ncl.Common.Csv
         /// </param>
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="path" /> is empty -or-
+        ///     <paramref name="path" /> contains the name of a system device (com1, com2, and so on).
+        /// </exception>
         /// <exception cref="T:System.IO.IOException">
         ///     <paramref name="path" /> includes an incorrect or invalid syntax for file name,
         ///     directory name, or volume label syntax.
@@ -594,6 +598,10 @@ namespace Ncl.Common.Csv
         /// <param name="integrityMode">The integrity mode for this stream. Defaults to IntegrityMode.Strict.</param>
         /// <returns>The new instance of <see cref="CsvStreamWriter" />.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="path" /> is null.</exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="path" /> is empty -or-
+        ///     <paramref name="path" /> contains the name of a system device (com1, com2, and so on).
+        /// </exception>
         /// <exception cref="T:System.IO.IOException">
         ///     <paramref name="path" /> includes an incorrect or invalid syntax for file name,
         ///     directory name, or volume label syntax.
