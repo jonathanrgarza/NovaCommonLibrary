@@ -9,15 +9,22 @@ namespace Ncl.Common.Csv.Tests
 {
     public class CsvStreamReaderTests
     {
-        private const string ValidHeader = "header";
-        private const string NeedsEscapingHeader = "header,\" more";
-        private const string NeedsEscapingHeaderExpected = "\"header,\"\" more\"";
+        private const string ValidField = "field1";
+        private const string ValidFieldWithNewLine = "field1\r\n";
+        private const string ValidFieldsTwoRows = "field1,field2\r\nfield3,field4";
+        
+        private const string EscapedField = "\"field1,\"\" more\"";
+        private const string EscapedFieldExpected = "field1,\" more";
+        
+        private const string EscapedFieldWithNewLine = "\"field1,\"\" more\"\r\n";
+        private const string EscapedFieldWithNewLineExpected = "field1,\" more";
+        
+        private const string EscapedFieldsTwoRows = 
+            "\"field1,\"\" more\",\"field2,\"\" more\"\r\n\"field3,\"\" more\",\"field4,\"\" more\"";
+        private const string EscapedFieldTwoRowsExpected = 
+            "field1,\" more,field2,\" more\r\nfield3,\" more,field4,\" more";
 
-        private const string ValidField = "field";
-        private const string NeedsEscapingField = "field,\" more";
-        private const string NeedsEscapingFieldExpected = "\"field,\"\" more\"";
-
-        private const string DefaultCsvContent = "field1,field2\r\nfield3, field4";
+        private const string DefaultCsvContent = ValidFieldsTwoRows;
 
         private const string SimpleFormat = "{0}";
 
@@ -1596,15 +1603,145 @@ namespace Ncl.Common.Csv.Tests
         }
         
         [Fact]
+        public void EndOfStream_WithNoReadsAndEOF_ShouldReturnTrue()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance();
+
+            // Act
+            bool actual = csvStream.EndOfStream;
+
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public void EndOfStream_WithNoReadsAndNotEOF_ShouldReturnFalse()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+
+            // Act
+            bool actual = csvStream.EndOfStream;
+
+            // Assert
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        public void EndOfStream_WithOneReadAndNewLineEnding_ShouldReturnTrue()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+            csvStream.ReadField();
+            
+            // Act
+            bool actual = csvStream.EndOfStream;
+
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public void EndOfStream_WithOneReadAndEOF_ShouldReturnTrue()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+            csvStream.ReadField();
+            
+            // Act
+            bool actual = csvStream.EndOfStream;
+
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public void EndOfStream_WithDisposed_ShouldThrowObjectDisposedException()
+        {
+            // Arrange
+            CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+            csvStream.Dispose();
+            
+            // Act
+            void TestCode()
+            {
+                _ = csvStream.EndOfStream;
+            }
+
+            // Assert
+            Assert.Throws<ObjectDisposedException>(TestCode);
+        }
+        
+        [Fact]
+        public void FirstRowRead_WithNothingRead_ShouldReturnFalse()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+
+            // Act
+            bool actual = csvStream.FirstRowRead;
+
+            // Assert
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        public void FirstRowRead_WithReadButNotFinishFirstRow_ShouldReturnFalse()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadField();
+
+            // Act
+            bool actual = csvStream.FirstRowRead;
+
+            // Assert
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        public void FirstRowRead_WithFirstRowRead_ShouldReturnTrue()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadField();
+            csvStream.ReadField();
+
+            // Act
+            bool actual = csvStream.FirstRowRead;
+
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public void FirstRowRead_WithFirstRowReadPlusAdditionalRead_ShouldReturnTrue()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadField();
+            csvStream.ReadField();
+            csvStream.ReadField();
+            
+            // Act
+            bool actual = csvStream.FirstRowRead;
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
         public void RowsRead_WithNothingRead_ShouldReturnZero()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance();
 
             // Act
+            long actual = csvStream.RowsRead;
 
             // Assert
-            Assert.Equal(0, csvStream.RowsRead);
+            Assert.Equal(0, actual);
         }
 
         [Fact]
@@ -1612,13 +1749,13 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance("Field1,Field2\r\nField3,Field4");
+            csvStream.ReadField();
 
             // Act
-            csvStream.ReadField();
-            csvStream.ReadField();
+            long actual = csvStream.RowsRead;
 
             // Assert
-            Assert.Equal(0, csvStream.RowsRead);
+            Assert.Equal(0, actual);
         }
         
         [Fact]
@@ -1626,14 +1763,15 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance("Field1,Field2\r\nField3,Field4");
-
+            csvStream.ReadField();
+            csvStream.ReadField();
+            csvStream.ReadField();
+            
             // Act
-            csvStream.ReadField();
-            csvStream.ReadField();
-            csvStream.ReadField();
+            long actual = csvStream.RowsRead;
 
             // Assert
-            Assert.Equal(1, csvStream.RowsRead);
+            Assert.Equal(1, actual);
         }
 
         [Fact]
@@ -1684,6 +1822,257 @@ namespace Ncl.Common.Csv.Tests
 
             // Assert
             Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void FieldsRead_WithNoReads_ShouldReturnZero()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance();
+
+            // Act
+            long actual = csvStream.FieldsRead;
+
+            // Assert
+            Assert.Equal(0, actual);
+        }
+        
+        [Fact]
+        public void FieldsRead_WithOneRead_ShouldReturnOne()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadField();
+
+            // Act
+            long actual = csvStream.FieldsRead;
+
+            // Assert
+            Assert.Equal(1, actual);
+        }
+        
+        [Fact]
+        public void FieldsRead_WithReadsPastRowEnd_ShouldReturnTwo()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadField();
+            csvStream.ReadField();
+
+            // Act
+            long actual = csvStream.FieldsRead;
+
+            // Assert
+            Assert.Equal(2, actual);
+        }
+        
+        [Fact]
+        public void FieldPosition_WithNoReads_ShouldReturnZero()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance();
+
+            // Act
+            long actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(0, actual);
+        }
+        
+        [Fact]
+        public void FieldPosition_WithOneRead_ShouldReturnOne()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadField();
+
+            // Act
+            long actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(1, actual);
+        }
+        
+        [Fact]
+        public void FieldPosition_WithReadsPastRowEnd_ShouldReturnZero()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadField();
+            csvStream.ReadField();
+
+            // Act
+            long actual = csvStream.FieldPosition;
+
+            // Assert
+            Assert.Equal(0, actual);
+        }
+        
+        [Fact]
+        public void MaxFieldCount_WithNoReads_ShouldReturnZero()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance();
+
+            // Act
+            long actual = csvStream.MaxFieldCount;
+
+            // Assert
+            Assert.Equal(0, actual);
+        }
+        
+        [Fact]
+        public void MaxFieldCount_WithOneReadButRowNotDone_ShouldReturnOne()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadField();
+
+            // Act
+            long actual = csvStream.MaxFieldCount;
+
+            // Assert
+            Assert.Equal(0, actual);
+        }
+        
+        [Fact]
+        public void MaxFieldCount_WithReadsPastRowEnd_ShouldReturnTwo()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadField();
+            csvStream.ReadField();
+
+            // Act
+            long actual = csvStream.MaxFieldCount;
+
+            // Assert
+            Assert.Equal(2, actual);
+        }
+        
+        [Fact]
+        public void ReadField_WithNoContent_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance();
+            
+
+            // Act
+            string actual = csvStream.ReadField();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public void ReadField_WithContent_ShouldReturnField()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+
+            // Act
+            string actual = csvStream.ReadField();
+
+            // Assert
+            Assert.Equal(ValidField, actual);
+        }
+        
+        [Fact]
+        public void ReadField_WithEOF_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+            csvStream.ReadField();
+            
+            // Act
+            string actual = csvStream.ReadField();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public void ReadField_WithEmptyFieldContent_ShouldReturnEmptyString()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(",field1");
+
+            // Act
+            string actual = csvStream.ReadField();
+
+            // Assert
+            Assert.Equal(string.Empty, actual);
+        }
+        
+        [Fact]
+        public void ReadField_WithEscapedFieldContent_ShouldReturnUnescapedField()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(EscapedFieldWithNewLine);
+
+            // Act
+            string actual = csvStream.ReadField();
+
+            // Assert
+            Assert.Equal(EscapedFieldWithNewLineExpected, actual);
+        }
+        
+        [Fact]
+        public void ReadField_WithEscapedFieldButTextAfterLastDoubleQuoteContent_ShouldReturnUnescapedField()
+        {
+            const string expected = "field1,test extra";
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("\"field1,test\" extra,next field\r\n");
+
+            // Act
+            string actual = csvStream.ReadField();
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void ReadField_WithEscapedFieldButTextBeforeFirstDoubleQuoteContent_ShouldReturnUnescapedField()
+        {
+            const string expected = "extra field1,test";
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("extra \"field1,test\",next field\r\n");
+
+            // Act
+            string actual = csvStream.ReadField();
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void ReadField_WithEscapedEmptyFieldContent_ShouldReturnEmptyString()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("\"\"");
+
+            // Act
+            string actual = csvStream.ReadField();
+
+            // Assert
+            Assert.Equal(string.Empty, actual);
+        }
+        
+        [Fact]
+        public void ReadField_WithStreamDisposed_ShouldThrowObjectDisposedException()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+            csvStream.Dispose();
+            
+            // Act
+            void TestCode()
+            {
+                csvStream.ReadField();
+            }
+
+            // Assert
+            Assert.Throws<ObjectDisposedException>(TestCode);
         }
 
         //Utility functions

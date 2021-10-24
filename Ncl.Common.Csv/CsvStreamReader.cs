@@ -72,7 +72,7 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     The new line sequence used to determine when a row ends.
         /// </summary>
-        protected string _newLine;
+        protected readonly string _newLine;
 
         /// <summary>
         ///     Single character buffer used for when need to move back a character.
@@ -83,7 +83,7 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     The separator character used to delineate fields.
         /// </summary>
-        protected char _separator;
+        protected readonly char _separator;
 
         private IFormatProvider _formatProvider;
 
@@ -297,9 +297,6 @@ namespace Ncl.Common.Csv
                 if (_isDisposed)
                     throw new ObjectDisposedException(nameof(CsvStreamReader));
 
-                if (_stream is StreamReader streamReader)
-                    return streamReader.EndOfStream;
-
                 return Peek() == null;
             }
         }
@@ -308,6 +305,11 @@ namespace Ncl.Common.Csv
         ///     Gets the field position in the current row.
         /// </summary>
         public int FieldPosition { get; protected set; }
+        
+        /// <summary>
+        ///     Gets the total number of fields read from the stream.
+        /// </summary>
+        public long FieldsRead { get; protected set; }
 
         /// <summary>
         ///     Gets if the first row has been read. Special as it can optionally be a header row.
@@ -345,65 +347,17 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Gets the new line character sequence.
         /// </summary>
-        /// <exception cref="ArgumentNullException"><paramref name="value" /> is null.</exception>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="value" /> is an empty string, contains a double quotation mark (") or
-        ///     is longer than 2 characters.
-        /// </exception>
-        public string NewLine
-        {
-            get => _newLine;
-            protected set
-            {
-                if (value == _newLine)
-                    return;
-
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                if (value.Length == 0)
-                    throw new ArgumentException("New line sequence can't be an empty string", nameof(value));
-                if (value.Length > 2)
-                {
-                    throw new ArgumentException("New line sequence can't not be more than two characters",
-                        nameof(value));
-                }
-
-                if (value.Contains("\""))
-                {
-                    throw new ArgumentException("New line sequence can't contain a double quotation mark (\")",
-                        nameof(value));
-                }
-
-
-                _newLine = value;
-            }
-        }
+        public string NewLine => _newLine;
 
         /// <summary>
         ///     Gets the rows written for the current stream.
         /// </summary>
-        public int RowsRead { get; protected set; }
+        public long RowsRead { get; protected set; }
 
         /// <summary>
         ///     Gets the separator character.
         /// </summary>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="value" /> is equal to a double quotation mark ("),
-        ///     return feed (\r) or newline character (\n).
-        /// </exception>
-        public char Separator
-        {
-            get => _separator;
-            protected set
-            {
-                if (value == DoubleQuoteChar || value == '\r' || value == '\n')
-                {
-                    throw new ArgumentException(InvalidSeparatorCharacterMsg);
-                }
-
-                _separator = value;
-            }
-        }
+        public char Separator => _separator;
 
         /// <inheritdoc />
         public void Dispose()
@@ -860,6 +814,11 @@ namespace Ncl.Common.Csv
             if (FieldPosition == 0)
                 return;
 
+            if (FieldPosition > MaxFieldCount)
+            {
+                MaxFieldCount = FieldPosition;
+            }
+            
             FieldPosition = 0;
             RowsRead++;
         }
@@ -1028,9 +987,8 @@ namespace Ncl.Common.Csv
         {
             if (_isDisposed)
                 throw new ObjectDisposedException(nameof(CsvStreamReader));
-
+            
             //Check if we are at the end of a row
-            //Is at the top of this call so FieldPosition doesn't change until this is called
             CheckForEndRow();
 
             bool escaped = false;
@@ -1117,10 +1075,11 @@ namespace Ncl.Common.Csv
                 nextCharBuffer = Read();
             }
 
-            if (sb.Length == 0)
-                return null;
-
             FieldPosition++;
+            FieldsRead++;
+            
+            //Check if we are at the end of a row
+            CheckForEndRow();
             return sb.ToString();
         }
 
