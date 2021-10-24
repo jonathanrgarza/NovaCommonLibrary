@@ -192,6 +192,9 @@ namespace Ncl.Common.Csv
                 encoding = Utf8NoBom;
             }
 
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+
             _stream = new StreamWriter(path, append, encoding);
             _formatProvider = Thread.CurrentThread.CurrentCulture;
             _separator = separator;
