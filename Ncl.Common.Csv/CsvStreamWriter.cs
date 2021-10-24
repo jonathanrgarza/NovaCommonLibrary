@@ -54,10 +54,10 @@ namespace Ncl.Common.Csv
         private static volatile Encoding _utf8NoBom;
 
         protected readonly bool _leaveOpen;
+        protected readonly char _separator;
         protected readonly TextWriter _stream;
         protected bool _autoFlush;
         protected List<string> _headers;
-        protected char _separator;
 
         private IFormatProvider _formatProvider;
         private bool _isDisposed;
@@ -289,23 +289,7 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Gets the separator character.
         /// </summary>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="value"/> is equal to a double quotation mark ("),
-        ///     return feed (\r) or newline character (\n).
-        /// </exception>
-        public char Separator
-        {
-            get => _separator;
-            protected set
-            {
-                if (value == DoubleQuoteChar || value == '\r' || value == '\n')
-                {
-                    throw new ArgumentException(InvalidSeparatorCharacterMsg);
-                }
-
-                _separator = value;
-            }
-        }
+        public char Separator => _separator;
 
         /// <summary>
         ///     Gets the default encoding for a stream.
