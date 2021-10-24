@@ -170,10 +170,12 @@ namespace Ncl.Common.Csv.Tests
         public void Create_WithInvalidSeparator_ShouldThrowException()
         {
             // Arrange
+            using MemoryStream stream = GetDefaultStream();
+            
             // Act
             void TestCode()
             {
-                _ = CsvStreamWriter.Create((Stream) null, separator: '\n');
+                _ = CsvStreamWriter.Create(stream, separator: '\n');
             }
 
             // Assert
@@ -208,8 +210,10 @@ namespace Ncl.Common.Csv.Tests
         public void Create1_WithInvalidSeparator_ShouldSetExceptionArgument()
         {
             // Arrange
+            using MemoryStream stream = GetDefaultStream();
+            
             // Act
-            _ = CsvStreamWriter.Create((Stream) null, out Exception actual, separator: '\n');
+            _ = CsvStreamWriter.Create(stream, out Exception actual, separator: '\n');
 
             // Assert
             Assert.IsType<ArgumentException>(actual);
@@ -291,8 +295,10 @@ namespace Ncl.Common.Csv.Tests
         public void TryCreate_WithInvalidSeparator_ShouldReturnFalse()
         {
             // Arrange
+            using MemoryStream stream = GetDefaultStream();
+            
             // Act
-            bool actual = CsvStreamWriter.TryCreate((Stream) null, out Exception _, out CsvStreamWriter _,
+            bool actual = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter _,
                 separator: '\n');
 
             // Assert
@@ -303,8 +309,10 @@ namespace Ncl.Common.Csv.Tests
         public void TryCreate_WithInvalidSeparator_ShouldSetInstanceArgumentToNull()
         {
             // Arrange
+            using MemoryStream stream = GetDefaultStream();
+            
             // Act
-            bool _ = CsvStreamWriter.TryCreate((Stream) null, out Exception _, out CsvStreamWriter actual,
+            bool _ = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter actual,
                 separator: '\n');
 
             // Assert
@@ -315,8 +323,10 @@ namespace Ncl.Common.Csv.Tests
         public void TryCreate_WithInvalidSeparator_ShouldSetExceptionArgument()
         {
             // Arrange
+            using MemoryStream stream = GetDefaultStream();
+            
             // Act
-            bool _ = CsvStreamWriter.TryCreate((Stream) null, out Exception actual, out CsvStreamWriter _,
+            bool _ = CsvStreamWriter.TryCreate(stream, out Exception actual, out CsvStreamWriter _,
                 separator: '\n');
 
             // Assert
@@ -354,10 +364,12 @@ namespace Ncl.Common.Csv.Tests
         public void Create2_WithInvalidSeparator_ShouldThrowException()
         {
             // Arrange
+            using StreamWriter stream = GetDefaultStreamWriter();
+            
             // Act
             void TestCode()
             {
-                _ = CsvStreamWriter.Create((TextWriter) null, separator: '\n');
+                _ = CsvStreamWriter.Create(stream, separator: '\n');
             }
 
             // Assert
@@ -392,8 +404,10 @@ namespace Ncl.Common.Csv.Tests
         public void Create3_WithInvalidSeparator_ShouldSetExceptionArgument()
         {
             // Arrange
+            using StreamWriter stream = GetDefaultStreamWriter();
+            
             // Act
-            _ = CsvStreamWriter.Create((TextWriter) null, out Exception actual, separator: '\n');
+            _ = CsvStreamWriter.Create(stream, out Exception actual, separator: '\n');
 
             // Assert
             Assert.IsType<ArgumentException>(actual);
@@ -475,8 +489,10 @@ namespace Ncl.Common.Csv.Tests
         public void TryCreate1_WithInvalidSeparator_ShouldReturnFalse()
         {
             // Arrange
+            using StreamWriter stream = GetDefaultStreamWriter();
+            
             // Act
-            bool actual = CsvStreamWriter.TryCreate((TextWriter) null, out Exception _, out CsvStreamWriter _,
+            bool actual = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter _,
                 separator: '\n');
 
             // Assert
@@ -487,8 +503,10 @@ namespace Ncl.Common.Csv.Tests
         public void TryCreate1_WithInvalidSeparator_ShouldSetInstanceArgumentToNull()
         {
             // Arrange
+            using StreamWriter stream = GetDefaultStreamWriter();
+            
             // Act
-            bool _ = CsvStreamWriter.TryCreate((TextWriter) null, out Exception _, out CsvStreamWriter actual,
+            bool _ = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter actual,
                 separator: '\n');
 
             // Assert
@@ -499,8 +517,10 @@ namespace Ncl.Common.Csv.Tests
         public void TryCreate1_WithInvalidSeparator_ShouldSetExceptionArgument()
         {
             // Arrange
+            using StreamWriter stream = GetDefaultStreamWriter();
+            
             // Act
-            bool _ = CsvStreamWriter.TryCreate((TextWriter) null, out Exception actual, out CsvStreamWriter _,
+            bool _ = CsvStreamWriter.TryCreate(stream, out Exception actual, out CsvStreamWriter _,
                 separator: '\n');
 
             // Assert
@@ -508,7 +528,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Create3_WithNullString_ShouldThrowException()
+        public void Create4_WithNullString_ShouldThrowException()
         {
             // Arrange
             // Act
@@ -522,7 +542,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Create3_WithInvalidSeparator_ShouldThrowException()
+        public void Create4_WithInvalidSeparator_ShouldThrowException()
         {
             // Arrange
             // Act
@@ -536,7 +556,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Create4_WithNullString_ShouldSetExceptionArgument()
+        public void Create5_WithNullString_ShouldSetExceptionArgument()
         {
             // Arrange
             // Act
@@ -547,7 +567,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Create4_WithInvalidSeparator_ShouldSetExceptionArgument()
+        public void Create5_WithInvalidSeparator_ShouldSetExceptionArgument()
         {
             // Arrange
             // Act
