@@ -815,6 +815,9 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Asynchronously flushes the underlying stream's buffers.
         /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous flush operation.
+        /// </returns>
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
