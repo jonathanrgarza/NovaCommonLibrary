@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Ncl.Common.Csv
 {
@@ -50,9 +52,24 @@ namespace Ncl.Common.Csv
         protected readonly bool _leaveOpen;
 
         /// <summary>
+        ///     The new line sequence used to determine when a row ends.
+        /// </summary>
+        protected readonly string _newLine;
+
+        /// <summary>
+        ///     The separator character used to delineate fields.
+        /// </summary>
+        protected readonly char _separator;
+
+        /// <summary>
         ///     The stream.
         /// </summary>
         protected readonly TextReader _stream;
+
+        /// <summary>
+        ///     The underlying stream, if possible to get.
+        /// </summary>
+        protected readonly Stream _underlyingStream;
 
         /// <summary>
         ///     The buffer holding characters read from the stream.
@@ -70,20 +87,12 @@ namespace Ncl.Common.Csv
         protected int _bufferPosition;
 
         /// <summary>
-        ///     The new line sequence used to determine when a row ends.
-        /// </summary>
-        protected readonly string _newLine;
-
-        /// <summary>
         ///     Single character buffer used for when need to move back a character.
         ///     Needed in case a newline sequence crosses the end of a buffer.
         /// </summary>
         protected char? _previousCharBuffer;
 
-        /// <summary>
-        ///     The separator character used to delineate fields.
-        /// </summary>
-        protected readonly char _separator;
+        protected Task _asyncTask;
 
         private IFormatProvider _formatProvider;
 
@@ -153,6 +162,7 @@ namespace Ncl.Common.Csv
 
             _stream = new StreamReader(stream, encoding, detectEncodingFromByteOrderMarks, DefaultBufferSize,
                 leaveOpen);
+            _underlyingStream = stream;
             _leaveOpen = leaveOpen;
             _separator = separator;
             _newLine = newLine;
@@ -204,6 +214,7 @@ namespace Ncl.Common.Csv
             }
 
             _stream = stream ?? throw new ArgumentNullException(nameof(stream));
+            _underlyingStream = GetUnderlyingStreamFromTextReader(stream);
             _leaveOpen = leaveOpen;
             _separator = separator;
             _newLine = newLine;
@@ -277,12 +288,20 @@ namespace Ncl.Common.Csv
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
-            _stream = new StreamReader(path, encoding, detectEncodingFromByteOrderMarks, DefaultBufferSize);
+            var streamReader = new StreamReader(path, encoding, detectEncodingFromByteOrderMarks, DefaultBufferSize);
+            _stream = streamReader;
+            _underlyingStream = streamReader.BaseStream;
             _leaveOpen = false;
             _separator = separator;
             _newLine = newLine;
             _formatProvider = formatProvider ?? Thread.CurrentThread.CurrentCulture;
         }
+
+        /// <summary>
+        ///     Gets the base/underlying stream.
+        ///     Can be null if it couldn't be determined from the given <see cref="TextReader" />.
+        /// </summary>
+        public Stream BaseStream => _underlyingStream;
 
         /// <summary>
         ///     Gets if the end of the stream has been reached.
@@ -294,8 +313,7 @@ namespace Ncl.Common.Csv
         {
             get
             {
-                if (_isDisposed)
-                    throw new ObjectDisposedException(nameof(CsvStreamReader));
+                GuardAgainstObjectDisposed();
 
                 return Peek() == null;
             }
@@ -305,7 +323,7 @@ namespace Ncl.Common.Csv
         ///     Gets the field position in the current row.
         /// </summary>
         public int FieldPosition { get; protected set; }
-        
+
         /// <summary>
         ///     Gets the total number of fields read from the stream.
         /// </summary>
@@ -806,19 +824,51 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
+        ///     Gets the underlying stream from a text reader, if possible.
+        /// </summary>
+        /// <returns>The underlying stream or null if not known.</returns>
+        protected static Stream GetUnderlyingStreamFromTextReader(TextReader textReader)
+        {
+            if (textReader is StreamReader streamReader)
+                return streamReader.BaseStream;
+            return null;
+        }
+        
+        /// <summary>
+        ///     Guards against an already running async operation.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader"/> has already been disposed.
+        /// </exception>
+        protected void GuardAgainstObjectDisposed()
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(CsvStreamReader));
+        }
+
+        /// <summary>
+        ///     Guards against an already running async operation.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        ///     The stream is currently in use by a previous operation on the stream.
+        /// </exception>
+        protected void GuardAgainstAlreadyRunningAsyncTask()
+        {
+            if (_asyncTask != null && !_asyncTask.IsCompleted)
+                throw new InvalidOperationException(
+                    "The stream is currently in use by a previous operation on the stream.");
+        }
+
+        /// <summary>
         ///     Resets the reader's properties as a new/next row.
         /// </summary>
         protected virtual void ResetAsNextRow()
         {
-            //Empty rows don't count
-            if (FieldPosition == 0)
-                return;
-
             if (FieldPosition > MaxFieldCount)
             {
                 MaxFieldCount = FieldPosition;
             }
-            
+
             FieldPosition = 0;
             RowsRead++;
         }
@@ -858,6 +908,42 @@ namespace Ncl.Common.Csv
 
             return secondChar.Value == newLineSequence[1];
         }
+        
+        /// <summary>
+        ///     Checks for the end of a row in the stream.
+        /// </summary>
+        /// <param name="firstCharacter">
+        ///     The character to check. The character MUST be removed/read from the stream already.
+        /// </param>
+        /// <returns>
+        ///     <see langword="true" /> if the given character, and next character if new line sequence is
+        ///     made up of two characters, matches the new line sequence, otherwise, <see langword="false" />.
+        ///     Will also return <see langword="true" /> if the first character,
+        ///     of a two character new line sequence, matches and EOF is reached.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        protected virtual async Task<bool> IsEndRowAsync(char? firstCharacter)
+        {
+            if (firstCharacter == null)
+                return false;
+
+            string newLineSequence = NewLine;
+            if (firstCharacter.Value != newLineSequence[0])
+                return false;
+
+            if (newLineSequence.Length <= 1)
+                return true;
+
+            char? secondChar = await PeekAsync().ConfigureAwait(false);
+
+            //Check if at EOF, if so, then consider it an end of row
+            if (secondChar == null)
+                return true;
+
+            return secondChar.Value == newLineSequence[1];
+        }
 
         /// <summary>
         ///     Checks for the end of a row in the stream and processes it.
@@ -866,10 +952,11 @@ namespace Ncl.Common.Csv
         ///     The first character to check; MUST be removed/read from the stream already.
         ///     If null, will read the first character from the stream instead.
         /// </param>
+        /// <returns><see langword="true" /> if an end row was reached, and processed, otherwise <see langword="false" />.</returns>
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
         /// </exception>
-        protected virtual void CheckForEndRow(char? firstCharacter = null)
+        protected virtual bool CheckForEndRow(char? firstCharacter = null)
         {
             char? nextChar = firstCharacter;
             if (firstCharacter == null)
@@ -878,7 +965,7 @@ namespace Ncl.Common.Csv
             }
 
             if (nextChar == null)
-                return;
+                return false;
 
             if (!IsEndRow(nextChar))
             {
@@ -888,7 +975,7 @@ namespace Ncl.Common.Csv
                     _previousCharBuffer = nextChar;
                 }
 
-                return;
+                return false;
             }
 
             if (_newLine.Length == 2)
@@ -897,6 +984,49 @@ namespace Ncl.Common.Csv
             }
 
             ResetAsNextRow();
+            return true;
+        }
+        
+        /// <summary>
+        ///     Checks for the end of a row in the stream and processes it.
+        /// </summary>
+        /// <param name="firstCharacter">
+        ///     The first character to check; MUST be removed/read from the stream already.
+        ///     If null, will read the first character from the stream instead.
+        /// </param>
+        /// <returns><see langword="true" /> if an end row was reached, and processed, otherwise <see langword="false" />.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        protected virtual async Task<bool> CheckForEndRowAsync(char? firstCharacter = null)
+        {
+            char? nextChar = firstCharacter;
+            if (firstCharacter == null)
+            {
+                nextChar = await ReadAsync().ConfigureAwait(false);
+            }
+
+            if (nextChar == null)
+                return false;
+
+            if (!await IsEndRowAsync(nextChar).ConfigureAwait(false))
+            {
+                if (firstCharacter == null)
+                {
+                    //Ensure the character goes back on the stream/buffer
+                    _previousCharBuffer = nextChar;
+                }
+
+                return false;
+            }
+
+            if (_newLine.Length == 2)
+            {
+                await ReadAsync().ConfigureAwait(false); //Remove the next character from stream
+            }
+
+            ResetAsNextRow();
+            return true;
         }
 
         /// <summary>
@@ -908,13 +1038,32 @@ namespace Ncl.Common.Csv
         /// </exception>
         protected virtual int ReadBuffer()
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamReader));
+            GuardAgainstObjectDisposed();
 
             _bufferPosition = 0;
             _bufferLength = 0;
 
             int length = _stream.Read(_buffer, 0, _buffer.Length);
+
+            _bufferLength = length;
+            return length;
+        }
+        
+        /// <summary>
+        ///     Reads in the next block of characters into the buffer.
+        /// </summary>
+        /// <returns>The number of characters read into the buffer.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        protected virtual async Task<int> ReadBufferAsync()
+        {
+            GuardAgainstObjectDisposed();
+
+            _bufferPosition = 0;
+            _bufferLength = 0;
+
+            int length = await _stream.ReadAsync(_buffer, 0, _buffer.Length).ConfigureAwait(false);
 
             _bufferLength = length;
             return length;
@@ -929,8 +1078,7 @@ namespace Ncl.Common.Csv
         /// </exception>
         protected virtual char? Peek()
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamReader));
+            GuardAgainstObjectDisposed();
 
             if (_previousCharBuffer.HasValue)
                 return _previousCharBuffer;
@@ -939,6 +1087,29 @@ namespace Ncl.Common.Csv
                 return _buffer[_bufferPosition];
 
             if (ReadBuffer() == 0)
+                return null; //Reached EOF
+
+            return _buffer[_bufferPosition];
+        }
+        
+        /// <summary>
+        ///     Peeks at the next character from the stream.
+        /// </summary>
+        /// <returns>The next character or null if there are no more characters in the stream.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        protected virtual async ValueTask<char?> PeekAsync()
+        {
+            GuardAgainstObjectDisposed();
+
+            if (_previousCharBuffer.HasValue)
+                return _previousCharBuffer;
+
+            if (_bufferPosition != _bufferLength)
+                return _buffer[_bufferPosition];
+
+            if (await ReadBufferAsync().ConfigureAwait(false) == 0)
                 return null; //Reached EOF
 
             return _buffer[_bufferPosition];
@@ -953,8 +1124,7 @@ namespace Ncl.Common.Csv
         /// </exception>
         protected virtual char? Read()
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamReader));
+            GuardAgainstObjectDisposed();
 
             if (_previousCharBuffer.HasValue)
             {
@@ -973,23 +1143,90 @@ namespace Ncl.Common.Csv
             _bufferPosition++;
             return nextChar;
         }
+        
+        /// <summary>
+        ///     Reads the next character from the stream.
+        /// </summary>
+        /// <returns>The next character or null if there are no more characters in the stream.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        protected virtual async ValueTask<char?> ReadAsync()
+        {
+            GuardAgainstObjectDisposed();
+
+            if (_previousCharBuffer.HasValue)
+            {
+                char previousChar = _previousCharBuffer.Value;
+                _previousCharBuffer = null;
+                return previousChar;
+            }
+
+            if (_bufferPosition == _bufferLength)
+            {
+                if (await ReadBufferAsync() == 0)
+                    return null; //Reached EOF
+            }
+
+            char nextChar = _buffer[_bufferPosition];
+            _bufferPosition++;
+            return nextChar;
+        }
 
         /// <summary>
-        ///     Reads the next field from the stream.
+        ///     Resets the stream position to the beginning of the stream.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
+        /// <exception cref="T:System.NotSupportedException">
+        ///     The stream does not support seeking, such as if the stream is
+        ///     constructed from a pipe or console output.
+        /// </exception>
+        public virtual void ResetStreamPosition()
+        {
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            if (_underlyingStream == null)
+                throw new NotSupportedException("This stream does not support seeking");
+
+            _underlyingStream.Seek(0, SeekOrigin.Begin);
+
+            FieldPosition = 0;
+            FieldsRead = 0;
+            MaxFieldCount = 0;
+            RowsRead = 0;
+            _bufferLength = 0;
+            _bufferPosition = 0;
+            _previousCharBuffer = null;
+
+            if (!(_stream is StreamReader streamReader))
+                return;
+
+            streamReader.DiscardBufferedData();
+        }
+
+        /// <summary>
+        ///     Reads the next field from the stream and checks if a new line was encountered.
         /// </summary>
         /// <returns>
-        ///     The next field, as a string, or null if there are no more fields in the stream.
+        ///     The next field, as a <see cref="FieldReadResult"/>, or null if there are no more fields in the stream.
         /// </returns>
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
         /// </exception>
-        public virtual string ReadField()
+        public virtual FieldReadResult ReadFieldAndCheck()
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamReader));
-            
-            //Check if we are at the end of a row
-            CheckForEndRow();
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            //Check if we are at the end of a row already (means empty row)
+            if (CheckForEndRow())
+            {
+                return new FieldReadResult(string.Empty, true);
+            }
 
             bool escaped = false;
             char? nextCharBuffer = Read();
@@ -1004,7 +1241,7 @@ namespace Ncl.Common.Csv
             if (nextCharBuffer.Value == separator)
             {
                 FieldPosition++;
-                return string.Empty;
+                return new FieldReadResult(string.Empty, false);
             }
 
             var sb = new StringBuilder();
@@ -1022,6 +1259,7 @@ namespace Ncl.Common.Csv
                         char? peekedChar = Peek();
                         if (peekedChar == null)
                             break;
+
                         if (peekedChar.Value == DoubleQuoteChar)
                         {
                             //Escaped quote
@@ -1077,10 +1315,383 @@ namespace Ncl.Common.Csv
 
             FieldPosition++;
             FieldsRead++;
-            
+
             //Check if we are at the end of a row
-            CheckForEndRow();
-            return sb.ToString();
+            bool newLineEncountered = CheckForEndRow();
+            return new FieldReadResult(sb.ToString(), newLineEncountered);
+        }
+
+        /// <summary>
+        ///     Reads the next field from the stream.
+        /// </summary>
+        /// <returns>
+        ///     The next field, as a string, or null if there are no more fields in the stream.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        public string ReadField()
+        {
+            return ReadFieldAndCheck()?.Field;
+        }
+
+        /// <summary>
+        ///     Reads the next field from the stream.
+        /// </summary>
+        /// <returns>
+        ///     A task, with a <see cref="FieldReadResult" /> result, that represents
+        ///     the asynchronous read operation.
+        ///     The <see cref="FieldReadResult" /> contains the next field
+        ///     or null if there are no more fields in the stream.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The reader is currently in use by a previous read operation.
+        /// </exception>
+        public virtual Task<FieldReadResult> ReadFieldAndCheckAsync()
+        {
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            //Run it on its own thread since the processing could potentially take a while
+            Task<FieldReadResult> asyncTask = Task.Run(InternalReadFieldAndCheckAsync);
+            _asyncTask = asyncTask;
+            return asyncTask;
+        }
+
+        /// <summary>
+        ///     Reads the next field from the stream.
+        /// </summary>
+        /// <returns>
+        ///     A task, with a <see cref="FieldReadResult" /> result, that represents
+        ///     the asynchronous read operation.
+        ///     The <see cref="FieldReadResult" /> contains the next field
+        ///     or null if there are no more fields in the stream.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        protected virtual async Task<FieldReadResult> InternalReadFieldAndCheckAsync()
+        {
+            //Check if we are at the end of a row already (means empty row)
+            if (await CheckForEndRowAsync().ConfigureAwait(false))
+            {
+                return new FieldReadResult(string.Empty, true);
+            }
+
+            bool escaped = false;
+            char? nextCharBuffer = await ReadAsync().ConfigureAwait(false);
+
+            //Check for EOF
+            if (nextCharBuffer == null)
+                return null;
+
+            char separator = Separator;
+
+            //Check if an empty field
+            if (nextCharBuffer.Value == separator)
+            {
+                FieldPosition++;
+                return new FieldReadResult(string.Empty, false);
+            }
+
+            var sb = new StringBuilder();
+
+            //Get the next field from the stream
+            while (nextCharBuffer != null)
+            {
+                char nextChar = nextCharBuffer.Value;
+
+                //Are we within an escape sequence
+                if (escaped)
+                {
+                    if (nextChar == DoubleQuoteChar)
+                    {
+                        char? peekedChar = await PeekAsync().ConfigureAwait(false);
+                        if (peekedChar == null)
+                            break;
+
+                        if (peekedChar.Value == DoubleQuoteChar)
+                        {
+                            //Escaped quote
+                            sb.Append(nextChar);
+                            await ReadAsync();
+
+                            nextCharBuffer = await ReadAsync().ConfigureAwait(false);
+                            continue;
+                        }
+
+                        escaped = false;
+
+                        nextCharBuffer = await ReadAsync().ConfigureAwait(false);
+                        continue;
+                    }
+
+                    //Just append whatever character it is
+                    sb.Append(nextChar);
+
+                    nextCharBuffer = await ReadAsync().ConfigureAwait(false);
+                    continue;
+                }
+
+                //Does the next char match the start of an escape sequence
+                if (nextChar == DoubleQuoteChar)
+                {
+                    escaped = true;
+
+                    nextCharBuffer = await ReadAsync().ConfigureAwait(false);
+                    continue;
+                }
+
+                //Does the next char match the start of a newline character
+                if (await IsEndRowAsync(nextChar))
+                {
+                    //Ensure the character goes back on the stream/buffer
+                    _previousCharBuffer = nextChar;
+                    break;
+                }
+
+                //Does the next char match the separator, i.e. the end of the field
+                if (nextChar == separator)
+                {
+                    //No need to add character back on the stream/buffer
+                    break;
+                }
+
+                //Normal character, append it
+                sb.Append(nextChar);
+
+                nextCharBuffer = await ReadAsync().ConfigureAwait(false);
+            }
+
+            FieldPosition++;
+            FieldsRead++;
+
+            //Check if we are at the end of a row
+            bool newLineEncountered = await CheckForEndRowAsync().ConfigureAwait(false);
+            return new FieldReadResult(sb.ToString(), newLineEncountered);
+        }
+
+        /// <summary>
+        ///     Reads the next field from the stream.
+        /// </summary>
+        /// <returns>
+        ///     The next field, as a string, or null if there are no more fields in the stream.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The reader is currently in use by a previous read operation.
+        /// </exception>
+        public Task<string> ReadFieldAsync()
+        {
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            //Run it on its own thread since the processing could potentially take a while
+            Task<string> asyncTask = Task.Run(InternalReadFieldAsync);
+            _asyncTask = asyncTask;
+            return asyncTask;
+        }
+        
+        /// <summary>
+        ///     Reads the next field from the stream.
+        /// </summary>
+        /// <returns>
+        ///     The next field, as a string, or null if there are no more fields in the stream.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        protected virtual async Task<string> InternalReadFieldAsync()
+        {
+            FieldReadResult result = await InternalReadFieldAndCheckAsync().ConfigureAwait(false);
+            return result?.Field;
+        }
+
+        /// <summary>
+        ///     Reads the next row from the stream.
+        /// </summary>
+        /// <returns>The array of fields or null if EOF has already been reached.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The reader is currently in use by a previous read operation.
+        /// </exception>
+        public string[] ReadRow()
+        {
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+            
+            var fields = new List<string>();
+
+            if (EndOfStream)
+                return null;
+
+            bool newLineEncountered = false;
+            while (newLineEncountered == false)
+            {
+                FieldReadResult result = ReadFieldAndCheck();
+
+                if (result == null)
+                    break; //EOF reached
+                
+                newLineEncountered = result.NewLineEncountered;
+
+                string field = result.Field;
+                if (field == null)
+                    continue;
+
+                fields.Add(field);
+            }
+
+            return fields.ToArray();
+        }
+        
+        /// <summary>
+        ///     Reads the next row from the stream; asynchronously.
+        /// </summary>
+        /// <returns>The array of fields or null if EOF has already been reached.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The reader is currently in use by a previous read operation.
+        /// </exception>
+        public Task<string[]> ReadRowAsync()
+        {
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            //Run it on its own thread since the processing could potentially take a while
+            Task<string[]> asyncTask = Task.Run(InternalReadRowAsync);
+            _asyncTask = asyncTask;
+            return asyncTask;
+        }
+        
+        /// <summary>
+        ///     Reads the next row from the stream; asynchronously.
+        /// </summary>
+        /// <returns>The array of fields or null if EOF has already been reached.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The reader is currently in use by a previous read operation.
+        /// </exception>
+        public async Task<string[]> InternalReadRowAsync()
+        {
+            var fields = new List<string>();
+
+            if (EndOfStream)
+                return null;
+
+            bool newLineEncountered = false;
+            while (newLineEncountered == false)
+            {
+                FieldReadResult result = await InternalReadFieldAndCheckAsync().ConfigureAwait(false);
+
+                if (result == null)
+                    break; //EOF reached
+                
+                newLineEncountered = result.NewLineEncountered;
+
+                string field = result.Field;
+                if (field == null)
+                    continue;
+
+                fields.Add(field);
+            }
+
+            return fields.ToArray();
+        }
+        
+        /// <summary>
+        ///     Reads the all the rows from the stream.
+        /// </summary>
+        /// <returns>The array of fields or null if EOF has already been reached.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The reader is currently in use by a previous read operation.
+        /// </exception>
+        public string[][] ReadToEnd()
+        {
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+            
+            var rows = new List<string[]>();
+
+            if (EndOfStream)
+                return null;
+
+            while (true)
+            {
+                string[] row = ReadRow();
+
+                if (row == null)
+                    break;
+
+                rows.Add(row);
+            }
+
+            return rows.ToArray();
+        }
+        
+        /// <summary>
+        ///     Reads the all the rows from the stream; asynchronously.
+        /// </summary>
+        /// <returns>The array of fields or null if EOF has already been reached.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The reader is currently in use by a previous read operation.
+        /// </exception>
+        public Task<string[][]> ReadToEndAsync()
+        {
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            //Run it on its own thread since the processing could potentially take a while
+            Task<string[][]> asyncTask = Task.Run(InternalReadToEndAsync);
+            _asyncTask = asyncTask;
+            return asyncTask;
+        }
+        
+        /// <summary>
+        ///     Reads the all the rows from the stream; asynchronously.
+        /// </summary>
+        /// <returns>The rows of fields or null if EOF has already been reached.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The reader is currently in use by a previous read operation.
+        /// </exception>
+        public async Task<string[][]> InternalReadToEndAsync()
+        {
+            var rows = new List<string[]>();
+
+            if (EndOfStream)
+                return null;
+
+            while (true)
+            {
+                string[] row = await InternalReadRowAsync().ConfigureAwait(false);
+
+                if (row == null)
+                    break;
+
+                rows.Add(row);
+            }
+
+            return rows.ToArray();
         }
 
         /// <summary>
@@ -1097,9 +1708,19 @@ namespace Ncl.Common.Csv
             {
             }
 
-            _stream.Dispose();
+            if (!_leaveOpen)
+            {
+                _stream.Dispose();
+            }
 
             _isDisposed = true;
+        }
+        
+        // override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        ~CsvStreamReader()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(false);
         }
     }
 }

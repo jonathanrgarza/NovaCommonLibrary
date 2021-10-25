@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Ncl.Common.Csv.Tests
@@ -1949,6 +1950,71 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(2, actual);
         }
+
+        [Fact]
+        public void ResetStreamPosition_WithOneFieldRead_ShouldMoveStreamPositionToBeginning()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadField();
+            
+            // Act
+            csvStream.ResetStreamPosition();
+            
+            // Assert
+            Assert.Equal(0, csvStream.BaseStream.Position);
+            Assert.Equal(ValidField, csvStream.ReadField());
+        }
+        
+        [Fact]
+        public void ResetStreamPosition_WithOneFieldRead_ShouldResetProperties()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadField();
+            
+            // Act
+            csvStream.ResetStreamPosition();
+            
+            // Assert
+            Assert.Equal(0, csvStream.FieldPosition);
+            Assert.Equal(0, csvStream.FieldsRead);
+        }
+        
+        [Fact]
+        public void ResetStreamPosition_WithUnSeekableStream_ShouldThrowNotSupportException()
+        {
+            // Arrange
+            using var csvStream = new CsvStreamReader(new StringReader("field1,field2"));
+            csvStream.ReadField();
+            
+            // Act
+            void TestCode()
+            {
+                csvStream.ResetStreamPosition();
+            }
+
+            // Assert
+            Assert.Throws<NotSupportedException>(TestCode);
+        }
+        
+        [Fact]
+        public void ResetStreamPosition_WithDisposedStream_ShouldThrowObjectDisposedException()
+        {
+            // Arrange
+            using var csvStream = new CsvStreamReader(new StringReader("field1,field2"));
+            csvStream.ReadField();
+            csvStream.Dispose();
+            
+            // Act
+            void TestCode()
+            {
+                csvStream.ResetStreamPosition();
+            }
+
+            // Assert
+            Assert.Throws<ObjectDisposedException>(TestCode);
+        }
         
         [Fact]
         public void ReadField_WithNoContent_ShouldReturnNull()
@@ -2059,6 +2125,21 @@ namespace Ncl.Common.Csv.Tests
         }
         
         [Fact]
+        public void ReadField_WithEmptyRowBetweenContent_ShouldReturnEmptyString()
+        {
+            const string expected = "";
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("field1\r\n\r\nfield2");
+            csvStream.ReadField();
+
+            // Act
+            string actual = csvStream.ReadField();
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
         public void ReadField_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
             // Arrange
@@ -2074,23 +2155,286 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<ObjectDisposedException>(TestCode);
         }
+        
+        [Fact]
+        public void ReadField_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+            Task<string> task = csvStream.ReadFieldAsync();
+            
+            // Act
+            void TestCode()
+            {
+                csvStream.ReadField();
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
+        }
+        
+        [Fact]
+        public void ReadFieldAndCheck_WithContentButNoNewLineEncountered_ShouldHaveNewLineEncounteredAsFalse()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+
+            // Act
+            FieldReadResult actual = csvStream.ReadFieldAndCheck();
+
+            // Assert
+            Assert.False(actual.NewLineEncountered);
+        }
+        
+        [Fact]
+        public void ReadFieldAndCheck_WithContentAndNewLineEncountered_ShouldHaveNewLineEncounteredAsTrue()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+
+            // Act
+            FieldReadResult actual = csvStream.ReadFieldAndCheck();
+
+            // Assert
+            Assert.True(actual.NewLineEncountered);
+        }
+        
+        [Fact]
+        public void ReadFieldAndCheck_WithContentAndAltNewLineEncountered_ShouldHaveNewLineEncounteredAsTrue()
+        {
+            // Arrange
+            using var csvStream = new CsvStreamReader(GetDefaultStream("field1\n"), newLine:"\n");
+
+            // Act
+            FieldReadResult actual = csvStream.ReadFieldAndCheck();
+
+            // Assert
+            Assert.True(actual.NewLineEncountered);
+        }
+        
+        [Fact]
+        public void ReadFieldAndCheck_WithContentAndEOFEncountered_ShouldHaveNewLineEncounteredAsFalse()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+
+            // Act
+            FieldReadResult actual = csvStream.ReadFieldAndCheck();
+
+            // Assert
+            Assert.False(actual.NewLineEncountered);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAsync_WithNoContent_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance();
+            
+
+            // Act
+            string actual = await csvStream.ReadFieldAsync();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAsync_WithContent_ShouldReturnField()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+
+            // Act
+            string actual = await csvStream.ReadFieldAsync();
+
+            // Assert
+            Assert.Equal(ValidField, actual);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAsync_WithEOF_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+            await csvStream.ReadFieldAsync();
+            
+            // Act
+            string actual = await csvStream.ReadFieldAsync();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAsync_WithEmptyFieldContent_ShouldReturnEmptyString()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(",field1");
+
+            // Act
+            string actual = await csvStream.ReadFieldAsync();
+
+            // Assert
+            Assert.Equal(string.Empty, actual);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAsync_WithEscapedFieldContent_ShouldReturnUnescapedField()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(EscapedFieldWithNewLine);
+
+            // Act
+            string actual = await csvStream.ReadFieldAsync();
+
+            // Assert
+            Assert.Equal(EscapedFieldWithNewLineExpected, actual);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAsync_WithEscapedFieldButTextAfterLastDoubleQuoteContent_ShouldReturnUnescapedField()
+        {
+            const string expected = "field1,test extra";
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("\"field1,test\" extra,next field\r\n");
+
+            // Act
+            string actual = await csvStream.ReadFieldAsync();
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAsync_WithEscapedFieldButTextBeforeFirstDoubleQuoteContent_ShouldReturnUnescapedField()
+        {
+            const string expected = "extra field1,test";
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("extra \"field1,test\",next field\r\n");
+
+            // Act
+            string actual = await csvStream.ReadFieldAsync();
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAsync_WithEscapedEmptyFieldContent_ShouldReturnEmptyString()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("\"\"");
+
+            // Act
+            string actual = await csvStream.ReadFieldAsync();
+
+            // Assert
+            Assert.Equal(string.Empty, actual);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAsync_WithEmptyRowBetweenContent_ShouldReturnEmptyString()
+        {
+            const string expected = "";
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("field1\r\n\r\nfield2");
+            await csvStream.ReadFieldAsync();
+
+            // Act
+            string actual = await csvStream.ReadFieldAsync();
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAsync_WithStreamDisposed_ShouldThrowObjectDisposedException()
+        {
+            // Act
+            async Task TestCode()
+            {
+                // Arrange
+                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                csvStream.Dispose();
+                
+                await csvStream.ReadFieldAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Act
+            async Task TestCode()
+            {
+                // Arrange
+                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                Task<string> task = csvStream.ReadFieldAsync();
+                
+                await csvStream.ReadFieldAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAndCheckAsync_WithContentButNoNewLineEncountered_ShouldHaveNewLineEncounteredAsFalse()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+
+            // Act
+            FieldReadResult actual = await csvStream.ReadFieldAndCheckAsync();
+
+            // Assert
+            Assert.False(actual.NewLineEncountered);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAndCheckAsync_WithContentAndNewLineEncountered_ShouldHaveNewLineEncounteredAsTrue()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+
+            // Act
+            FieldReadResult actual = await csvStream.ReadFieldAndCheckAsync();
+
+            // Assert
+            Assert.True(actual.NewLineEncountered);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAndCheckAsync_WithContentAndAltNewLineEncountered_ShouldHaveNewLineEncounteredAsTrue()
+        {
+            // Arrange
+            using var csvStream = new CsvStreamReader(GetDefaultStream("field1\n"), newLine:"\n");
+
+            // Act
+            FieldReadResult actual = await csvStream.ReadFieldAndCheckAsync();
+
+            // Assert
+            Assert.True(actual.NewLineEncountered);
+        }
+        
+        [Fact]
+        public async Task ReadFieldAndCheckAsync_WithContentAndEOFEncountered_ShouldHaveNewLineEncounteredAsFalse()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+
+            // Act
+            FieldReadResult actual = await csvStream.ReadFieldAndCheckAsync();
+
+            // Assert
+            Assert.False(actual.NewLineEncountered);
+        }
 
         //Utility functions
-
-        private static string GetString(Stream stream)
-        {
-            long initialPosition = stream.Position;
-
-            //Reset to beginning
-            stream.Position = 0;
-
-            using var streamReader = new StreamReader(stream, leaveOpen: true);
-            string text = streamReader.ReadToEnd();
-
-            stream.Position = initialPosition;
-
-            return text;
-        }
 
         private static CsvStreamReader GetDefaultInstance()
         {
