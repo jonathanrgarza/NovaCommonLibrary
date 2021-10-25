@@ -13,7 +13,7 @@ namespace Ncl.Common.Csv.Tests
         private const string ValidFieldBase = "field";
         private const string ValidField = "field1";
         private const string ValidFieldWithNewLine = "field1\r\n";
-        private const string ValidFieldsTwoRows = "field1,field2\r\nfield3,field4";
+        private const string ValidFieldsTwoRows = "field1,field2\r\nfield3,field4\r\n";
         
         private const string EscapedField = "\"field1,\"\" more\"";
         private const string EscapedFieldExpected = "field1,\" more";
@@ -22,11 +22,16 @@ namespace Ncl.Common.Csv.Tests
         private const string EscapedFieldWithNewLineExpected = "field1,\" more";
         
         private const string EscapedFieldsTwoRows = 
-            "\"field1,\"\" more\",\"field2,\"\" more\"\r\n\"field3,\"\" more\",\"field4,\"\" more\"";
+            "\"field1,\"\" more\",\"field2,\"\" more\"\r\n\"field3,\"\" more\",\"field4,\"\" more\"\r\n";
         private const string EscapedFieldTwoRowsExpected = 
             "field1,\" more,field2,\" more\r\nfield3,\" more,field4,\" more";
 
         private const string DefaultCsvContent = ValidFieldsTwoRows;
+        
+        private const string ExtraLongCsvContent = ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
+                                                   ValidFieldsTwoRows + ValidFieldsTwoRows+ ValidFieldsTwoRows +
+                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
+                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows;
 
         private const string SimpleFormat = "{0}";
 
@@ -1676,6 +1681,23 @@ namespace Ncl.Common.Csv.Tests
         }
         
         [Fact]
+        public void EndOfStream_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
+            Task<string[][]> task = csvStream.ReadToEndAsync();
+
+            // Act
+            void TestCode()
+            {
+                _ = csvStream.EndOfStream;
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
+        }
+        
+        [Fact]
         public void FirstRowRead_WithNothingRead_ShouldReturnFalse()
         {
             // Arrange
@@ -2161,8 +2183,8 @@ namespace Ncl.Common.Csv.Tests
         public void ReadField_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
             // Arrange
-            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
-            Task<string> task = csvStream.ReadFieldAsync();
+            using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
+            Task<string[][]> task = csvStream.ReadToEndAsync();
             
             // Act
             void TestCode()
@@ -2373,8 +2395,8 @@ namespace Ncl.Common.Csv.Tests
             async Task TestCode()
             {
                 // Arrange
-                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
-                Task<string> task = csvStream.ReadFieldAsync();
+                using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
+                Task<string[][]> task = csvStream.ReadToEndAsync();
                 
                 await csvStream.ReadFieldAsync();
             }
@@ -2535,8 +2557,8 @@ namespace Ncl.Common.Csv.Tests
             void TestCode()
             {
                 // Arrange
-                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
-                Task<string[]> task = csvStream.ReadRowAsync();
+                using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
+                Task<string[][]> task = csvStream.ReadToEndAsync();
                 
                 csvStream.ReadRow();
             }
@@ -2645,8 +2667,8 @@ namespace Ncl.Common.Csv.Tests
             async Task TestCode()
             {
                 // Arrange
-                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
-                Task<string[]> task = csvStream.ReadRowAsync();
+                using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
+                Task<string[][]> task = csvStream.ReadToEndAsync();
                 
                 await csvStream.ReadRowAsync();
             }
@@ -2763,7 +2785,7 @@ namespace Ncl.Common.Csv.Tests
             void TestCode()
             {
                 // Arrange
-                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
                 Task<string[][]> task = csvStream.ReadToEndAsync();
                 
                 csvStream.ReadToEnd();
@@ -2881,10 +2903,98 @@ namespace Ncl.Common.Csv.Tests
             async Task TestCode()
             {
                 // Arrange
-                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
                 Task<string[][]> task = csvStream.ReadToEndAsync();
                 
                 await csvStream.ReadToEndAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
+        }
+        
+        [Fact]
+        public async Task GetEndOfStreamAsync_WithNoReadsAndEOF_ShouldReturnTrue()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance();
+
+            // Act
+            bool actual = await csvStream.GetEndOfStreamAsync();
+
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public async Task GetEndOfStreamAsync_WithNoReadsAndNotEOF_ShouldReturnFalse()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+
+            // Act
+            bool actual = await csvStream.GetEndOfStreamAsync();
+
+            // Assert
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        public async Task GetEndOfStreamAsync_WithOneReadAndNewLineEnding_ShouldReturnTrue()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+            await csvStream.ReadFieldAsync();
+            
+            // Act
+            bool actual = await csvStream.GetEndOfStreamAsync();
+
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public async Task GetEndOfStreamAsync_WithOneReadAndEOF_ShouldReturnTrue()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+            await csvStream.ReadFieldAsync();
+            
+            // Act
+            bool actual = await csvStream.GetEndOfStreamAsync();
+
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public async Task GetEndOfStreamAsync_WithDisposed_ShouldThrowObjectDisposedException()
+        {
+            // Arrange
+            CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+            csvStream.Dispose();
+            
+            // Act
+            async Task TestCode()
+            {
+                _ = await csvStream.GetEndOfStreamAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
+        }
+        
+        [Fact]
+        public async Task GetEndOfStreamAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
+            Task<string[][]> task = csvStream.ReadToEndAsync();
+
+            // Act
+            async Task TestCode()
+            {
+                _ = await csvStream.GetEndOfStreamAsync();
             }
 
             // Assert

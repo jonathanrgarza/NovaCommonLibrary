@@ -312,11 +312,15 @@ namespace Ncl.Common.Csv
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The reader is currently in use by a previous read operation.
+        /// </exception>
         public bool EndOfStream
         {
             get
             {
                 GuardAgainstObjectDisposed();
+                GuardAgainstAlreadyRunningAsyncTask();
 
                 return Peek() == null;
             }
@@ -1589,7 +1593,7 @@ namespace Ncl.Common.Csv
         {
             var fields = new List<string>();
 
-            if (EndOfStream)
+            if (await InternalGetEndOfStreamAsync().ConfigureAwait(false))
                 return null;
 
             bool newLineEncountered = false;
@@ -1680,7 +1684,7 @@ namespace Ncl.Common.Csv
         {
             var rows = new List<string[]>();
 
-            if (EndOfStream)
+            if (await InternalGetEndOfStreamAsync().ConfigureAwait(false))
                 return null;
 
             while (true)
@@ -1694,6 +1698,44 @@ namespace Ncl.Common.Csv
             }
 
             return rows.ToArray();
+        }
+        
+        /// <summary>
+        ///     Gets the end of stream status asynchronously.
+        ///     Checking EOF status can cause a read operation.
+        /// </summary>
+        /// <returns>True if the end of the stream has been reached, otherwise, false.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The reader is currently in use by a previous read operation.
+        /// </exception>
+        public Task<bool> GetEndOfStreamAsync()
+        {
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+            
+            Task<bool> asyncTask = InternalGetEndOfStreamAsync();
+            _asyncTask = asyncTask;
+            return asyncTask;
+        }
+        
+        /// <summary>
+        ///     Gets the end of stream status asynchronously.
+        ///     Checking EOF status can cause a read operation.
+        /// </summary>
+        /// <returns>True if the end of the stream has been reached, otherwise, false.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The reader is currently in use by a previous read operation.
+        /// </exception>
+        protected async Task<bool> InternalGetEndOfStreamAsync()
+        {
+            char? result = await PeekAsync().ConfigureAwait(false);
+            return result == null;
         }
 
         /// <summary>
