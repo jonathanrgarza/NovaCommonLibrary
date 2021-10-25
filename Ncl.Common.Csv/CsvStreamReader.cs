@@ -92,6 +92,9 @@ namespace Ncl.Common.Csv
         /// </summary>
         protected char? _previousCharBuffer;
 
+        /// <summary>
+        ///     The current running asynchronous task.
+        /// </summary>
         protected Task _asyncTask;
 
         private IFormatProvider _formatProvider;
@@ -1522,7 +1525,7 @@ namespace Ncl.Common.Csv
         /// <exception cref="InvalidOperationException">
         ///     The reader is currently in use by a previous read operation.
         /// </exception>
-        public string[] ReadRow()
+        public virtual string[] ReadRow()
         {
             GuardAgainstObjectDisposed();
             GuardAgainstAlreadyRunningAsyncTask();
@@ -1541,11 +1544,10 @@ namespace Ncl.Common.Csv
                     break; //EOF reached
                 
                 newLineEncountered = result.NewLineEncountered;
+                
+                //Null field should not happen
 
                 string field = result.Field;
-                if (field == null)
-                    continue;
-
                 fields.Add(field);
             }
 
@@ -1583,7 +1585,7 @@ namespace Ncl.Common.Csv
         /// <exception cref="InvalidOperationException">
         ///     The reader is currently in use by a previous read operation.
         /// </exception>
-        public async Task<string[]> InternalReadRowAsync()
+        public virtual async Task<string[]> InternalReadRowAsync()
         {
             var fields = new List<string>();
 
@@ -1599,10 +1601,10 @@ namespace Ncl.Common.Csv
                     break; //EOF reached
                 
                 newLineEncountered = result.NewLineEncountered;
+                
+                //Null field should not happen
 
                 string field = result.Field;
-                if (field == null)
-                    continue;
 
                 fields.Add(field);
             }
@@ -1620,7 +1622,7 @@ namespace Ncl.Common.Csv
         /// <exception cref="InvalidOperationException">
         ///     The reader is currently in use by a previous read operation.
         /// </exception>
-        public string[][] ReadToEnd()
+        public virtual string[][] ReadToEnd()
         {
             GuardAgainstObjectDisposed();
             GuardAgainstAlreadyRunningAsyncTask();
@@ -1674,7 +1676,7 @@ namespace Ncl.Common.Csv
         /// <exception cref="InvalidOperationException">
         ///     The reader is currently in use by a previous read operation.
         /// </exception>
-        public async Task<string[][]> InternalReadToEndAsync()
+        public virtual async Task<string[][]> InternalReadToEndAsync()
         {
             var rows = new List<string[]>();
 
@@ -1712,6 +1714,8 @@ namespace Ncl.Common.Csv
             {
                 _stream.Dispose();
             }
+            
+            _buffer = null;
 
             _isDisposed = true;
         }

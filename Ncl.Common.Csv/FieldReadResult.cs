@@ -60,6 +60,12 @@ namespace Ncl.Common.Csv
             }
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return Field;
+        }
+
         public static bool operator ==(FieldReadResult left, FieldReadResult right)
         {
             return Equals(left, right);

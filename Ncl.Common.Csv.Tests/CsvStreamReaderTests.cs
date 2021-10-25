@@ -10,6 +10,7 @@ namespace Ncl.Common.Csv.Tests
 {
     public class CsvStreamReaderTests
     {
+        private const string ValidFieldBase = "field";
         private const string ValidField = "field1";
         private const string ValidFieldWithNewLine = "field1\r\n";
         private const string ValidFieldsTwoRows = "field1,field2\r\nfield3,field4";
@@ -2432,6 +2433,462 @@ namespace Ncl.Common.Csv.Tests
 
             // Assert
             Assert.False(actual.NewLineEncountered);
+        }
+
+        [Fact]
+        public void ReadRow_WithContent_ShouldReturnRow()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            
+            // Act
+            string[] actual = csvStream.ReadRow();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(2, actual.Length);
+            Assert.Equal(ValidFieldBase + "1", actual[0]);
+            Assert.Equal(ValidFieldBase + "2", actual[1]);
+        }
+        
+        [Fact]
+        public void ReadRow_WithContentAndEOF_ShouldReturnRow()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadRow();
+            
+            // Act
+            string[] actual = csvStream.ReadRow();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(2, actual.Length);
+            Assert.Equal(ValidFieldBase + "3", actual[0]);
+            Assert.Equal(ValidFieldBase + "4", actual[1]);
+        }
+        
+        [Fact]
+        public void ReadRow_WithAtEOF_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+            csvStream.ReadRow();
+            
+            // Act
+            string[] actual = csvStream.ReadRow();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public void ReadRow_WithNoNewLineAndAtEOF_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+            csvStream.ReadRow();
+            
+            // Act
+            string[] actual = csvStream.ReadRow();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public void ReadRow_WithEmptyRow_ShouldReturnEmptyField()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("field1\r\n\r\nfield2");
+            csvStream.ReadRow();
+            
+            // Act
+            string[] actual = csvStream.ReadRow();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Single(actual);
+        }
+        
+        [Fact]
+        public void ReadRow_WithStreamDisposed_ShouldThrowObjectDisposedException()
+        {
+            // Act
+            void TestCode()
+            {
+                // Arrange
+                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                csvStream.Dispose();
+                
+                csvStream.ReadRow();
+            }
+
+            // Assert
+            Assert.Throws<ObjectDisposedException>(TestCode);
+        }
+        
+        [Fact]
+        public void ReadRow_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Act
+            void TestCode()
+            {
+                // Arrange
+                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                Task<string[]> task = csvStream.ReadRowAsync();
+                
+                csvStream.ReadRow();
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
+        }
+        
+        [Fact]
+        public async Task ReadRowAsync_WithContent_ShouldReturnRow()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            
+            // Act
+            string[] actual = await csvStream.ReadRowAsync();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(2, actual.Length);
+            Assert.Equal(ValidFieldBase + "1", actual[0]);
+            Assert.Equal(ValidFieldBase + "2", actual[1]);
+        }
+        
+        [Fact]
+        public async Task ReadRowAsync_WithContentAndEOF_ShouldReturnRow()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            await csvStream.ReadRowAsync();
+            
+            // Act
+            string[] actual = await csvStream.ReadRowAsync();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(2, actual.Length);
+            Assert.Equal(ValidFieldBase + "3", actual[0]);
+            Assert.Equal(ValidFieldBase + "4", actual[1]);
+        }
+        
+        [Fact]
+        public async Task ReadRowAsync_WithAtEOF_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+            await csvStream.ReadRowAsync();
+            
+            // Act
+            string[] actual = await csvStream.ReadRowAsync();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public async Task ReadRowAsync_WithNoNewLineAndAtEOF_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+            await csvStream.ReadRowAsync();
+            
+            // Act
+            string[] actual = await csvStream.ReadRowAsync();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public async Task ReadRowAsync_WithEmptyRow_ShouldReturnEmptyField()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("field1\r\n\r\nfield2");
+            await csvStream.ReadRowAsync();
+            
+            // Act
+            string[] actual = await csvStream.ReadRowAsync();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Single(actual);
+        }
+        
+        [Fact]
+        public async Task ReadRowAsync_WithStreamDisposed_ShouldThrowObjectDisposedException()
+        {
+            // Act
+            async Task TestCode()
+            {
+                // Arrange
+                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                csvStream.Dispose();
+                
+                await csvStream.ReadRowAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
+        }
+        
+        [Fact]
+        public async Task ReadRowAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Act
+            async Task TestCode()
+            {
+                // Arrange
+                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                Task<string[]> task = csvStream.ReadRowAsync();
+                
+                await csvStream.ReadRowAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
+        }
+        
+        [Fact]
+        public void ReadToEnd_WithContent_ShouldReturnAllRowsAsMatrix()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            
+            // Act
+            string[][] actual = csvStream.ReadToEnd();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(2, actual.Length);
+            Assert.Equal(2, actual[0].Length);
+            Assert.Equal(2, actual[0].Length);
+            Assert.Equal(ValidFieldBase + "1", actual[0][0]);
+            Assert.Equal(ValidFieldBase + "2", actual[0][1]);
+            Assert.Equal(ValidFieldBase + "3", actual[1][0]);
+            Assert.Equal(ValidFieldBase + "4", actual[1][1]);
+        }
+        
+        [Fact]
+        public void ReadToEnd_WithContentAndEOF_ShouldReturnRemainingRowAsMatrix()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            csvStream.ReadRow();
+            
+            // Act
+            string[][] actual = csvStream.ReadToEnd();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Single(actual);
+            Assert.Equal(2, actual[0].Length);
+            Assert.Equal(ValidFieldBase + "3", actual[0][0]);
+            Assert.Equal(ValidFieldBase + "4", actual[0][1]);
+        }
+        
+        [Fact]
+        public void ReadToEnd_WithAtEOF_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+            csvStream.ReadRow();
+            
+            // Act
+            string[][] actual = csvStream.ReadToEnd();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public void ReadToEnd_WithNoNewLineAndAtEOF_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+            csvStream.ReadRow();
+            
+            // Act
+            string[][] actual = csvStream.ReadToEnd();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public void ReadToEnd_WithEmptyRow_ShouldReturnAllContentIncludingEmptyRow()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("field1\r\n\r\nfield2");
+
+            // Act
+            string[][] actual = csvStream.ReadToEnd();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(3, actual.Length);
+            Assert.Single(actual[0]);
+            Assert.Single(actual[1]);
+            Assert.Single(actual[2]);
+            Assert.Equal("", actual[1][0]);
+        }
+        
+        [Fact]
+        public void ReadToEnd_WithStreamDisposed_ShouldThrowObjectDisposedException()
+        {
+            // Act
+            void TestCode()
+            {
+                // Arrange
+                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                csvStream.Dispose();
+                
+                csvStream.ReadToEnd();
+            }
+
+            // Assert
+            Assert.Throws<ObjectDisposedException>(TestCode);
+        }
+        
+        [Fact]
+        public void ReadToEnd_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Act
+            void TestCode()
+            {
+                // Arrange
+                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                Task<string[][]> task = csvStream.ReadToEndAsync();
+                
+                csvStream.ReadToEnd();
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
+        }
+        
+        [Fact]
+        public async Task ReadToEndAsync_WithContent_ShouldReturnAllRowsAsMatrix()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            
+            // Act
+            string[][] actual = await csvStream.ReadToEndAsync();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(2, actual.Length);
+            Assert.Equal(2, actual[0].Length);
+            Assert.Equal(2, actual[0].Length);
+            Assert.Equal(ValidFieldBase + "1", actual[0][0]);
+            Assert.Equal(ValidFieldBase + "2", actual[0][1]);
+            Assert.Equal(ValidFieldBase + "3", actual[1][0]);
+            Assert.Equal(ValidFieldBase + "4", actual[1][1]);
+        }
+        
+        [Fact]
+        public async Task ReadToEndAsync_WithContentAndEOF_ShouldReturnRemainingRowAsMatrix()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
+            await csvStream.ReadRowAsync();
+            
+            // Act
+            string[][] actual = await csvStream.ReadToEndAsync();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Single(actual);
+            Assert.Equal(2, actual[0].Length);
+            Assert.Equal(ValidFieldBase + "3", actual[0][0]);
+            Assert.Equal(ValidFieldBase + "4", actual[0][1]);
+        }
+        
+        [Fact]
+        public async Task ReadToEndAsync_WithAtEOF_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+            await csvStream.ReadRowAsync();
+            
+            // Act
+            string[][] actual = await csvStream.ReadToEndAsync();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public async Task ReadToEndAsync_WithNoNewLineAndAtEOF_ShouldReturnNull()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
+            await csvStream.ReadRowAsync();
+            
+            // Act
+            string[][] actual = await csvStream.ReadToEndAsync();
+
+            // Assert
+            Assert.Null(actual);
+        }
+        
+        [Fact]
+        public async Task ReadToEndAsync_WithEmptyRow_ShouldReturnAllContentIncludingEmptyRow()
+        {
+            // Arrange
+            using CsvStreamReader csvStream = GetDefaultInstance("field1\r\n\r\nfield2");
+
+            // Act
+            string[][] actual = await csvStream.ReadToEndAsync();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(3, actual.Length);
+            Assert.Single(actual[0]);
+            Assert.Single(actual[1]);
+            Assert.Single(actual[2]);
+            Assert.Equal("", actual[1][0]);
+        }
+        
+        [Fact]
+        public async Task ReadToEndAsync_WithStreamDisposed_ShouldThrowObjectDisposedException()
+        {
+            // Act
+            async Task TestCode()
+            {
+                // Arrange
+                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                csvStream.Dispose();
+                
+                await csvStream.ReadToEndAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
+        }
+        
+        [Fact]
+        public async Task ReadToEndAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Act
+            async Task TestCode()
+            {
+                // Arrange
+                using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
+                Task<string[][]> task = csvStream.ReadToEndAsync();
+                
+                await csvStream.ReadToEndAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
 
         //Utility functions
