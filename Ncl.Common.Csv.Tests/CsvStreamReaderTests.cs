@@ -14,22 +14,23 @@ namespace Ncl.Common.Csv.Tests
         private const string ValidField = "field1";
         private const string ValidFieldWithNewLine = "field1\r\n";
         private const string ValidFieldsTwoRows = "field1,field2\r\nfield3,field4\r\n";
-        
+
         private const string EscapedField = "\"field1,\"\" more\"";
         private const string EscapedFieldExpected = "field1,\" more";
-        
+
         private const string EscapedFieldWithNewLine = "\"field1,\"\" more\"\r\n";
         private const string EscapedFieldWithNewLineExpected = "field1,\" more";
-        
-        private const string EscapedFieldsTwoRows = 
+
+        private const string EscapedFieldsTwoRows =
             "\"field1,\"\" more\",\"field2,\"\" more\"\r\n\"field3,\"\" more\",\"field4,\"\" more\"\r\n";
-        private const string EscapedFieldTwoRowsExpected = 
+
+        private const string EscapedFieldTwoRowsExpected =
             "field1,\" more,field2,\" more\r\nfield3,\" more,field4,\" more";
 
         private const string DefaultCsvContent = ValidFieldsTwoRows;
-        
+
         private const string ExtraLongCsvContent = ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
-                                                   ValidFieldsTwoRows + ValidFieldsTwoRows+ ValidFieldsTwoRows +
+                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
                                                    ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
                                                    ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows;
 
@@ -81,7 +82,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<ArgumentException>("separator", TestCode);
         }
-        
+
         [Fact]
         public void CsvStreamReader_WithNullNewLine_ShouldThrowException()
         {
@@ -91,13 +92,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader(stream, newLine:null);
+                _ = new CsvStreamReader(stream, newLine: null);
             }
 
             // Assert
             Assert.Throws<ArgumentNullException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void CsvStreamReader_WithEmptyNewLine_ShouldThrowException()
         {
@@ -107,7 +108,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader(stream, newLine:"");
+                _ = new CsvStreamReader(stream, newLine: "");
             }
 
             // Assert
@@ -123,13 +124,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader(stream, newLine:"\r\n\n");
+                _ = new CsvStreamReader(stream, newLine: "\r\n\n");
             }
 
             // Assert
             Assert.Throws<ArgumentException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void CsvStreamReader_WithDoubleQuoteNewLine_ShouldThrowException()
         {
@@ -139,7 +140,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader(stream, newLine:"\r\"");
+                _ = new CsvStreamReader(stream, newLine: "\r\"");
             }
 
             // Assert
@@ -189,7 +190,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<ArgumentException>("separator", TestCode);
         }
-        
+
         [Fact]
         public void CsvStreamReader1_WithNullNewLine_ShouldThrowException()
         {
@@ -199,13 +200,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader(stream, newLine:null);
+                _ = new CsvStreamReader(stream, newLine: null);
             }
 
             // Assert
             Assert.Throws<ArgumentNullException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void CsvStreamReader1_WithEmptyNewLine_ShouldThrowException()
         {
@@ -215,7 +216,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader(stream, newLine:"");
+                _ = new CsvStreamReader(stream, newLine: "");
             }
 
             // Assert
@@ -231,13 +232,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader(stream, newLine:"\r\n\n");
+                _ = new CsvStreamReader(stream, newLine: "\r\n\n");
             }
 
             // Assert
             Assert.Throws<ArgumentException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void CsvStreamReader1_WithDoubleQuoteNewLine_ShouldThrowException()
         {
@@ -247,7 +248,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader(stream, newLine:"\r\"");
+                _ = new CsvStreamReader(stream, newLine: "\r\"");
             }
 
             // Assert
@@ -281,7 +282,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<ArgumentException>("separator", TestCode);
         }
-        
+
         [Fact]
         public void CsvStreamReader2_WithNullNewLine_ShouldThrowException()
         {
@@ -289,13 +290,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader((string) null, newLine:null);
+                _ = new CsvStreamReader((string) null, newLine: null);
             }
 
             // Assert
             Assert.Throws<ArgumentNullException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void CsvStreamReader2_WithEmptyNewLine_ShouldThrowException()
         {
@@ -303,7 +304,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader((string) null, newLine:"");
+                _ = new CsvStreamReader((string) null, newLine: "");
             }
 
             // Assert
@@ -317,13 +318,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader((string) null, newLine:"\r\n\n");
+                _ = new CsvStreamReader((string) null, newLine: "\r\n\n");
             }
 
             // Assert
             Assert.Throws<ArgumentException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void CsvStreamReader2_WithDoubleQuoteNewLine_ShouldThrowException()
         {
@@ -331,7 +332,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = new CsvStreamReader((string) null, newLine:"\r\"");
+                _ = new CsvStreamReader((string) null, newLine: "\r\"");
             }
 
             // Assert
@@ -378,7 +379,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<ArgumentException>("separator", TestCode);
         }
-        
+
         [Fact]
         public void Create_WithNullNewLine_ShouldThrowException()
         {
@@ -388,13 +389,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create(stream, newLine:null);
+                _ = CsvStreamReader.Create(stream, newLine: null);
             }
 
             // Assert
             Assert.Throws<ArgumentNullException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void Create_WithEmptyNewLine_ShouldThrowException()
         {
@@ -404,7 +405,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create(stream, newLine:"");
+                _ = CsvStreamReader.Create(stream, newLine: "");
             }
 
             // Assert
@@ -420,13 +421,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create(stream, newLine:"\r\n\n");
+                _ = CsvStreamReader.Create(stream, newLine: "\r\n\n");
             }
 
             // Assert
             Assert.Throws<ArgumentException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void Create_WithDoubleQuoteNewLine_ShouldThrowException()
         {
@@ -436,7 +437,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create(stream, newLine:"\r\"");
+                _ = CsvStreamReader.Create(stream, newLine: "\r\"");
             }
 
             // Assert
@@ -472,14 +473,14 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using Stream stream = GetDefaultStream();
-            
+
             // Act
             _ = CsvStreamReader.Create(stream, out Exception actual, separator: '\n');
 
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void Create1_WithNullNewLine_ShouldThrowException()
         {
@@ -492,7 +493,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentNullException>(actual);
         }
-        
+
         [Fact]
         public void Create1_WithEmptyNewLine_ShouldThrowException()
         {
@@ -518,7 +519,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void Create1_WithDoubleQuoteNewLine_ShouldThrowException()
         {
@@ -609,7 +610,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool actual = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader _,
                 separator: '\n');
@@ -623,7 +624,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader actual,
                 separator: '\n');
@@ -637,7 +638,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception actual, out CsvStreamReader _,
                 separator: '\n');
@@ -645,13 +646,13 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate_WithNullNewLine_ShouldReturnFalse()
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool actual = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader _,
                 newLine: null);
@@ -665,7 +666,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader actual,
                 newLine: null);
@@ -673,7 +674,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate_WithNullNewLine_ShouldSetExceptionArgument()
         {
@@ -687,13 +688,13 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentNullException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate_WithEmptyNewLine_ShouldReturnFalse()
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool actual = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader _,
                 newLine: "");
@@ -707,7 +708,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader actual,
                 newLine: "");
@@ -715,7 +716,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate_WithEmptyNewLine_ShouldSetExceptionArgument()
         {
@@ -729,13 +730,13 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate_WithTooLongNewLine_ShouldReturnFalse()
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool actual = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader _,
                 newLine: "\r\n\n");
@@ -749,7 +750,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader actual,
                 newLine: "\r\n\n");
@@ -757,7 +758,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate_WithTooLongNewLine_ShouldSetExceptionArgument()
         {
@@ -771,13 +772,13 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate_WithDoubleQuoteNewLine_ShouldReturnFalse()
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool actual = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader _,
                 newLine: "\r\"");
@@ -791,7 +792,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader actual,
                 newLine: "\r\"");
@@ -799,7 +800,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate_WithDoubleQuoteNewLine_ShouldSetExceptionArgument()
         {
@@ -854,7 +855,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<ArgumentException>("separator", TestCode);
         }
-        
+
         [Fact]
         public void Create2_WithNullNewLine_ShouldThrowException()
         {
@@ -864,13 +865,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create(stream, newLine:null);
+                _ = CsvStreamReader.Create(stream, newLine: null);
             }
 
             // Assert
             Assert.Throws<ArgumentNullException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void Create2_WithEmptyNewLine_ShouldThrowException()
         {
@@ -880,7 +881,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create(stream, newLine:"");
+                _ = CsvStreamReader.Create(stream, newLine: "");
             }
 
             // Assert
@@ -896,13 +897,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create(stream, newLine:"\r\n\n");
+                _ = CsvStreamReader.Create(stream, newLine: "\r\n\n");
             }
 
             // Assert
             Assert.Throws<ArgumentException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void Create2_WithDoubleQuoteNewLine_ShouldThrowException()
         {
@@ -912,7 +913,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create(stream, newLine:"\r\"");
+                _ = CsvStreamReader.Create(stream, newLine: "\r\"");
             }
 
             // Assert
@@ -948,14 +949,14 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             _ = CsvStreamReader.Create(stream, out Exception actual, separator: '\n');
 
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void Create3_WithNullNewLine_ShouldThrowException()
         {
@@ -968,7 +969,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentNullException>(actual);
         }
-        
+
         [Fact]
         public void Create3_WithEmptyNewLine_ShouldThrowException()
         {
@@ -994,7 +995,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void Create3_WithDoubleQuoteNewLine_ShouldThrowException()
         {
@@ -1085,7 +1086,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             bool actual = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader _,
                 separator: '\n');
@@ -1099,7 +1100,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader actual,
                 separator: '\n');
@@ -1113,7 +1114,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception actual, out CsvStreamReader _,
                 separator: '\n');
@@ -1121,13 +1122,13 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate1_WithNullNewLine_ShouldReturnFalse()
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             bool actual = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader _,
                 newLine: null);
@@ -1141,7 +1142,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader actual,
                 newLine: null);
@@ -1149,7 +1150,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate1_WithNullNewLine_ShouldSetExceptionArgument()
         {
@@ -1163,13 +1164,13 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentNullException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate1_WithEmptyNewLine_ShouldReturnFalse()
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             bool actual = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader _,
                 newLine: "");
@@ -1183,7 +1184,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader actual,
                 newLine: "");
@@ -1191,7 +1192,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate1_WithEmptyNewLine_ShouldSetExceptionArgument()
         {
@@ -1205,13 +1206,13 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate1_WithTooLongNewLine_ShouldReturnFalse()
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             bool actual = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader _,
                 newLine: "\r\n\n");
@@ -1225,7 +1226,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader actual,
                 newLine: "\r\n\n");
@@ -1233,7 +1234,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate1_WithTooLongNewLine_ShouldSetExceptionArgument()
         {
@@ -1247,13 +1248,13 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate1_WithDoubleQuoteNewLine_ShouldReturnFalse()
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             bool actual = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader _,
                 newLine: "\r\"");
@@ -1267,7 +1268,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamReader stream = GetDefaultStreamReader();
-            
+
             // Act
             bool _ = CsvStreamReader.TryCreate(stream, out Exception _, out CsvStreamReader actual,
                 newLine: "\r\"");
@@ -1275,7 +1276,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate1_WithDoubleQuoteNewLine_ShouldSetExceptionArgument()
         {
@@ -1317,7 +1318,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<ArgumentException>("separator", TestCode);
         }
-        
+
         [Fact]
         public void Create4_WithNullNewLine_ShouldThrowException()
         {
@@ -1325,13 +1326,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create((string) null, newLine:null);
+                _ = CsvStreamReader.Create((string) null, newLine: null);
             }
 
             // Assert
             Assert.Throws<ArgumentNullException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void Create4_WithEmptyNewLine_ShouldThrowException()
         {
@@ -1339,7 +1340,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create((string) null, newLine:"");
+                _ = CsvStreamReader.Create((string) null, newLine: "");
             }
 
             // Assert
@@ -1353,13 +1354,13 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create((string) null, newLine:"\r\n\n");
+                _ = CsvStreamReader.Create((string) null, newLine: "\r\n\n");
             }
 
             // Assert
             Assert.Throws<ArgumentException>("newLine", TestCode);
         }
-        
+
         [Fact]
         public void Create4_WithDoubleQuoteNewLine_ShouldThrowException()
         {
@@ -1367,7 +1368,7 @@ namespace Ncl.Common.Csv.Tests
             // Act
             void TestCode()
             {
-                _ = CsvStreamReader.Create((string) null, newLine:"\r\"");
+                _ = CsvStreamReader.Create((string) null, newLine: "\r\"");
             }
 
             // Assert
@@ -1464,7 +1465,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate2_WithNullNewLine_ShouldReturnFalse()
         {
@@ -1488,7 +1489,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate2_WithNullNewLine_ShouldSetExceptionArgument()
         {
@@ -1500,7 +1501,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentNullException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate2_WithEmptyNewLine_ShouldReturnFalse()
         {
@@ -1524,7 +1525,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate2_WithEmptyNewLine_ShouldSetExceptionArgument()
         {
@@ -1536,7 +1537,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate2_WithTooLongNewLine_ShouldReturnFalse()
         {
@@ -1560,7 +1561,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate2_WithTooLongNewLine_ShouldSetExceptionArgument()
         {
@@ -1572,7 +1573,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void TryCreate2_WithDoubleQuoteNewLine_ShouldReturnFalse()
         {
@@ -1596,7 +1597,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void TryCreate2_WithDoubleQuoteNewLine_ShouldSetExceptionArgument()
         {
@@ -1608,7 +1609,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void EndOfStream_WithNoReadsAndEOF_ShouldReturnTrue()
         {
@@ -1621,7 +1622,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.True(actual);
         }
-        
+
         [Fact]
         public void EndOfStream_WithNoReadsAndNotEOF_ShouldReturnFalse()
         {
@@ -1634,42 +1635,42 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.False(actual);
         }
-        
+
         [Fact]
         public void EndOfStream_WithOneReadAndNewLineEnding_ShouldReturnTrue()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
             csvStream.ReadField();
-            
+
             // Act
             bool actual = csvStream.EndOfStream;
 
             // Assert
             Assert.True(actual);
         }
-        
+
         [Fact]
         public void EndOfStream_WithOneReadAndEOF_ShouldReturnTrue()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
             csvStream.ReadField();
-            
+
             // Act
             bool actual = csvStream.EndOfStream;
 
             // Assert
             Assert.True(actual);
         }
-        
+
         [Fact]
         public void EndOfStream_WithDisposed_ShouldThrowObjectDisposedException()
         {
             // Arrange
             CsvStreamReader csvStream = GetDefaultInstance(ValidField);
             csvStream.Dispose();
-            
+
             // Act
             void TestCode()
             {
@@ -1679,7 +1680,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<ObjectDisposedException>(TestCode);
         }
-        
+
         [Fact]
         public void EndOfStream_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
@@ -1696,7 +1697,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<InvalidOperationException>(TestCode);
         }
-        
+
         [Fact]
         public void FirstRowRead_WithNothingRead_ShouldReturnFalse()
         {
@@ -1709,7 +1710,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.False(actual);
         }
-        
+
         [Fact]
         public void FirstRowRead_WithReadButNotFinishFirstRow_ShouldReturnFalse()
         {
@@ -1723,7 +1724,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.False(actual);
         }
-        
+
         [Fact]
         public void FirstRowRead_WithFirstRowRead_ShouldReturnTrue()
         {
@@ -1738,7 +1739,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.True(actual);
         }
-        
+
         [Fact]
         public void FirstRowRead_WithFirstRowReadPlusAdditionalRead_ShouldReturnTrue()
         {
@@ -1747,7 +1748,7 @@ namespace Ncl.Common.Csv.Tests
             csvStream.ReadField();
             csvStream.ReadField();
             csvStream.ReadField();
-            
+
             // Act
             bool actual = csvStream.FirstRowRead;
 
@@ -1781,7 +1782,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(0, actual);
         }
-        
+
         [Fact]
         public void RowsRead_WithFieldsReadAndFinishedRow_ShouldReturnOne()
         {
@@ -1790,7 +1791,7 @@ namespace Ncl.Common.Csv.Tests
             csvStream.ReadField();
             csvStream.ReadField();
             csvStream.ReadField();
-            
+
             // Act
             long actual = csvStream.RowsRead;
 
@@ -1847,7 +1848,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void FieldsRead_WithNoReads_ShouldReturnZero()
         {
@@ -1860,7 +1861,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(0, actual);
         }
-        
+
         [Fact]
         public void FieldsRead_WithOneRead_ShouldReturnOne()
         {
@@ -1874,7 +1875,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(1, actual);
         }
-        
+
         [Fact]
         public void FieldsRead_WithReadsPastRowEnd_ShouldReturnTwo()
         {
@@ -1889,7 +1890,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(2, actual);
         }
-        
+
         [Fact]
         public void FieldPosition_WithNoReads_ShouldReturnZero()
         {
@@ -1902,7 +1903,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(0, actual);
         }
-        
+
         [Fact]
         public void FieldPosition_WithOneRead_ShouldReturnOne()
         {
@@ -1916,7 +1917,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(1, actual);
         }
-        
+
         [Fact]
         public void FieldPosition_WithReadsPastRowEnd_ShouldReturnZero()
         {
@@ -1931,7 +1932,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(0, actual);
         }
-        
+
         [Fact]
         public void MaxFieldCount_WithNoReads_ShouldReturnZero()
         {
@@ -1944,7 +1945,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(0, actual);
         }
-        
+
         [Fact]
         public void MaxFieldCount_WithOneReadButRowNotDone_ShouldReturnOne()
         {
@@ -1958,7 +1959,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(0, actual);
         }
-        
+
         [Fact]
         public void MaxFieldCount_WithReadsPastRowEnd_ShouldReturnTwo()
         {
@@ -1980,37 +1981,37 @@ namespace Ncl.Common.Csv.Tests
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
             csvStream.ReadField();
-            
+
             // Act
             csvStream.ResetStreamPosition();
-            
+
             // Assert
             Assert.Equal(0, csvStream.BaseStream.Position);
             Assert.Equal(ValidField, csvStream.ReadField());
         }
-        
+
         [Fact]
         public void ResetStreamPosition_WithOneFieldRead_ShouldResetProperties()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
             csvStream.ReadField();
-            
+
             // Act
             csvStream.ResetStreamPosition();
-            
+
             // Assert
             Assert.Equal(0, csvStream.FieldPosition);
             Assert.Equal(0, csvStream.FieldsRead);
         }
-        
+
         [Fact]
         public void ResetStreamPosition_WithUnSeekableStream_ShouldThrowNotSupportException()
         {
             // Arrange
             using var csvStream = new CsvStreamReader(new StringReader("field1,field2"));
             csvStream.ReadField();
-            
+
             // Act
             void TestCode()
             {
@@ -2020,7 +2021,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<NotSupportedException>(TestCode);
         }
-        
+
         [Fact]
         public void ResetStreamPosition_WithDisposedStream_ShouldThrowObjectDisposedException()
         {
@@ -2028,7 +2029,7 @@ namespace Ncl.Common.Csv.Tests
             using var csvStream = new CsvStreamReader(new StringReader("field1,field2"));
             csvStream.ReadField();
             csvStream.Dispose();
-            
+
             // Act
             void TestCode()
             {
@@ -2038,13 +2039,13 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<ObjectDisposedException>(TestCode);
         }
-        
+
         [Fact]
         public void ReadField_WithNoContent_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance();
-            
+
 
             // Act
             string actual = csvStream.ReadField();
@@ -2052,7 +2053,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void ReadField_WithContent_ShouldReturnField()
         {
@@ -2065,21 +2066,21 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(ValidField, actual);
         }
-        
+
         [Fact]
         public void ReadField_WithEOF_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
             csvStream.ReadField();
-            
+
             // Act
             string actual = csvStream.ReadField();
 
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void ReadField_WithEmptyFieldContent_ShouldReturnEmptyString()
         {
@@ -2092,7 +2093,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(string.Empty, actual);
         }
-        
+
         [Fact]
         public void ReadField_WithEscapedFieldContent_ShouldReturnUnescapedField()
         {
@@ -2105,7 +2106,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(EscapedFieldWithNewLineExpected, actual);
         }
-        
+
         [Fact]
         public void ReadField_WithEscapedFieldButTextAfterLastDoubleQuoteContent_ShouldReturnUnescapedField()
         {
@@ -2119,7 +2120,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void ReadField_WithEscapedFieldButTextBeforeFirstDoubleQuoteContent_ShouldReturnUnescapedField()
         {
@@ -2133,7 +2134,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void ReadField_WithEscapedEmptyFieldContent_ShouldReturnEmptyString()
         {
@@ -2146,7 +2147,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(string.Empty, actual);
         }
-        
+
         [Fact]
         public void ReadField_WithEmptyRowBetweenContent_ShouldReturnEmptyString()
         {
@@ -2161,14 +2162,14 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void ReadField_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
             csvStream.Dispose();
-            
+
             // Act
             void TestCode()
             {
@@ -2178,14 +2179,14 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<ObjectDisposedException>(TestCode);
         }
-        
+
         [Fact]
         public void ReadField_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
             Task<string[][]> task = csvStream.ReadToEndAsync();
-            
+
             // Act
             void TestCode()
             {
@@ -2195,7 +2196,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Throws<InvalidOperationException>(TestCode);
         }
-        
+
         [Fact]
         public void ReadFieldAndCheck_WithContentButNoNewLineEncountered_ShouldHaveNewLineEncounteredAsFalse()
         {
@@ -2208,7 +2209,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.False(actual.NewLineEncountered);
         }
-        
+
         [Fact]
         public void ReadFieldAndCheck_WithContentAndNewLineEncountered_ShouldHaveNewLineEncounteredAsTrue()
         {
@@ -2221,12 +2222,12 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.True(actual.NewLineEncountered);
         }
-        
+
         [Fact]
         public void ReadFieldAndCheck_WithContentAndAltNewLineEncountered_ShouldHaveNewLineEncounteredAsTrue()
         {
             // Arrange
-            using var csvStream = new CsvStreamReader(GetDefaultStream("field1\n"), newLine:"\n");
+            using var csvStream = new CsvStreamReader(GetDefaultStream("field1\n"), newLine: "\n");
 
             // Act
             FieldReadResult actual = csvStream.ReadFieldAndCheck();
@@ -2234,7 +2235,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.True(actual.NewLineEncountered);
         }
-        
+
         [Fact]
         public void ReadFieldAndCheck_WithContentAndEOFEncountered_ShouldHaveNewLineEncounteredAsFalse()
         {
@@ -2247,13 +2248,13 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.False(actual.NewLineEncountered);
         }
-        
+
         [Fact]
         public async Task ReadFieldAsync_WithNoContent_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance();
-            
+
 
             // Act
             string actual = await csvStream.ReadFieldAsync();
@@ -2261,7 +2262,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public async Task ReadFieldAsync_WithContent_ShouldReturnField()
         {
@@ -2274,21 +2275,21 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(ValidField, actual);
         }
-        
+
         [Fact]
         public async Task ReadFieldAsync_WithEOF_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
             await csvStream.ReadFieldAsync();
-            
+
             // Act
             string actual = await csvStream.ReadFieldAsync();
 
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public async Task ReadFieldAsync_WithEmptyFieldContent_ShouldReturnEmptyString()
         {
@@ -2301,7 +2302,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(string.Empty, actual);
         }
-        
+
         [Fact]
         public async Task ReadFieldAsync_WithEscapedFieldContent_ShouldReturnUnescapedField()
         {
@@ -2314,7 +2315,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(EscapedFieldWithNewLineExpected, actual);
         }
-        
+
         [Fact]
         public async Task ReadFieldAsync_WithEscapedFieldButTextAfterLastDoubleQuoteContent_ShouldReturnUnescapedField()
         {
@@ -2328,9 +2329,10 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
-        public async Task ReadFieldAsync_WithEscapedFieldButTextBeforeFirstDoubleQuoteContent_ShouldReturnUnescapedField()
+        public async Task
+            ReadFieldAsync_WithEscapedFieldButTextBeforeFirstDoubleQuoteContent_ShouldReturnUnescapedField()
         {
             const string expected = "extra field1,test";
             // Arrange
@@ -2342,7 +2344,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task ReadFieldAsync_WithEscapedEmptyFieldContent_ShouldReturnEmptyString()
         {
@@ -2355,7 +2357,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(string.Empty, actual);
         }
-        
+
         [Fact]
         public async Task ReadFieldAsync_WithEmptyRowBetweenContent_ShouldReturnEmptyString()
         {
@@ -2370,7 +2372,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task ReadFieldAsync_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
@@ -2380,14 +2382,14 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
                 csvStream.Dispose();
-                
+
                 await csvStream.ReadFieldAsync();
             }
 
             // Assert
             await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
         }
-        
+
         [Fact]
         public async Task ReadFieldAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
@@ -2397,16 +2399,17 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
                 Task<string[][]> task = csvStream.ReadToEndAsync();
-                
+
                 await csvStream.ReadFieldAsync();
             }
 
             // Assert
             await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
-        
+
         [Fact]
-        public async Task ReadFieldAndCheckAsync_WithContentButNoNewLineEncountered_ShouldHaveNewLineEncounteredAsFalse()
+        public async Task
+            ReadFieldAndCheckAsync_WithContentButNoNewLineEncountered_ShouldHaveNewLineEncounteredAsFalse()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
@@ -2417,7 +2420,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.False(actual.NewLineEncountered);
         }
-        
+
         [Fact]
         public async Task ReadFieldAndCheckAsync_WithContentAndNewLineEncountered_ShouldHaveNewLineEncounteredAsTrue()
         {
@@ -2430,12 +2433,13 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.True(actual.NewLineEncountered);
         }
-        
+
         [Fact]
-        public async Task ReadFieldAndCheckAsync_WithContentAndAltNewLineEncountered_ShouldHaveNewLineEncounteredAsTrue()
+        public async Task
+            ReadFieldAndCheckAsync_WithContentAndAltNewLineEncountered_ShouldHaveNewLineEncounteredAsTrue()
         {
             // Arrange
-            using var csvStream = new CsvStreamReader(GetDefaultStream("field1\n"), newLine:"\n");
+            using var csvStream = new CsvStreamReader(GetDefaultStream("field1\n"), newLine: "\n");
 
             // Act
             FieldReadResult actual = await csvStream.ReadFieldAndCheckAsync();
@@ -2443,7 +2447,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.True(actual.NewLineEncountered);
         }
-        
+
         [Fact]
         public async Task ReadFieldAndCheckAsync_WithContentAndEOFEncountered_ShouldHaveNewLineEncounteredAsFalse()
         {
@@ -2462,7 +2466,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
-            
+
             // Act
             string[] actual = csvStream.ReadRow();
 
@@ -2472,14 +2476,14 @@ namespace Ncl.Common.Csv.Tests
             Assert.Equal(ValidFieldBase + "1", actual[0]);
             Assert.Equal(ValidFieldBase + "2", actual[1]);
         }
-        
+
         [Fact]
         public void ReadRow_WithContentAndEOF_ShouldReturnRow()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
             csvStream.ReadRow();
-            
+
             // Act
             string[] actual = csvStream.ReadRow();
 
@@ -2489,42 +2493,42 @@ namespace Ncl.Common.Csv.Tests
             Assert.Equal(ValidFieldBase + "3", actual[0]);
             Assert.Equal(ValidFieldBase + "4", actual[1]);
         }
-        
+
         [Fact]
         public void ReadRow_WithAtEOF_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
             csvStream.ReadRow();
-            
+
             // Act
             string[] actual = csvStream.ReadRow();
 
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void ReadRow_WithNoNewLineAndAtEOF_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
             csvStream.ReadRow();
-            
+
             // Act
             string[] actual = csvStream.ReadRow();
 
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void ReadRow_WithEmptyRow_ShouldReturnEmptyField()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance("field1\r\n\r\nfield2");
             csvStream.ReadRow();
-            
+
             // Act
             string[] actual = csvStream.ReadRow();
 
@@ -2532,7 +2536,7 @@ namespace Ncl.Common.Csv.Tests
             Assert.NotNull(actual);
             Assert.Single(actual);
         }
-        
+
         [Fact]
         public void ReadRow_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
@@ -2542,14 +2546,14 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
                 csvStream.Dispose();
-                
+
                 csvStream.ReadRow();
             }
 
             // Assert
             Assert.Throws<ObjectDisposedException>(TestCode);
         }
-        
+
         [Fact]
         public void ReadRow_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
@@ -2559,20 +2563,20 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
                 Task<string[][]> task = csvStream.ReadToEndAsync();
-                
+
                 csvStream.ReadRow();
             }
 
             // Assert
             Assert.Throws<InvalidOperationException>(TestCode);
         }
-        
+
         [Fact]
         public async Task ReadRowAsync_WithContent_ShouldReturnRow()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
-            
+
             // Act
             string[] actual = await csvStream.ReadRowAsync();
 
@@ -2582,14 +2586,14 @@ namespace Ncl.Common.Csv.Tests
             Assert.Equal(ValidFieldBase + "1", actual[0]);
             Assert.Equal(ValidFieldBase + "2", actual[1]);
         }
-        
+
         [Fact]
         public async Task ReadRowAsync_WithContentAndEOF_ShouldReturnRow()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
             await csvStream.ReadRowAsync();
-            
+
             // Act
             string[] actual = await csvStream.ReadRowAsync();
 
@@ -2599,42 +2603,42 @@ namespace Ncl.Common.Csv.Tests
             Assert.Equal(ValidFieldBase + "3", actual[0]);
             Assert.Equal(ValidFieldBase + "4", actual[1]);
         }
-        
+
         [Fact]
         public async Task ReadRowAsync_WithAtEOF_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
             await csvStream.ReadRowAsync();
-            
+
             // Act
             string[] actual = await csvStream.ReadRowAsync();
 
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public async Task ReadRowAsync_WithNoNewLineAndAtEOF_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
             await csvStream.ReadRowAsync();
-            
+
             // Act
             string[] actual = await csvStream.ReadRowAsync();
 
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public async Task ReadRowAsync_WithEmptyRow_ShouldReturnEmptyField()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance("field1\r\n\r\nfield2");
             await csvStream.ReadRowAsync();
-            
+
             // Act
             string[] actual = await csvStream.ReadRowAsync();
 
@@ -2642,7 +2646,7 @@ namespace Ncl.Common.Csv.Tests
             Assert.NotNull(actual);
             Assert.Single(actual);
         }
-        
+
         [Fact]
         public async Task ReadRowAsync_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
@@ -2652,14 +2656,14 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
                 csvStream.Dispose();
-                
+
                 await csvStream.ReadRowAsync();
             }
 
             // Assert
             await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
         }
-        
+
         [Fact]
         public async Task ReadRowAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
@@ -2669,20 +2673,20 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
                 Task<string[][]> task = csvStream.ReadToEndAsync();
-                
+
                 await csvStream.ReadRowAsync();
             }
 
             // Assert
             await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
-        
+
         [Fact]
         public void ReadToEnd_WithContent_ShouldReturnAllRowsAsMatrix()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
-            
+
             // Act
             string[][] actual = csvStream.ReadToEnd();
 
@@ -2696,14 +2700,14 @@ namespace Ncl.Common.Csv.Tests
             Assert.Equal(ValidFieldBase + "3", actual[1][0]);
             Assert.Equal(ValidFieldBase + "4", actual[1][1]);
         }
-        
+
         [Fact]
         public void ReadToEnd_WithContentAndEOF_ShouldReturnRemainingRowAsMatrix()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
             csvStream.ReadRow();
-            
+
             // Act
             string[][] actual = csvStream.ReadToEnd();
 
@@ -2714,35 +2718,35 @@ namespace Ncl.Common.Csv.Tests
             Assert.Equal(ValidFieldBase + "3", actual[0][0]);
             Assert.Equal(ValidFieldBase + "4", actual[0][1]);
         }
-        
+
         [Fact]
         public void ReadToEnd_WithAtEOF_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
             csvStream.ReadRow();
-            
+
             // Act
             string[][] actual = csvStream.ReadToEnd();
 
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void ReadToEnd_WithNoNewLineAndAtEOF_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
             csvStream.ReadRow();
-            
+
             // Act
             string[][] actual = csvStream.ReadToEnd();
 
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public void ReadToEnd_WithEmptyRow_ShouldReturnAllContentIncludingEmptyRow()
         {
@@ -2760,7 +2764,7 @@ namespace Ncl.Common.Csv.Tests
             Assert.Single(actual[2]);
             Assert.Equal("", actual[1][0]);
         }
-        
+
         [Fact]
         public void ReadToEnd_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
@@ -2770,14 +2774,14 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
                 csvStream.Dispose();
-                
+
                 csvStream.ReadToEnd();
             }
 
             // Assert
             Assert.Throws<ObjectDisposedException>(TestCode);
         }
-        
+
         [Fact]
         public void ReadToEnd_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
@@ -2787,20 +2791,20 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
                 Task<string[][]> task = csvStream.ReadToEndAsync();
-                
+
                 csvStream.ReadToEnd();
             }
 
             // Assert
             Assert.Throws<InvalidOperationException>(TestCode);
         }
-        
+
         [Fact]
         public async Task ReadToEndAsync_WithContent_ShouldReturnAllRowsAsMatrix()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
-            
+
             // Act
             string[][] actual = await csvStream.ReadToEndAsync();
 
@@ -2814,14 +2818,14 @@ namespace Ncl.Common.Csv.Tests
             Assert.Equal(ValidFieldBase + "3", actual[1][0]);
             Assert.Equal(ValidFieldBase + "4", actual[1][1]);
         }
-        
+
         [Fact]
         public async Task ReadToEndAsync_WithContentAndEOF_ShouldReturnRemainingRowAsMatrix()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(DefaultCsvContent);
             await csvStream.ReadRowAsync();
-            
+
             // Act
             string[][] actual = await csvStream.ReadToEndAsync();
 
@@ -2832,35 +2836,35 @@ namespace Ncl.Common.Csv.Tests
             Assert.Equal(ValidFieldBase + "3", actual[0][0]);
             Assert.Equal(ValidFieldBase + "4", actual[0][1]);
         }
-        
+
         [Fact]
         public async Task ReadToEndAsync_WithAtEOF_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
             await csvStream.ReadRowAsync();
-            
+
             // Act
             string[][] actual = await csvStream.ReadToEndAsync();
 
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public async Task ReadToEndAsync_WithNoNewLineAndAtEOF_ShouldReturnNull()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
             await csvStream.ReadRowAsync();
-            
+
             // Act
             string[][] actual = await csvStream.ReadToEndAsync();
 
             // Assert
             Assert.Null(actual);
         }
-        
+
         [Fact]
         public async Task ReadToEndAsync_WithEmptyRow_ShouldReturnAllContentIncludingEmptyRow()
         {
@@ -2878,7 +2882,7 @@ namespace Ncl.Common.Csv.Tests
             Assert.Single(actual[2]);
             Assert.Equal("", actual[1][0]);
         }
-        
+
         [Fact]
         public async Task ReadToEndAsync_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
@@ -2888,14 +2892,14 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
                 csvStream.Dispose();
-                
+
                 await csvStream.ReadToEndAsync();
             }
 
             // Assert
             await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
         }
-        
+
         [Fact]
         public async Task ReadToEndAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
@@ -2905,14 +2909,14 @@ namespace Ncl.Common.Csv.Tests
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
                 Task<string[][]> task = csvStream.ReadToEndAsync();
-                
+
                 await csvStream.ReadToEndAsync();
             }
 
             // Assert
             await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
-        
+
         [Fact]
         public async Task GetEndOfStreamAsync_WithNoReadsAndEOF_ShouldReturnTrue()
         {
@@ -2925,7 +2929,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.True(actual);
         }
-        
+
         [Fact]
         public async Task GetEndOfStreamAsync_WithNoReadsAndNotEOF_ShouldReturnFalse()
         {
@@ -2938,42 +2942,42 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.False(actual);
         }
-        
+
         [Fact]
         public async Task GetEndOfStreamAsync_WithOneReadAndNewLineEnding_ShouldReturnTrue()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
             await csvStream.ReadFieldAsync();
-            
+
             // Act
             bool actual = await csvStream.GetEndOfStreamAsync();
 
             // Assert
             Assert.True(actual);
         }
-        
+
         [Fact]
         public async Task GetEndOfStreamAsync_WithOneReadAndEOF_ShouldReturnTrue()
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ValidField);
             await csvStream.ReadFieldAsync();
-            
+
             // Act
             bool actual = await csvStream.GetEndOfStreamAsync();
 
             // Assert
             Assert.True(actual);
         }
-        
+
         [Fact]
         public async Task GetEndOfStreamAsync_WithDisposed_ShouldThrowObjectDisposedException()
         {
             // Arrange
             CsvStreamReader csvStream = GetDefaultInstance(ValidField);
             csvStream.Dispose();
-            
+
             // Act
             async Task TestCode()
             {
@@ -2983,7 +2987,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
         }
-        
+
         [Fact]
         public async Task GetEndOfStreamAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {

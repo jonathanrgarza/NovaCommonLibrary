@@ -72,6 +72,11 @@ namespace Ncl.Common.Csv
         protected readonly Stream _underlyingStream;
 
         /// <summary>
+        ///     The current running asynchronous task.
+        /// </summary>
+        protected Task _asyncTask;
+
+        /// <summary>
         ///     The buffer holding characters read from the stream.
         /// </summary>
         protected char[] _buffer = new char[DefaultBufferSize];
@@ -91,11 +96,6 @@ namespace Ncl.Common.Csv
         ///     Needed in case a newline sequence crosses the end of a buffer.
         /// </summary>
         protected char? _previousCharBuffer;
-
-        /// <summary>
-        ///     The current running asynchronous task.
-        /// </summary>
-        protected Task _asyncTask;
 
         private IFormatProvider _formatProvider;
 
@@ -840,12 +840,12 @@ namespace Ncl.Common.Csv
                 return streamReader.BaseStream;
             return null;
         }
-        
+
         /// <summary>
         ///     Guards against an already running async operation.
         /// </summary>
         /// <exception cref="ObjectDisposedException">
-        ///     The <see cref="CsvStreamReader"/> has already been disposed.
+        ///     The <see cref="CsvStreamReader" /> has already been disposed.
         /// </exception>
         protected void GuardAgainstObjectDisposed()
         {
@@ -862,8 +862,10 @@ namespace Ncl.Common.Csv
         protected void GuardAgainstAlreadyRunningAsyncTask()
         {
             if (_asyncTask != null && !_asyncTask.IsCompleted)
+            {
                 throw new InvalidOperationException(
                     "The stream is currently in use by a previous operation on the stream.");
+            }
         }
 
         /// <summary>
@@ -915,7 +917,7 @@ namespace Ncl.Common.Csv
 
             return secondChar.Value == newLineSequence[1];
         }
-        
+
         /// <summary>
         ///     Checks for the end of a row in the stream.
         /// </summary>
@@ -993,7 +995,7 @@ namespace Ncl.Common.Csv
             ResetAsNextRow();
             return true;
         }
-        
+
         /// <summary>
         ///     Checks for the end of a row in the stream and processes it.
         /// </summary>
@@ -1055,7 +1057,7 @@ namespace Ncl.Common.Csv
             _bufferLength = length;
             return length;
         }
-        
+
         /// <summary>
         ///     Reads in the next block of characters into the buffer.
         /// </summary>
@@ -1098,7 +1100,7 @@ namespace Ncl.Common.Csv
 
             return _buffer[_bufferPosition];
         }
-        
+
         /// <summary>
         ///     Peeks at the next character from the stream.
         /// </summary>
@@ -1150,7 +1152,7 @@ namespace Ncl.Common.Csv
             _bufferPosition++;
             return nextChar;
         }
-        
+
         /// <summary>
         ///     Reads the next character from the stream.
         /// </summary>
@@ -1219,7 +1221,7 @@ namespace Ncl.Common.Csv
         ///     Reads the next field from the stream and checks if a new line was encountered.
         /// </summary>
         /// <returns>
-        ///     The next field, as a <see cref="FieldReadResult"/>, or null if there are no more fields in the stream.
+        ///     The next field, as a <see cref="FieldReadResult" />, or null if there are no more fields in the stream.
         /// </returns>
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="CsvStreamReader" /> or underlying stream is disposed.
@@ -1503,7 +1505,7 @@ namespace Ncl.Common.Csv
             _asyncTask = asyncTask;
             return asyncTask;
         }
-        
+
         /// <summary>
         ///     Reads the next field from the stream.
         /// </summary>
@@ -1533,7 +1535,7 @@ namespace Ncl.Common.Csv
         {
             GuardAgainstObjectDisposed();
             GuardAgainstAlreadyRunningAsyncTask();
-            
+
             var fields = new List<string>();
 
             if (EndOfStream)
@@ -1546,9 +1548,9 @@ namespace Ncl.Common.Csv
 
                 if (result == null)
                     break; //EOF reached
-                
+
                 newLineEncountered = result.NewLineEncountered;
-                
+
                 //Null field should not happen
 
                 string field = result.Field;
@@ -1557,7 +1559,7 @@ namespace Ncl.Common.Csv
 
             return fields.ToArray();
         }
-        
+
         /// <summary>
         ///     Reads the next row from the stream; asynchronously.
         /// </summary>
@@ -1578,7 +1580,7 @@ namespace Ncl.Common.Csv
             _asyncTask = asyncTask;
             return asyncTask;
         }
-        
+
         /// <summary>
         ///     Reads the next row from the stream; asynchronously.
         /// </summary>
@@ -1603,9 +1605,9 @@ namespace Ncl.Common.Csv
 
                 if (result == null)
                     break; //EOF reached
-                
+
                 newLineEncountered = result.NewLineEncountered;
-                
+
                 //Null field should not happen
 
                 string field = result.Field;
@@ -1615,7 +1617,7 @@ namespace Ncl.Common.Csv
 
             return fields.ToArray();
         }
-        
+
         /// <summary>
         ///     Reads the all the rows from the stream.
         /// </summary>
@@ -1630,7 +1632,7 @@ namespace Ncl.Common.Csv
         {
             GuardAgainstObjectDisposed();
             GuardAgainstAlreadyRunningAsyncTask();
-            
+
             var rows = new List<string[]>();
 
             if (EndOfStream)
@@ -1648,7 +1650,7 @@ namespace Ncl.Common.Csv
 
             return rows.ToArray();
         }
-        
+
         /// <summary>
         ///     Reads the all the rows from the stream; asynchronously.
         /// </summary>
@@ -1669,7 +1671,7 @@ namespace Ncl.Common.Csv
             _asyncTask = asyncTask;
             return asyncTask;
         }
-        
+
         /// <summary>
         ///     Reads the all the rows from the stream; asynchronously.
         /// </summary>
@@ -1699,7 +1701,7 @@ namespace Ncl.Common.Csv
 
             return rows.ToArray();
         }
-        
+
         /// <summary>
         ///     Gets the end of stream status asynchronously.
         ///     Checking EOF status can cause a read operation.
@@ -1715,12 +1717,12 @@ namespace Ncl.Common.Csv
         {
             GuardAgainstObjectDisposed();
             GuardAgainstAlreadyRunningAsyncTask();
-            
+
             Task<bool> asyncTask = InternalGetEndOfStreamAsync();
             _asyncTask = asyncTask;
             return asyncTask;
         }
-        
+
         /// <summary>
         ///     Gets the end of stream status asynchronously.
         ///     Checking EOF status can cause a read operation.
@@ -1756,12 +1758,12 @@ namespace Ncl.Common.Csv
             {
                 _stream.Dispose();
             }
-            
+
             _buffer = null;
 
             _isDisposed = true;
         }
-        
+
         // override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
         ~CsvStreamReader()
         {
