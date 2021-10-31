@@ -53,9 +53,20 @@ namespace Ncl.Common.Csv
         /// </summary>
         private static volatile Encoding _utf8NoBom;
 
+        /// <summary>
+        ///     Represents an already completed task with a result of type <see cref="CsvStreamWriter" />.
+        /// </summary>
+        protected readonly Task<CsvStreamWriter> _completedTask;
+
         protected readonly bool _leaveOpen;
         protected readonly char _separator;
         protected readonly TextWriter _stream;
+
+        /// <summary>
+        ///     The current running asynchronous task.
+        /// </summary>
+        protected Task _asyncTask;
+
         protected bool _autoFlush;
         protected List<string> _headers;
 
@@ -106,6 +117,7 @@ namespace Ncl.Common.Csv
             _separator = separator;
             _formatProvider = formatProvider ?? Thread.CurrentThread.CurrentCulture;
             IntegrityMode = integrityMode;
+            _completedTask = Task.FromResult(this);
         }
 
         /// <summary>
@@ -139,6 +151,7 @@ namespace Ncl.Common.Csv
             _separator = separator;
             _formatProvider = formatProvider ?? Thread.CurrentThread.CurrentCulture;
             IntegrityMode = integrityMode;
+            _completedTask = Task.FromResult(this);
         }
 
         /// <summary>
@@ -200,6 +213,7 @@ namespace Ncl.Common.Csv
             _separator = separator;
             _formatProvider = formatProvider ?? Thread.CurrentThread.CurrentCulture;
             IntegrityMode = integrityMode;
+            _completedTask = Task.FromResult(this);
         }
 
         /// <summary>
@@ -721,6 +735,32 @@ namespace Ncl.Common.Csv
         }
 
         /// <summary>
+        ///     Guards against an already running async operation.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> has already been disposed.
+        /// </exception>
+        protected void GuardAgainstObjectDisposed()
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(CsvStreamWriter));
+        }
+
+        /// <summary>
+        ///     Guards against an already running async operation.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        ///     The stream is currently in use by a previous operation on the stream.
+        /// </exception>
+        protected void GuardAgainstAlreadyRunningAsyncTask()
+        {
+            if (_asyncTask == null || _asyncTask.IsCompleted)
+                return;
+            throw new InvalidOperationException(
+                "The stream is currently in use by a previous operation on the stream.");
+        }
+
+        /// <summary>
         ///     Escapes a field value, if necessary.
         /// </summary>
         /// <param name="value">The value being escaped, if necessary.</param>
@@ -801,35 +841,60 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Flushes the underlying stream's buffers.
         /// </summary>
+        /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
-        public void Flush()
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
+        public CsvStreamWriter Flush()
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamWriter));
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             _stream.Flush();
+            return this;
         }
 
         /// <summary>
         ///     Asynchronously flushes the underlying stream's buffers.
         /// </summary>
         /// <returns>
-        ///     A task that represents the asynchronous flush operation.
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous flush operation.
         /// </returns>
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        public Task FlushAsync()
+        public Task<CsvStreamWriter> FlushAsync()
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamWriter));
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
-            return _stream.FlushAsync();
+            Task<CsvStreamWriter> task = InternalFlushAsync();
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Asynchronously flushes the underlying stream's buffers.
+        /// </summary>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous flush operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        protected async Task<CsvStreamWriter> InternalFlushAsync()
+        {
+            GuardAgainstObjectDisposed();
+            await _stream.FlushAsync().ConfigureAwait(false);
+            return this;
         }
 
         /// <summary>
@@ -843,16 +908,18 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
-        ///     written.
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public CsvStreamWriter WriteHeader(string header)
         {
             if (header == null)
                 return this;
 
+            GuardAgainstObjectDisposed();
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
+            GuardAgainstAlreadyRunningAsyncTask();
 
             if (_headers == null)
             {
@@ -878,14 +945,47 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
-        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteHeaderAsync(string header)
         {
             if (header == null)
-                return Task.FromResult(this);
+                return _completedTask;
 
+            GuardAgainstObjectDisposed();
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteHeaderAsync(header);
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes a <see cref="string" /> to the stream as a header entry; asynchronously.
+        ///     The <paramref name="header" /> will be escaped, if necessary.
+        ///     If <paramref name="header" /> is null, nothing is written to the stream.
+        /// </summary>
+        /// <param name="header">The header to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written.
+        /// </exception>
+        protected Task<CsvStreamWriter> InternalWriteHeaderAsync(string header)
+        {
+            if (header == null)
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
 
@@ -896,7 +996,7 @@ namespace Ncl.Common.Csv
 
             _headers.Add(header);
 
-            return WriteUnescapedEntryAsync(header, true);
+            return InternalWriteUnescapedEntryAsync(header, true);
         }
 
         /// <summary>
@@ -908,16 +1008,18 @@ namespace Ncl.Common.Csv
         /// <param name="headers">The values to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         /// <exception cref="InvalidOperationException">
-        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
-        ///     written.
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public CsvStreamWriter WriteHeaders(IEnumerable<string> headers)
         {
             if (headers == null)
                 return this;
 
+            GuardAgainstObjectDisposed();
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
+            GuardAgainstAlreadyRunningAsyncTask();
 
             foreach (string headerEntry in headers)
             {
@@ -929,7 +1031,7 @@ namespace Ncl.Common.Csv
                     _headers = new List<string>();
                 }
 
-                WriteUnescapedEntry(headerEntry);
+                WriteUnescapedEntry(headerEntry, true);
             }
 
             return this;
@@ -950,14 +1052,48 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
-        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        public async Task<CsvStreamWriter> WriteHeadersAsync(IEnumerable<string> headers)
+        public Task<CsvStreamWriter> WriteHeadersAsync(IEnumerable<string> headers)
+        {
+            if (headers == null)
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteHeadersAsync(headers);
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the header entries; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="headers" /> is null or contains all null entries,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="headers">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written.
+        /// </exception>
+        protected async Task<CsvStreamWriter> InternalWriteHeadersAsync(IEnumerable<string> headers)
         {
             if (headers == null)
                 return this;
 
+            GuardAgainstObjectDisposed();
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
 
@@ -971,7 +1107,7 @@ namespace Ncl.Common.Csv
                     _headers = new List<string>();
                 }
 
-                await WriteUnescapedEntryAsync(headerEntry).ConfigureAwait(false);
+                await InternalWriteUnescapedEntryAsync(headerEntry, true).ConfigureAwait(false);
             }
 
             return this;
@@ -986,16 +1122,18 @@ namespace Ncl.Common.Csv
         /// <param name="headers">The values to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
         /// <exception cref="InvalidOperationException">
-        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
-        ///     written.
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public CsvStreamWriter WriteHeaders(string header, params string[] headers)
         {
             if (header == null && headers == null)
                 return this;
 
+            GuardAgainstObjectDisposed();
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
+            GuardAgainstAlreadyRunningAsyncTask();
 
             if (header != null)
             {
@@ -1022,7 +1160,7 @@ namespace Ncl.Common.Csv
                     _headers = new List<string>();
                 }
 
-                WriteUnescapedEntry(headerEntry);
+                WriteUnescapedEntry(headerEntry, true);
             }
 
             return this;
@@ -1044,14 +1182,49 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
-        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        public async Task<CsvStreamWriter> WriteHeadersAsync(string header, params string[] headers)
+        public Task<CsvStreamWriter> WriteHeadersAsync(string header, params string[] headers)
+        {
+            if (header == null && headers == null)
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteHeadersAsync(header, headers);
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes multiple <see cref="string" /> fields to the stream as header entities; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="header" /> and <see cref="headers" /> is null,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="header">The value to write.</param>
+        /// <param name="headers">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written.
+        /// </exception>
+        protected async Task<CsvStreamWriter> InternalWriteHeadersAsync(string header, params string[] headers)
         {
             if (header == null && headers == null)
                 return this;
 
+            GuardAgainstObjectDisposed();
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
 
@@ -1062,7 +1235,7 @@ namespace Ncl.Common.Csv
                     _headers = new List<string>();
                 }
 
-                await WriteUnescapedEntryAsync(header).ConfigureAwait(false);
+                await InternalWriteUnescapedEntryAsync(header, true).ConfigureAwait(false);
 
                 if (IsEmptyArray(headers))
                     return this;
@@ -1070,9 +1243,9 @@ namespace Ncl.Common.Csv
             else if (IsEmptyArray(headers))
                 return this;
 
-            foreach (string fieldEntry in headers)
+            foreach (string headerEntry in headers)
             {
-                if (fieldEntry == null)
+                if (headerEntry == null)
                     continue;
 
                 if (_headers == null)
@@ -1080,7 +1253,7 @@ namespace Ncl.Common.Csv
                     _headers = new List<string>();
                 }
 
-                await WriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
+                await InternalWriteUnescapedEntryAsync(headerEntry, true).ConfigureAwait(false);
             }
 
             return this;
@@ -1098,16 +1271,18 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
-        ///     written.
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public CsvStreamWriter WriteHeaderRow(IEnumerable<string> headers)
         {
             if (headers == null)
                 return this;
 
+            GuardAgainstObjectDisposed();
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
+            GuardAgainstAlreadyRunningAsyncTask();
 
             foreach (string header in headers)
             {
@@ -1144,14 +1319,48 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
-        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        public async Task<CsvStreamWriter> WriteHeaderRowAsync(IEnumerable<string> headers)
+        public Task<CsvStreamWriter> WriteHeaderRowAsync(IEnumerable<string> headers)
+        {
+            if (headers == null)
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteHeaderRowAsync(headers);
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes a <see cref="IEnumerable{T}" /> to the stream as the header entries
+        ///     then moves to the start of the next row; asynchronously.
+        ///     The headers will be escaped, if necessary.
+        ///     If <paramref name="headers" /> is null, nothing is written to the stream.
+        /// </summary>
+        /// <param name="headers">The header row to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written.
+        /// </exception>
+        protected async Task<CsvStreamWriter> InternalWriteHeaderRowAsync(IEnumerable<string> headers)
         {
             if (headers == null)
                 return this;
 
+            GuardAgainstObjectDisposed();
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
 
@@ -1172,7 +1381,7 @@ namespace Ncl.Common.Csv
             if (_headers == null)
                 return this;
 
-            return await WriteRowEndAsync().ConfigureAwait(false);
+            return await InternalWriteRowEndAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -1189,16 +1398,18 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
-        ///     written.
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public CsvStreamWriter WriteHeaderRow(string header, params string[] headers)
         {
             if (header == null && headers == null)
                 return this;
 
+            GuardAgainstObjectDisposed();
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
+            GuardAgainstAlreadyRunningAsyncTask();
 
             if (header != null)
             {
@@ -1257,17 +1468,52 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     <see cref="FirstRowWritten" /> is true and thus no further headers can be
-        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written -or- the <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        public async Task<CsvStreamWriter> WriteHeaderRowAsync(string header, params string[] headers)
+        public Task<CsvStreamWriter> WriteHeaderRowAsync(string header, params string[] headers)
+        {
+            if (header == null && headers == null)
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
+            if (FirstRowWritten)
+                throw new InvalidOperationException(HeaderRowWrittenMsg);
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteHeaderRowAsync(header, headers);
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes headers to the stream as the header entries
+        ///     then moves to the start of the next row; asynchronously.
+        ///     The headers will be escaped, if necessary.
+        ///     If <paramref name="header" /> and <paramref name="headers" /> is null or empty,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="header">The first header to write.</param>
+        /// <param name="headers">The other headers to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     <see cref="FirstRowWritten" /> is <see langword="true" /> and thus no further headers can be
+        ///     written.
+        /// </exception>
+        protected async Task<CsvStreamWriter> InternalWriteHeaderRowAsync(string header, params string[] headers)
         {
             if (header == null && headers == null)
                 return this;
 
+            GuardAgainstObjectDisposed();
             if (FirstRowWritten)
                 throw new InvalidOperationException(HeaderRowWrittenMsg);
-
 
             if (header != null)
             {
@@ -1277,10 +1523,10 @@ namespace Ncl.Common.Csv
                 }
 
                 _headers.Add(header);
-                await WriteUnescapedEntryAsync(header, true);
+                await InternalWriteUnescapedEntryAsync(header, true);
 
                 if (headers == null || headers.Length == 0)
-                    return await WriteRowEndAsync().ConfigureAwait(false);
+                    return await InternalWriteRowEndAsync().ConfigureAwait(false);
             }
             else if (headers.Length == 0 || headers.Length == 1 && headers[0] == null)
                 return this;
@@ -1296,23 +1542,33 @@ namespace Ncl.Common.Csv
                 }
 
                 _headers.Add(otherHeader);
-                await WriteUnescapedEntryAsync(otherHeader, true).ConfigureAwait(false);
+                await InternalWriteUnescapedEntryAsync(otherHeader, true).ConfigureAwait(false);
             }
 
             if (_headers == null)
                 return this;
 
-            return await WriteRowEndAsync().ConfigureAwait(false);
+            return await InternalWriteRowEndAsync().ConfigureAwait(false);
         }
 
         /// <summary>
         ///     Writes the row terminating characters to the stream.
         /// </summary>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="IntegrityViolatedException">
+        ///     Thrown if a row is empty or IntegrityMode.Strict is set and the
+        ///     row's count does not match.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteRowEnd()
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamWriter));
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             VerifyRowEndIntegrity(out string fieldsToAdd);
 
@@ -1336,16 +1592,43 @@ namespace Ncl.Common.Csv
         ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
         ///     the asynchronous write operation.
         /// </returns>
+        /// <exception cref="IntegrityViolatedException">
+        ///     Thrown if a row is empty or IntegrityMode.Strict is set and the
+        ///     row's count does not match.
+        /// </exception>
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        public async Task<CsvStreamWriter> WriteRowEndAsync()
+        public Task<CsvStreamWriter> WriteRowEndAsync()
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamWriter));
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteRowEndAsync();
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes the row terminating characters to the stream; asynchronously.
+        /// </summary>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="IntegrityViolatedException">
+        ///     Thrown if a row is empty or IntegrityMode.Strict is set and the
+        ///     row's count does not match.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        protected async Task<CsvStreamWriter> InternalWriteRowEndAsync()
+        {
+            GuardAgainstObjectDisposed();
 
             VerifyRowEndIntegrity(out string fieldsToAdd);
 
@@ -1369,6 +1652,12 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(string value)
         {
             return WriteUnescapedEntry(value);
@@ -1388,7 +1677,7 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(string value)
         {
@@ -1403,10 +1692,19 @@ namespace Ncl.Common.Csv
         /// <param name="format">The format to write.</param>
         /// <param name="args">The format arguments.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(string format, params object[] args)
         {
             if (format == null)
                 return this;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             string valueStr = string.Format(FormatProvider, format, args);
             return WriteUnescapedEntry(valueStr);
@@ -1427,12 +1725,15 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(string format, params object[] args)
         {
             if (format == null)
-                return Task.FromResult(this);
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             string valueStr = string.Format(FormatProvider, format, args);
             return WriteUnescapedEntryAsync(valueStr);
@@ -1445,10 +1746,19 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(object value)
         {
             if (value == null)
                 return this;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             if (value is IFormattable formattable)
                 return WriteUnescapedEntry(formattable.ToString(null, FormatProvider));
@@ -1470,12 +1780,15 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(object value)
         {
             if (value == null)
-                return Task.FromResult(this);
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             if (value is IFormattable formattable)
                 return WriteUnescapedEntryAsync(formattable.ToString(null, FormatProvider));
@@ -1492,11 +1805,20 @@ namespace Ncl.Common.Csv
         /// <param name="index">The index to start at.</param>
         /// <param name="count">The number of entries to get.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(char[] buffer, int index, int count)
         {
             //Check index and count ranges
             if (buffer == null)
                 return this;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             if (index < 0 || index > buffer.Length)
                 throw new ArgumentOutOfRangeException(nameof(index));
@@ -1527,13 +1849,16 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(char[] buffer, int index, int count)
         {
             //Check index and count ranges
             if (buffer == null)
-                return Task.FromResult(this);
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             if (index < 0 || index > buffer.Length)
                 throw new ArgumentOutOfRangeException(nameof(index));
@@ -1555,11 +1880,20 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="buffer">The buffer to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(char[] buffer)
         {
             //Check index and count ranges
             if (buffer == null)
                 return this;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             if (buffer.Length == 0)
                 return WriteUnescapedEntry(string.Empty);
@@ -1585,13 +1919,13 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(char[] buffer)
         {
             //Check index and count ranges
             if (buffer == null)
-                return Task.FromResult(this);
+                return _completedTask;
 
             if (buffer.Length == 0)
                 return WriteUnescapedEntryAsync(string.Empty);
@@ -1609,6 +1943,12 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(char value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1629,7 +1969,7 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(char value)
         {
@@ -1644,6 +1984,12 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(float value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1664,7 +2010,7 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(float value)
         {
@@ -1679,6 +2025,12 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(bool value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1699,7 +2051,7 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(bool value)
         {
@@ -1714,6 +2066,12 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(ulong value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1734,7 +2092,7 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(ulong value)
         {
@@ -1749,6 +2107,12 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(uint value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1769,7 +2133,7 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(uint value)
         {
@@ -1784,6 +2148,12 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(long value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1804,7 +2174,7 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(long value)
         {
@@ -1819,6 +2189,12 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(int value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1839,7 +2215,7 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(int value)
         {
@@ -1854,6 +2230,12 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(double value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1874,7 +2256,7 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(double value)
         {
@@ -1889,6 +2271,12 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteField(decimal value)
         {
             string valueStr = value.ToString(_formatProvider);
@@ -1909,7 +2297,7 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
         public Task<CsvStreamWriter> WriteFieldAsync(decimal value)
         {
@@ -1925,10 +2313,19 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="fields">The values to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteFields(IEnumerable<string> fields)
         {
             if (fields == null)
                 return this;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             foreach (string fieldEntry in fields)
             {
@@ -1956,19 +2353,48 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        public async Task<CsvStreamWriter> WriteFieldsAsync(IEnumerable<string> fields)
+        public Task<CsvStreamWriter> WriteFieldsAsync(IEnumerable<string> fields)
+        {
+            if (fields == null)
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteFieldsAsync(fields);
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes an <see cref="IEnumerable{T}" /> to the stream as the field entries; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="fields" /> is null or contains all null entries,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        protected async Task<CsvStreamWriter> InternalWriteFieldsAsync(IEnumerable<string> fields)
         {
             if (fields == null)
                 return this;
+
+            GuardAgainstObjectDisposed();
 
             foreach (string fieldEntry in fields)
             {
                 if (fieldEntry == null)
                     continue;
 
-                await WriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
+                await InternalWriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
             }
 
             return this;
@@ -1982,10 +2408,19 @@ namespace Ncl.Common.Csv
         /// <param name="field">The value to write.</param>
         /// <param name="fields">The values to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteFields(string field, params string[] fields)
         {
             if (field == null && fields == null)
                 return this;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             if (field != null)
             {
@@ -2024,16 +2459,46 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        public async Task<CsvStreamWriter> WriteFieldsAsync(string field, params string[] fields)
+        public Task<CsvStreamWriter> WriteFieldsAsync(string field, params string[] fields)
+        {
+            if (field == null && fields == null)
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteFieldsAsync(field, fields);
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes multiple <see cref="string" /> fields to the stream as field entities; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="field" /> and <see cref="fields" /> is null,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="field">The value to write.</param>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        protected async Task<CsvStreamWriter> InternalWriteFieldsAsync(string field, params string[] fields)
         {
             if (field == null && fields == null)
                 return this;
 
+            GuardAgainstObjectDisposed();
+
             if (field != null)
             {
-                await WriteUnescapedEntryAsync(field).ConfigureAwait(false);
+                await InternalWriteUnescapedEntryAsync(field).ConfigureAwait(false);
 
                 if (IsEmptyArray(fields))
                     return this;
@@ -2046,7 +2511,7 @@ namespace Ncl.Common.Csv
                 if (fieldEntry == null)
                     continue;
 
-                await WriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
+                await InternalWriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
             }
 
             return this;
@@ -2061,10 +2526,19 @@ namespace Ncl.Common.Csv
         /// </summary>
         /// <param name="fields">The values to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteFieldRow(IEnumerable<string> fields)
         {
             if (fields == null)
                 return this;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             bool wroteEntry = false;
             foreach (string fieldEntry in fields)
@@ -2100,12 +2574,42 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        public async Task<CsvStreamWriter> WriteFieldRowAsync(IEnumerable<string> fields)
+        public Task<CsvStreamWriter> WriteFieldRowAsync(IEnumerable<string> fields)
+        {
+            if (fields == null)
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteFieldRowAsync(fields);
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes an <see cref="IEnumerable{T}" /> to the stream as field entries
+        ///     then moves to the start of the next row; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="fields" /> is null or contains all null entries,
+        ///     nothing is written to the stream.
+        /// </summary>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        protected async Task<CsvStreamWriter> InternalWriteFieldRowAsync(IEnumerable<string> fields)
         {
             if (fields == null)
                 return this;
+
+            GuardAgainstObjectDisposed();
 
             bool wroteEntry = false;
             foreach (string fieldEntry in fields)
@@ -2113,13 +2617,13 @@ namespace Ncl.Common.Csv
                 if (fieldEntry == null)
                     continue;
 
-                await WriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
+                await InternalWriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
                 wroteEntry = true;
             }
 
             if (wroteEntry)
             {
-                await WriteRowEndAsync().ConfigureAwait(false);
+                await InternalWriteRowEndAsync().ConfigureAwait(false);
             }
 
             return this;
@@ -2134,10 +2638,19 @@ namespace Ncl.Common.Csv
         /// <param name="field">The value to write.</param>
         /// <param name="fields">The values to write.</param>
         /// <returns>The <see cref="CsvStreamWriter" /> instance.</returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         public CsvStreamWriter WriteFieldRow(string field, params string[] fields)
         {
             if (field == null && fields == null)
                 return this;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             bool wroteEntry = false;
             if (field != null)
@@ -2187,22 +2700,53 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        public async Task<CsvStreamWriter> WriteFieldRowAsync(string field, params string[] fields)
+        public Task<CsvStreamWriter> WriteFieldRowAsync(string field, params string[] fields)
+        {
+            if (field == null && fields == null)
+                return _completedTask;
+
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteFieldRowAsync(field, fields);
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes multiple <see cref="string" /> fields to the stream as field entries
+        ///     then moves to the start of the next row; asynchronously.
+        ///     The values will be escaped, if necessary.
+        ///     If <paramref name="field" /> and <see cref="fields" /> is null, nothing is written to the stream.
+        /// </summary>
+        /// <param name="field">The value to write.</param>
+        /// <param name="fields">The values to write.</param>
+        /// <returns>
+        ///     A task, with a <see cref="CsvStreamWriter" /> result, that represents
+        ///     the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        protected async Task<CsvStreamWriter> InternalWriteFieldRowAsync(string field, params string[] fields)
         {
             if (field == null && fields == null)
                 return this;
 
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
             bool wroteEntry = false;
             if (field != null)
             {
-                await WriteUnescapedEntryAsync(field).ConfigureAwait(false);
+                await InternalWriteUnescapedEntryAsync(field).ConfigureAwait(false);
                 wroteEntry = true;
 
                 if (IsEmptyArray(fields))
                 {
-                    await WriteRowEndAsync().ConfigureAwait(false);
+                    await InternalWriteRowEndAsync().ConfigureAwait(false);
                     return this;
                 }
             }
@@ -2214,13 +2758,13 @@ namespace Ncl.Common.Csv
                 if (fieldEntry == null)
                     continue;
 
-                await WriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
+                await InternalWriteUnescapedEntryAsync(fieldEntry).ConfigureAwait(false);
                 wroteEntry = true;
             }
 
             if (wroteEntry)
             {
-                await WriteRowEndAsync().ConfigureAwait(false);
+                await InternalWriteRowEndAsync().ConfigureAwait(false);
             }
 
             return this;
@@ -2235,10 +2779,13 @@ namespace Ncl.Common.Csv
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         protected virtual CsvStreamWriter WriteUnescapedEntry(string value, bool isHeader = false)
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamWriter));
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             if (isHeader == false && FirstRowWritten == false && _headers?.Count > 0)
             {
@@ -2278,12 +2825,36 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        protected virtual async Task<CsvStreamWriter> WriteUnescapedEntryAsync(string value, bool isHeader = false)
+        protected Task<CsvStreamWriter> WriteUnescapedEntryAsync(string value, bool isHeader = false)
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamWriter));
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteUnescapedEntryAsync(value, isHeader);
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes a string to the stream asynchronously.
+        /// </summary>
+        /// <param name="value">
+        ///     The string to write. If value is null, nothing is written to the text stream.
+        /// </param>
+        /// <param name="isHeader">Is the value being written a header.</param>
+        /// <returns>
+        ///     A task with this instance as the result and
+        ///     that represents the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        protected virtual async Task<CsvStreamWriter> InternalWriteUnescapedEntryAsync(string value,
+            bool isHeader = false)
+        {
+            GuardAgainstObjectDisposed();
 
             if (isHeader == false && FirstRowWritten == false && _headers?.Count > 0)
             {
@@ -2319,10 +2890,13 @@ namespace Ncl.Common.Csv
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         protected virtual CsvStreamWriter WriteUnescapedEntry(StringBuilder buffer, bool isHeader = false)
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamWriter));
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
 
             if (isHeader == false && FirstRowWritten == false && _headers?.Count > 0)
             {
@@ -2362,13 +2936,37 @@ namespace Ncl.Common.Csv
         ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous write operation.
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
         /// </exception>
-        protected virtual async Task<CsvStreamWriter> WriteUnescapedEntryAsync(StringBuilder buffer,
+        protected virtual Task<CsvStreamWriter> WriteUnescapedEntryAsync(StringBuilder buffer,
             bool isHeader = false)
         {
-            if (_isDisposed)
-                throw new ObjectDisposedException(nameof(CsvStreamWriter));
+            GuardAgainstObjectDisposed();
+            GuardAgainstAlreadyRunningAsyncTask();
+
+            Task<CsvStreamWriter> task = InternalWriteUnescapedEntryAsync(buffer, isHeader);
+            _asyncTask = task;
+            return task;
+        }
+
+        /// <summary>
+        ///     Writes a <see cref="StringBuilder" /> to the stream asynchronously.
+        /// </summary>
+        /// <param name="buffer">
+        ///     The buffer to write. If buffer is null, nothing is written to the text stream.
+        /// </param>
+        /// <param name="isHeader">Is the value being written a header.</param>
+        /// <returns>
+        ///     A task with this instance as the result and
+        ///     that represents the asynchronous write operation.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        protected virtual async Task<CsvStreamWriter> InternalWriteUnescapedEntryAsync(StringBuilder buffer,
+            bool isHeader = false)
+        {
+            GuardAgainstObjectDisposed();
 
             if (isHeader == false && FirstRowWritten == false && _headers?.Count > 0)
             {
@@ -2442,6 +3040,12 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Performs a Flush if necessary.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         protected void PerformAutoFlushIfNecessary()
         {
             if (AutoFlush == false)
@@ -2462,6 +3066,12 @@ namespace Ncl.Common.Csv
         /// <summary>
         ///     Performs a Flush if necessary; asynchronously.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">
+        ///     The <see cref="CsvStreamWriter" /> or underlying stream is disposed.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     The <see cref="CsvStreamWriter" /> is currently in use by a previous operation.
+        /// </exception>
         protected async Task PerformAutoFlushIfNecessaryAsync()
         {
             if (AutoFlush == false)

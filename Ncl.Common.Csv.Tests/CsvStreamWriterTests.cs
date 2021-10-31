@@ -23,6 +23,9 @@ namespace Ncl.Common.Csv.Tests
         private static readonly CultureInfo _englishUsCulture = new("en-US");
         private static readonly CultureInfo _spanishCulture = new("es-ES");
 
+        //Note: Can't seem to get WithAsyncOperationRunning type of test working right as async operations are too fast
+        //and complete before Throw TestCode even runs
+
         [Fact]
         public void CsvStreamWriter_WithValidArguments_ShouldCreateInstance()
         {
@@ -171,7 +174,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             void TestCode()
             {
@@ -211,7 +214,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             _ = CsvStreamWriter.Create(stream, out Exception actual, separator: '\n');
 
@@ -296,7 +299,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool actual = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter _,
                 separator: '\n');
@@ -310,7 +313,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool _ = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter actual,
                 separator: '\n');
@@ -324,7 +327,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
-            
+
             // Act
             bool _ = CsvStreamWriter.TryCreate(stream, out Exception actual, out CsvStreamWriter _,
                 separator: '\n');
@@ -332,7 +335,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.IsType<ArgumentException>(actual);
         }
-        
+
         [Fact]
         public void Create2_WithValidArguments_ShouldReturnInstance()
         {
@@ -365,7 +368,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamWriter stream = GetDefaultStreamWriter();
-            
+
             // Act
             void TestCode()
             {
@@ -405,7 +408,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamWriter stream = GetDefaultStreamWriter();
-            
+
             // Act
             _ = CsvStreamWriter.Create(stream, out Exception actual, separator: '\n');
 
@@ -490,7 +493,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamWriter stream = GetDefaultStreamWriter();
-            
+
             // Act
             bool actual = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter _,
                 separator: '\n');
@@ -504,7 +507,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamWriter stream = GetDefaultStreamWriter();
-            
+
             // Act
             bool _ = CsvStreamWriter.TryCreate(stream, out Exception _, out CsvStreamWriter actual,
                 separator: '\n');
@@ -518,7 +521,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using StreamWriter stream = GetDefaultStreamWriter();
-            
+
             // Act
             bool _ = CsvStreamWriter.TryCreate(stream, out Exception actual, out CsvStreamWriter _,
                 separator: '\n');
@@ -800,7 +803,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void AutoFlush_WithSameValue_ShouldDoNothing()
         {
@@ -819,7 +822,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void AutoFlush_WithTrueSettingAndContentWritten_ShouldWriteContentToUnderlyingStream()
         {
@@ -837,7 +840,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void AutoFlush_WithFalseSettingAndContentWritten_ShouldNotWriteContentToUnderlyingStream()
         {
@@ -855,7 +858,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task AutoFlush_WithTrueSettingAndAsyncContentWritten_ShouldWriteContentToUnderlyingStream()
         {
@@ -873,7 +876,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task AutoFlush_WithFalseSettingAndAsyncContentWritten_ShouldNotWriteContentToUnderlyingStream()
         {
@@ -2642,6 +2645,42 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
+        public void WriteField4_WithSecondFieldValue_ShouldWriteSeparatorAndField()
+        {
+            // Arrange
+            string expected = $"{ValidField},{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+            csvStream.WriteField(charArray, 0, charArray.Length);
+
+            // Act
+            csvStream.WriteField(charArray, 0, charArray.Length);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField4_WithIncompleteHeaderRowValidFieldValue_ShouldWriteFieldOnNewRow()
+        {
+            // Arrange
+            string expected = $"{ValidHeader}\r\n{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+            csvStream.WriteHeader(ValidHeader);
+
+            // Act
+            csvStream.WriteField(charArray, 0, charArray.Length);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void WriteField4_WithInvalidIndex_ShouldThrowArgumentOutOfRangeException()
         {
             void TestCode()
@@ -2699,6 +2738,42 @@ namespace Ncl.Common.Csv.Tests
             const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
             char[] charArray = NeedsEscapingField.ToCharArray();
+
+            // Act
+            await csvStream.WriteFieldAsync(charArray, 0, charArray.Length);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync4_WithSecondFieldValue_ShouldWriteSeparatorAndField()
+        {
+            // Arrange
+            string expected = $"{ValidField},{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+            await csvStream.WriteFieldAsync(charArray, 0, charArray.Length);
+
+            // Act
+            await csvStream.WriteFieldAsync(charArray, 0, charArray.Length);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task WriteFieldAsync4_WithIncompleteHeaderRowValidFieldValue_ShouldWriteFieldOnNewRow()
+        {
+            // Arrange
+            string expected = $"{ValidHeader}\r\n{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+            await csvStream.WriteHeaderAsync(ValidHeader);
 
             // Act
             await csvStream.WriteFieldAsync(charArray, 0, charArray.Length);
@@ -2794,6 +2869,42 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
+        public void WriteField5_WithSecondFieldValue_ShouldWriteSeparatorAndField()
+        {
+            // Arrange
+            string expected = $"{ValidField},{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+            csvStream.WriteField(charArray);
+
+            // Act
+            csvStream.WriteField(charArray);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void WriteField5_WithIncompleteHeaderRowValidFieldValue_ShouldWriteFieldOnNewRow()
+        {
+            // Arrange
+            string expected = $"{ValidHeader}\r\n{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+            csvStream.WriteHeader(ValidHeader);
+
+            // Act
+            csvStream.WriteField(charArray);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void WriteField5_WithNullValue_ShouldDoNothing()
         {
             // Arrange
@@ -2850,6 +2961,42 @@ namespace Ncl.Common.Csv.Tests
             const string expected = NeedsEscapingFieldExpected;
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
             char[] charArray = NeedsEscapingField.ToCharArray();
+
+            // Act
+            await csvStream.WriteFieldAsync(charArray);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync5_WithSecondFieldValue_ShouldWriteSeparatorAndField()
+        {
+            // Arrange
+            string expected = $"{ValidField},{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+            await csvStream.WriteFieldAsync(charArray);
+
+            // Act
+            await csvStream.WriteFieldAsync(charArray);
+
+            string actual = GetString(memoryStream);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public async Task WriteFieldAsync5_WithIncompleteHeaderRowValidFieldValue_ShouldWriteFieldOnNewRow()
+        {
+            // Arrange
+            string expected = $"{ValidHeader}\r\n{ValidField}";
+            using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
+            char[] charArray = ValidField.ToCharArray();
+            await csvStream.WriteHeaderAsync(ValidHeader);
 
             // Act
             await csvStream.WriteFieldAsync(charArray);

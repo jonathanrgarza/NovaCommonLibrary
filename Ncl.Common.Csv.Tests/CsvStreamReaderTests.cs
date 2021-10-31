@@ -32,6 +32,13 @@ namespace Ncl.Common.Csv.Tests
         private const string ExtraLongCsvContent = ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
                                                    ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
                                                    ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
+                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
+                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
+                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
+                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
+                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
+                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
+                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
                                                    ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows;
 
         private const string SimpleFormat = "{0}";

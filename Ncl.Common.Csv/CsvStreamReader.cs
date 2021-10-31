@@ -861,11 +861,10 @@ namespace Ncl.Common.Csv
         /// </exception>
         protected void GuardAgainstAlreadyRunningAsyncTask()
         {
-            if (_asyncTask != null && !_asyncTask.IsCompleted)
-            {
-                throw new InvalidOperationException(
-                    "The stream is currently in use by a previous operation on the stream.");
-            }
+            if (_asyncTask == null || _asyncTask.IsCompleted) 
+                return;
+            throw new InvalidOperationException(
+                "The stream is currently in use by a previous operation on the stream.");
         }
 
         /// <summary>
