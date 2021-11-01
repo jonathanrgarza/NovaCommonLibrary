@@ -4,6 +4,9 @@ using Ncl.Common.Core.Infrastructure;
 
 namespace Ncl.Common.Core.Extensions
 {
+    /// <summary>
+    ///     Extensions for <see cref="Task"/>.
+    /// </summary>
     public static class TaskExtensions
     {
         /// <summary>
