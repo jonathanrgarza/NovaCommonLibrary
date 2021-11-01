@@ -243,9 +243,9 @@ namespace Ncl.Common.Wpf.ViewModel
 
     /// <summary>
     ///     The base class for a view model which support <see cref="INotifyDataErrorInfo" /> and
-    ///     uses <see cref="string" /> to represent data errors.
+    ///     uses a custom type to represent data errors.
     /// </summary>
-    /// <typeparam name="T">The type for the error object.</typeparam>
+    /// <typeparam name="T">The type for the error objects.</typeparam>
     public abstract class DataErrorHandlingViewModelBase<T> : ViewModelBase, INotifyDataErrorInfo
     {
         private readonly Dictionary<string, List<T>> _errors = new Dictionary<string, List<T>>();
