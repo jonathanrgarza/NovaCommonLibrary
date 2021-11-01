@@ -30,32 +30,6 @@ namespace Ncl.Common.Wpf.ViewModel
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
         /// <summary>
-        ///     Guards against a null or empty property name.
-        /// </summary>
-        /// <param name="propertyName">The property name to check.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is null.</exception>
-        /// <exception cref="ArgumentException"><paramref name="propertyName" /> is an empty string.</exception>
-        private void GuardAgainstInvalidPropertyName(string propertyName)
-        {
-            if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
-
-            if (propertyName.Length == 0)
-                throw new ArgumentException("propertyName can not be an empty string", nameof(propertyName));
-        }
-
-        /// <summary>
-        ///     Guards against a null error message.
-        /// </summary>
-        /// <param name="errorMessage">The error message to check.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="errorMessage" /> is null.</exception>
-        private void GuardAgainstInvalidErrorMessage(string errorMessage)
-        {
-            if (errorMessage == null)
-                throw new ArgumentNullException(nameof(errorMessage));
-        }
-
-        /// <summary>
         ///     Adds an error message for a given property.
         /// </summary>
         /// <param name="propertyName">The property's name.</param>
@@ -221,6 +195,32 @@ namespace Ncl.Common.Wpf.ViewModel
         }
 
         /// <summary>
+        ///     Guards against a null or empty property name.
+        /// </summary>
+        /// <param name="propertyName">The property name to check.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="propertyName" /> is an empty string.</exception>
+        private void GuardAgainstInvalidPropertyName(string propertyName)
+        {
+            if (propertyName == null)
+                throw new ArgumentNullException(nameof(propertyName));
+
+            if (propertyName.Length == 0)
+                throw new ArgumentException("propertyName can not be an empty string", nameof(propertyName));
+        }
+
+        /// <summary>
+        ///     Guards against a null error message.
+        /// </summary>
+        /// <param name="errorMessage">The error message to check.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="errorMessage" /> is null.</exception>
+        private void GuardAgainstInvalidErrorMessage(string errorMessage)
+        {
+            if (errorMessage == null)
+                throw new ArgumentNullException(nameof(errorMessage));
+        }
+
+        /// <summary>
         ///     Gets the <see cref="_errors" /> as a readonly dictionary.
         /// </summary>
         /// <returns>
@@ -264,32 +264,6 @@ namespace Ncl.Common.Wpf.ViewModel
 
         /// <inheritdoc />
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
-
-        /// <summary>
-        ///     Guards against a null or empty property name.
-        /// </summary>
-        /// <param name="propertyName">The property name to check.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is null.</exception>
-        /// <exception cref="ArgumentException"><paramref name="propertyName" /> is an empty string.</exception>
-        private void GuardAgainstInvalidPropertyName(string propertyName)
-        {
-            if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
-
-            if (propertyName.Length == 0)
-                throw new ArgumentException("propertyName can not be an empty string", nameof(propertyName));
-        }
-
-        /// <summary>
-        ///     Guards against a null error object.
-        /// </summary>
-        /// <param name="errorObject">The error object to check.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="errorObject" /> is null.</exception>
-        private void GuardAgainstInvalidErrorObject(T errorObject)
-        {
-            if (errorObject == null)
-                throw new ArgumentNullException(nameof(errorObject));
-        }
 
         /// <summary>
         ///     Adds an error for a given property.
@@ -454,6 +428,32 @@ namespace Ncl.Common.Wpf.ViewModel
         protected void ClearAllErrors()
         {
             _errors.Clear();
+        }
+
+        /// <summary>
+        ///     Guards against a null or empty property name.
+        /// </summary>
+        /// <param name="propertyName">The property name to check.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="propertyName" /> is an empty string.</exception>
+        private void GuardAgainstInvalidPropertyName(string propertyName)
+        {
+            if (propertyName == null)
+                throw new ArgumentNullException(nameof(propertyName));
+
+            if (propertyName.Length == 0)
+                throw new ArgumentException("propertyName can not be an empty string", nameof(propertyName));
+        }
+
+        /// <summary>
+        ///     Guards against a null error object.
+        /// </summary>
+        /// <param name="errorObject">The error object to check.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="errorObject" /> is null.</exception>
+        private void GuardAgainstInvalidErrorObject(T errorObject)
+        {
+            if (errorObject == null)
+                throw new ArgumentNullException(nameof(errorObject));
         }
 
         /// <summary>
