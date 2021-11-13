@@ -29,17 +29,26 @@ namespace Ncl.Common.Csv.Tests
 
         private const string DefaultCsvContent = ValidFieldsTwoRows;
 
-        private const string ExtraLongCsvContent = ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
-                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
-                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
-                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
-                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
-                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
-                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
-                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
-                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
-                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows +
-                                                   ValidFieldsTwoRows + ValidFieldsTwoRows + ValidFieldsTwoRows;
+        private const string ExtraLongCsvContent = EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows +
+                                                   EscapedFieldsTwoRows + EscapedFieldsTwoRows + EscapedFieldsTwoRows;
 
         private const string SimpleFormat = "{0}";
 
@@ -1693,7 +1702,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
-            Task<string[][]> task = csvStream.ReadToEndAsync();
+            _ = csvStream.ReadToEndAsync();
 
             // Act
             void TestCode()
@@ -2192,7 +2201,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
-            Task<string[][]> task = csvStream.ReadToEndAsync();
+            _ = csvStream.ReadToEndAsync();
 
             // Act
             void TestCode()
@@ -2405,7 +2414,7 @@ namespace Ncl.Common.Csv.Tests
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
-                Task<string[][]> task = csvStream.ReadToEndAsync();
+                _ = csvStream.ReadToEndAsync();
 
                 await csvStream.ReadFieldAsync();
             }
@@ -2569,7 +2578,7 @@ namespace Ncl.Common.Csv.Tests
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
-                Task<string[][]> task = csvStream.ReadToEndAsync();
+                _ = csvStream.ReadToEndAsync();
 
                 csvStream.ReadRow();
             }
@@ -2679,7 +2688,7 @@ namespace Ncl.Common.Csv.Tests
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
-                Task<string[][]> task = csvStream.ReadToEndAsync();
+                _ = csvStream.ReadToEndAsync();
 
                 await csvStream.ReadRowAsync();
             }
@@ -2797,7 +2806,7 @@ namespace Ncl.Common.Csv.Tests
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
-                Task<string[][]> task = csvStream.ReadToEndAsync();
+                _ = csvStream.ReadToEndAsync();
 
                 csvStream.ReadToEnd();
             }
@@ -2915,7 +2924,7 @@ namespace Ncl.Common.Csv.Tests
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
-                Task<string[][]> task = csvStream.ReadToEndAsync();
+                _ = csvStream.ReadToEndAsync();
 
                 await csvStream.ReadToEndAsync();
             }
@@ -3000,7 +3009,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
-            Task<string[][]> task = csvStream.ReadToEndAsync();
+            _ = csvStream.ReadToEndAsync();
 
             // Act
             async Task TestCode()

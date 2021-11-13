@@ -3120,7 +3120,9 @@ namespace Ncl.Common.Csv
             // set large fields to null
             if (_leaveOpen == false)
             {
-                _stream.Dispose();
+                //Shouldn't be null ever but finalizer/destructor
+                //seems to sometimes have it null causing exception
+                _stream?.Dispose();
             }
 
             _headers = null;

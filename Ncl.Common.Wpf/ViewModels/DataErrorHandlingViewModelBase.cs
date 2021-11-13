@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Ncl.Common.Wpf.ViewModel
+namespace Ncl.Common.Wpf.ViewModels
 {
     /// <summary>
     ///     The base class for a view model which support <see cref="INotifyDataErrorInfo" /> and
@@ -35,7 +35,7 @@ namespace Ncl.Common.Wpf.ViewModel
         /// <param name="propertyName">The property's name.</param>
         /// <param name="errorMessage">The error message to add.</param>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> or <paramref name="errorMessage" /> is null.
+        ///     <paramref name="propertyName" /> or <paramref name="errorMessage" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -61,7 +61,7 @@ namespace Ncl.Common.Wpf.ViewModel
         /// <param name="propertyName">The property's name.</param>
         /// <param name="errorMessages">The error messages to add.</param>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> or <paramref name="errorMessages" /> is null.
+        ///     <paramref name="propertyName" /> or <paramref name="errorMessages" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -91,7 +91,7 @@ namespace Ncl.Common.Wpf.ViewModel
         ///     <see langword="true" /> if the error message was removed, otherwise, <see langword="false" />.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> or <paramref name="errorMessage" /> is null.
+        ///     <paramref name="propertyName" /> or <paramref name="errorMessage" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -120,7 +120,7 @@ namespace Ncl.Common.Wpf.ViewModel
         /// <param name="propertyName">The property's name.</param>
         /// <param name="errorMessage">The error message to replace with.</param>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> or <paramref name="errorMessage" /> is null.
+        ///     <paramref name="propertyName" /> or <paramref name="errorMessage" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -147,7 +147,7 @@ namespace Ncl.Common.Wpf.ViewModel
         /// <param name="propertyName">The property's name.</param>
         /// <param name="errorMessages">The error messages to replace with.</param>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> or <paramref name="errorMessages" /> is null.
+        ///     <paramref name="propertyName" /> or <paramref name="errorMessages" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -174,7 +174,7 @@ namespace Ncl.Common.Wpf.ViewModel
         /// </summary>
         /// <param name="propertyName">The property's name.</param>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> is null.
+        ///     <paramref name="propertyName" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -195,12 +195,12 @@ namespace Ncl.Common.Wpf.ViewModel
         }
 
         /// <summary>
-        ///     Guards against a null or empty property name.
+        ///     Guards against a <see langword="null"/> or empty property name.
         /// </summary>
         /// <param name="propertyName">The property name to check.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is null.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="propertyName" /> is an empty string.</exception>
-        private void GuardAgainstInvalidPropertyName(string propertyName)
+        private static void GuardAgainstInvalidPropertyName(string propertyName)
         {
             if (propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
@@ -210,11 +210,11 @@ namespace Ncl.Common.Wpf.ViewModel
         }
 
         /// <summary>
-        ///     Guards against a null error message.
+        ///     Guards against a <see langword="null"/> error message.
         /// </summary>
         /// <param name="errorMessage">The error message to check.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="errorMessage" /> is null.</exception>
-        private void GuardAgainstInvalidErrorMessage(string errorMessage)
+        /// <exception cref="ArgumentNullException"><paramref name="errorMessage" /> is <see langword="null"/>.</exception>
+        private static void GuardAgainstInvalidErrorMessage(string errorMessage)
         {
             if (errorMessage == null)
                 throw new ArgumentNullException(nameof(errorMessage));
@@ -224,7 +224,7 @@ namespace Ncl.Common.Wpf.ViewModel
         ///     Gets the <see cref="_errors" /> as a readonly dictionary.
         /// </summary>
         /// <returns>
-        ///     A readonly version of <see cref="_errors" /> or null if the dictionary contains no elements.
+        ///     A readonly version of <see cref="_errors" /> or <see langword="null"/> if the dictionary contains no elements.
         /// </returns>
         private ReadOnlyDictionary<string, IReadOnlyList<string>> GetErrorDictionaryAsReadOnly()
         {
@@ -271,7 +271,7 @@ namespace Ncl.Common.Wpf.ViewModel
         /// <param name="propertyName">The property's name.</param>
         /// <param name="errorObject">The error object to add.</param>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> or <paramref name="errorObject" /> is null.
+        ///     <paramref name="propertyName" /> or <paramref name="errorObject" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -297,7 +297,7 @@ namespace Ncl.Common.Wpf.ViewModel
         /// <param name="propertyName">The property's name.</param>
         /// <param name="errorObjects">The error objects to add.</param>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> or <paramref name="errorObjects" /> is null.
+        ///     <paramref name="propertyName" /> or <paramref name="errorObjects" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -327,7 +327,7 @@ namespace Ncl.Common.Wpf.ViewModel
         ///     <see langword="true" /> if the error message was removed, otherwise, <see langword="false" />.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> or <paramref name="errorObject" /> is null.
+        ///     <paramref name="propertyName" /> or <paramref name="errorObject" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -356,7 +356,7 @@ namespace Ncl.Common.Wpf.ViewModel
         /// <param name="propertyName">The property's name.</param>
         /// <param name="errorObject">The error object to replace with.</param>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> or <paramref name="errorObject" /> is null.
+        ///     <paramref name="propertyName" /> or <paramref name="errorObject" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -383,7 +383,7 @@ namespace Ncl.Common.Wpf.ViewModel
         /// <param name="propertyName">The property's name.</param>
         /// <param name="errorObjects">The error objects to replace with.</param>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> or <paramref name="errorObjects" /> is null.
+        ///     <paramref name="propertyName" /> or <paramref name="errorObjects" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -410,7 +410,7 @@ namespace Ncl.Common.Wpf.ViewModel
         /// </summary>
         /// <param name="propertyName">The property's name.</param>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="propertyName" /> is null.
+        ///     <paramref name="propertyName" /> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     <paramref name="propertyName" /> is empty.
@@ -434,9 +434,9 @@ namespace Ncl.Common.Wpf.ViewModel
         ///     Guards against a null or empty property name.
         /// </summary>
         /// <param name="propertyName">The property name to check.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is null.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="propertyName" /> is an empty string.</exception>
-        private void GuardAgainstInvalidPropertyName(string propertyName)
+        private static void GuardAgainstInvalidPropertyName(string propertyName)
         {
             if (propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
@@ -449,8 +449,8 @@ namespace Ncl.Common.Wpf.ViewModel
         ///     Guards against a null error object.
         /// </summary>
         /// <param name="errorObject">The error object to check.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="errorObject" /> is null.</exception>
-        private void GuardAgainstInvalidErrorObject(T errorObject)
+        /// <exception cref="ArgumentNullException"><paramref name="errorObject" /> is <see langword="null"/>.</exception>
+        private static void GuardAgainstInvalidErrorObject(T errorObject)
         {
             if (errorObject == null)
                 throw new ArgumentNullException(nameof(errorObject));
@@ -460,7 +460,7 @@ namespace Ncl.Common.Wpf.ViewModel
         ///     Gets the <see cref="_errors" /> as a readonly dictionary.
         /// </summary>
         /// <returns>
-        ///     A readonly version of <see cref="_errors" /> or null if the dictionary contains no elements.
+        ///     A readonly version of <see cref="_errors" /> or <see langword="null"/> if the dictionary contains no elements.
         /// </returns>
         private ReadOnlyDictionary<string, IReadOnlyList<T>> GetErrorDictionaryAsReadOnly()
         {

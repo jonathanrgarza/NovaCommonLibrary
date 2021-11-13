@@ -1,4 +1,4 @@
-namespace Ncl.Common.Wpf.ViewModel
+namespace Ncl.Common.Wpf.ViewModels
 {
     /// <summary>
     ///     The base class for a view model.

@@ -1755,7 +1755,9 @@ namespace Ncl.Common.Csv
 
             if (!_leaveOpen)
             {
-                _stream.Dispose();
+                //Shouldn't be null ever but finalizer/destructor
+                //seems to sometimes have it null causing exception
+                _stream?.Dispose();
             }
 
             _buffer = null;
