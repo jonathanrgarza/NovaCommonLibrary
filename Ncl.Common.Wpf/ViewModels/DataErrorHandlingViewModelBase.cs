@@ -227,11 +227,11 @@ namespace Ncl.Common.Wpf.ViewModels
             if (propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
 
-            if (propertyName.Length == 0)
-            {
-                throw new ArgumentException("propertyName can not be an empty string",
-                    nameof(propertyName));
-            }
+            if (propertyName.Length != 0)
+                return;
+
+            throw new ArgumentException("propertyName can not be an empty string",
+                nameof(propertyName));
         }
 
         /// <summary>
@@ -501,11 +501,10 @@ namespace Ncl.Common.Wpf.ViewModels
             if (propertyName == null)
                 throw new ArgumentNullException(nameof(propertyName));
 
-            if (propertyName.Length == 0)
-            {
-                throw new ArgumentException("propertyName can not be an empty string",
-                    nameof(propertyName));
-            }
+            if (propertyName.Length != 0)
+                return;
+            throw new ArgumentException("propertyName can not be an empty string",
+                nameof(propertyName));
         }
 
         /// <summary>
