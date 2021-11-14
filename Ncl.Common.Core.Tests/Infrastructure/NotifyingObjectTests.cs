@@ -12,265 +12,6 @@ namespace Ncl.Common.Core.Tests.Infrastructure
 {
     public class NotifyingObjectTests
     {
-        /// <summary>
-        ///     Mock implementation of <see cref="NotifyingObject" /> to allow unit testing.
-        /// </summary>
-        private class NotifyingObjectMock : NotifyingObject
-        {
-            /// <summary>
-            ///     Raises the PropertyChanged event for the given property name.
-            ///     The calling member's name will be used as the parameter, by default.
-            /// </summary>
-            /// <param name="name">
-            ///     The property's name.
-            ///     Can specify <see cref="string.Empty" /> or <see langword="null"/> to 
-            ///     signal all properties have changed.
-            /// </param>
-            public void OnPropertyChangedImpl([CallerMemberName] string name = null)
-            {
-                OnPropertyChanged(name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            /// </summary>
-            /// <typeparam name="T">The field's type.</typeparam>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetImpl<T>(ref T current, T value, [CallerMemberName] string name = null)
-            {
-                return Set(ref current, value, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action" /> when the value is set.
-            /// </summary>
-            /// <typeparam name="T">The field's type.</typeparam>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetImpl<T>(ref T current, T value, Action onSetAction,
-                [CallerMemberName] string name = null)
-            {
-                return Set(ref current, value, onSetAction, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action" /> when the value is set before raising the
-            ///     <see cref="NotifyingObject.PropertyChanged" />
-            ///     event.
-            /// </summary>
-            /// <typeparam name="T">The field's type.</typeparam>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetAndCallFirstImpl<T>(ref T current, T value, Action onSetAction,
-                [CallerMemberName] string name = null)
-            {
-                return SetAndCallFirst(ref current, value, onSetAction, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetDoubleImpl(ref double current, double value, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetDouble(ref current, value, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action" /> when the value is set.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetDoubleImpl(ref double current, double value, Action onSetAction, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetDouble(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action" /> when the value is set before raising the
-            ///     <see cref="NotifyingObject.PropertyChanged" />
-            ///     event.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetDoubleAndCallFirstImpl(ref double current, double value, Action onSetAction, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetDoubleAndCallFirst(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetFloatImpl(ref float current, float value, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetFloat(ref current, value, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action" /> when the value is set.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetFloatImpl(ref float current, float value, Action onSetAction, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetFloat(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action" /> when the value is set before raising the
-            ///     <see cref="NotifyingObject.PropertyChanged" />
-            ///     event.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetFloatAndCallFirstImpl(ref float current, float value, Action onSetAction, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetFloatAndCallFirst(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetDoubleImpl(ref double? current, double? value, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetDouble(ref current, value, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action" /> when the value is set.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetDoubleImpl(ref double? current, double? value, Action onSetAction, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetDouble(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action" /> when the value is set before raising the
-            ///     <see cref="NotifyingObject.PropertyChanged" />
-            ///     event.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetDoubleAndCallFirstImpl(ref double? current, double? value, Action onSetAction, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetDoubleAndCallFirst(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetFloatImpl(ref float? current, float? value, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetFloat(ref current, value, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action" /> when the value is set.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetFloatImpl(ref float? current, float? value, Action onSetAction, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetFloat(ref current, value, onSetAction, decimals, name);
-            }
-
-            /// <summary>
-            ///     Sets a field to a given value if its different than the current value.
-            ///     Calls the given <see cref="Action" /> when the value is set before raising the
-            ///     <see cref="NotifyingObject.PropertyChanged" />
-            ///     event.
-            /// </summary>
-            /// <param name="current">The reference to the field.</param>
-            /// <param name="value">The value to set, if different.</param>
-            /// <param name="onSetAction">The action to call when the field is set.</param>
-            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
-            /// <param name="name">The name of the property.</param>
-            /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-            public bool SetFloatAndCallFirstImpl(ref float? current, float? value, Action onSetAction, int decimals = 3,
-                [CallerMemberName] string name = null)
-            {
-                return SetFloatAndCallFirst(ref current, value, onSetAction, decimals, name);
-            }
-        }
-
         [Theory]
         [InlineData("Value", "Value")]
         [InlineData("", "")]
@@ -295,6 +36,267 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             Assert.Equal(instance, actualSender);
             Assert.NotNull(actual);
             Assert.Equal(expected, actual.PropertyName);
+        }
+
+        /// <summary>
+        ///     Mock implementation of <see cref="NotifyingObject" /> to allow unit testing.
+        /// </summary>
+        private class NotifyingObjectMock : NotifyingObject
+        {
+            /// <summary>
+            ///     Raises the PropertyChanged event for the given property name.
+            ///     The calling member's name will be used as the parameter, by default.
+            /// </summary>
+            /// <param name="name">
+            ///     The property's name.
+            ///     Can specify <see cref="string.Empty" /> or <see langword="null" /> to
+            ///     signal all properties have changed.
+            /// </param>
+            public void OnPropertyChangedImpl([CallerMemberName] string name = null)
+            {
+                OnPropertyChanged(name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            /// </summary>
+            /// <typeparam name="T">The field's type.</typeparam>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetImpl<T>(ref T current, T value, [CallerMemberName] string name = null)
+            {
+                return Set(ref current, value, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set.
+            /// </summary>
+            /// <typeparam name="T">The field's type.</typeparam>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetImpl<T>(ref T current, T value, Action onSetAction,
+                [CallerMemberName] string name = null)
+            {
+                return Set(ref current, value, onSetAction, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set before raising the
+            ///     <see cref="NotifyingObject.PropertyChanged" />
+            ///     event.
+            /// </summary>
+            /// <typeparam name="T">The field's type.</typeparam>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetAndCallFirstImpl<T>(ref T current, T value, Action onSetAction,
+                [CallerMemberName] string name = null)
+            {
+                return SetAndCallFirst(ref current, value, onSetAction, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetDoubleImpl(ref double current, double value, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDouble(ref current, value, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetDoubleImpl(ref double current, double value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDouble(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set before raising the
+            ///     <see cref="NotifyingObject.PropertyChanged" />
+            ///     event.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetDoubleAndCallFirstImpl(ref double current, double value, Action onSetAction,
+                int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDoubleAndCallFirst(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetFloatImpl(ref float current, float value, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloat(ref current, value, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetFloatImpl(ref float current, float value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloat(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set before raising the
+            ///     <see cref="NotifyingObject.PropertyChanged" />
+            ///     event.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetFloatAndCallFirstImpl(ref float current, float value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloatAndCallFirst(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetDoubleImpl(ref double? current, double? value, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDouble(ref current, value, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetDoubleImpl(ref double? current, double? value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDouble(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set before raising the
+            ///     <see cref="NotifyingObject.PropertyChanged" />
+            ///     event.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetDoubleAndCallFirstImpl(ref double? current, double? value, Action onSetAction,
+                int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetDoubleAndCallFirst(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetFloatImpl(ref float? current, float? value, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloat(ref current, value, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetFloatImpl(ref float? current, float? value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloat(ref current, value, onSetAction, decimals, name);
+            }
+
+            /// <summary>
+            ///     Sets a field to a given value if its different than the current value.
+            ///     Calls the given <see cref="Action" /> when the value is set before raising the
+            ///     <see cref="NotifyingObject.PropertyChanged" />
+            ///     event.
+            /// </summary>
+            /// <param name="current">The reference to the field.</param>
+            /// <param name="value">The value to set, if different.</param>
+            /// <param name="onSetAction">The action to call when the field is set.</param>
+            /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
+            /// <param name="name">The name of the property.</param>
+            /// <returns><see langword="true" /> if the field's value changed, otherwise, <see langword="false" />.</returns>
+            public bool SetFloatAndCallFirstImpl(ref float? current, float? value, Action onSetAction, int decimals = 3,
+                [CallerMemberName] string name = null)
+            {
+                return SetFloatAndCallFirst(ref current, value, onSetAction, decimals, name);
+            }
         }
 
         #region Normal Set
