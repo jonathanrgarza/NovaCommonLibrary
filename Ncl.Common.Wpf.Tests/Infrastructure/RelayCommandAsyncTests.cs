@@ -33,7 +33,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             // Assert
             Assert.Throws<ArgumentNullException>("executeFunction", TestCode);
         }
-        
+
         [Fact]
         public void RelayCommand1_WithValidParameters_ShouldCreateInstance()
         {
@@ -44,7 +44,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             // Assert
             Assert.NotNull(instance);
         }
-        
+
         [Fact]
         public void RelayCommand2_WithValidParameters_ShouldCreateInstance()
         {
@@ -55,7 +55,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             // Assert
             Assert.NotNull(instance);
         }
-        
+
         [Fact]
         public void RelayCommand2_WithValidParameters2_ShouldCreateInstance()
         {
@@ -186,7 +186,6 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
         {
             public void HandleException(Exception exception)
             {
-                
             }
         }
     }
@@ -217,7 +216,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             // Assert
             Assert.Throws<ArgumentNullException>("executeFunction", TestCode);
         }
-        
+
         [Fact]
         public void RelayCommand1_WithValidParameters_ShouldCreateInstance()
         {
@@ -228,7 +227,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             // Assert
             Assert.NotNull(instance);
         }
-        
+
         [Fact]
         public void RelayCommand2_WithValidParameters_ShouldCreateInstance()
         {
@@ -239,7 +238,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             // Assert
             Assert.NotNull(instance);
         }
-        
+
         [Fact]
         public void RelayCommand2_WithValidParameters2_ShouldCreateInstance()
         {
@@ -276,7 +275,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             // Assert
             Assert.False(actual);
         }
-        
+
         [Fact]
         public void CanExecute_WithParameter_ShouldPassParameterToFunction()
         {
@@ -285,6 +284,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             var instance = new RelayCommandAsync<int>(MockExecute, CanExecuteHandler);
 
             int actual = -1;
+
             bool CanExecuteHandler(int parameter)
             {
                 actual = parameter;
@@ -315,7 +315,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             // Assert
             Assert.True(isInvoked);
         }
-        
+
         [Fact]
         public async Task ExecuteAsync_WithParameter_ShouldPassParameterToFunction()
         {
@@ -324,6 +324,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             var instance = new RelayCommandAsync<int>(ExecuteHandler);
 
             int actual = -1;
+
             Task ExecuteHandler(int parameter)
             {
                 actual = parameter;
@@ -384,7 +385,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             // Assert
             Assert.False(actual);
         }
-        
+
         [Fact]
         public void ICommandCanExecute_WithParameter_ShouldPassParameterToFunction()
         {
@@ -393,6 +394,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             ICommand instance = new RelayCommandAsync<int>(MockExecute, CanExecuteHandler);
 
             int actual = -1;
+
             bool CanExecuteHandler(int parameter)
             {
                 actual = parameter;
@@ -423,7 +425,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             // Assert
             Assert.True(isInvoked);
         }
-        
+
         [Fact]
         public void Execute_WithParameter_ShouldPassParameterToFunction()
         {
@@ -432,6 +434,7 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
             ICommand instance = new RelayCommandAsync<int>(ExecuteHandler);
 
             int actual = -1;
+
             Task ExecuteHandler(int parameter)
             {
                 actual = parameter;
@@ -449,12 +452,11 @@ namespace Ncl.Common.Wpf.Tests.Infrastructure
         {
             return Task.CompletedTask;
         }
-        
+
         private class ExceptionHandlerMock : IExceptionHandler
         {
             public void HandleException(Exception exception)
             {
-                
             }
         }
     }
