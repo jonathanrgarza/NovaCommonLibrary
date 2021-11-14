@@ -20,10 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Infrastructure" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Ncl.Common.Wpf\Ncl.Common.Wpf.csproj" />
     </ItemGroup>
 

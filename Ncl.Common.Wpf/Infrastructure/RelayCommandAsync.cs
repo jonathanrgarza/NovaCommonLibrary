@@ -129,7 +129,7 @@ namespace Ncl.Common.Wpf.Infrastructure
     {
         private readonly Func<T, bool> _canExecuteFunction;
         private readonly Action<Exception> _exceptionHandleAction;
-        private readonly Func<T, Task<T>> _executeFunction;
+        private readonly Func<T, Task> _executeFunction;
 
         /// <summary>
         ///     Initializes a new instance of <see cref="RelayCommandAsync{T}" />.
@@ -140,7 +140,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         ///     A default value results in the command always return true for CanExecute. Default is null.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="executeFunction" /> is null.</exception>
-        public RelayCommandAsync(Func<T, Task<T>> executeFunction, Func<T, bool> canExecuteFunction = null)
+        public RelayCommandAsync(Func<T, Task> executeFunction, Func<T, bool> canExecuteFunction = null)
         {
             _executeFunction = executeFunction ?? throw new ArgumentNullException(nameof(executeFunction));
             _canExecuteFunction = canExecuteFunction;
@@ -158,7 +158,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         ///     The exception handler delegate. If null, exceptions will be swallowed.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="executeFunction" /> is null.</exception>
-        public RelayCommandAsync(Func<T, Task<T>> executeFunction, Func<T, bool> canExecuteFunction,
+        public RelayCommandAsync(Func<T, Task> executeFunction, Func<T, bool> canExecuteFunction,
             Action<Exception> exceptionHandlerAction)
         {
             _executeFunction = executeFunction ?? throw new ArgumentNullException(nameof(executeFunction));
@@ -176,7 +176,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         /// </param>
         /// <param name="exceptionHandler">The exception handler. If null, exceptions will be swallowed.</param>
         /// <exception cref="ArgumentNullException"><paramref name="executeFunction" /> is null.</exception>
-        public RelayCommandAsync(Func<T, Task<T>> executeFunction, Func<T, bool> canExecuteFunction,
+        public RelayCommandAsync(Func<T, Task> executeFunction, Func<T, bool> canExecuteFunction,
             IExceptionHandler exceptionHandler)
         {
             _executeFunction = executeFunction ?? throw new ArgumentNullException(nameof(executeFunction));
