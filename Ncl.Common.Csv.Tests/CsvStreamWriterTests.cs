@@ -45,7 +45,7 @@ namespace Ncl.Common.Csv.Tests
             // Arrange
 
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamWriter((Stream) null);
             }
@@ -89,7 +89,7 @@ namespace Ncl.Common.Csv.Tests
             // Arrange
 
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamWriter((TextWriter) null);
             }
@@ -119,7 +119,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamWriter((string) null);
             }
@@ -133,7 +133,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamWriter((string) null, separator: '\n');
             }
@@ -160,7 +160,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamWriter.Create((Stream) null);
             }
@@ -354,7 +354,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamWriter.Create((TextWriter) null);
             }
@@ -535,7 +535,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamWriter.Create((string) null);
             }
@@ -549,7 +549,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamWriter.Create((string) null, separator: '\n');
             }
@@ -917,7 +917,7 @@ namespace Ncl.Common.Csv.Tests
         [Fact]
         public void Flush_WithDisposedStream_ShouldThrowException()
         {
-            void TestCode()
+            static void TestCode()
             {
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
@@ -955,7 +955,7 @@ namespace Ncl.Common.Csv.Tests
         [Fact]
         public async Task FlushAsync_WithDisposedStream_ShouldThrowException()
         {
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
@@ -1882,7 +1882,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteRowEnd_WithDisposedStream_ShouldThrowException()
         {
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
@@ -2035,7 +2035,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteRowEndAsync_WithNoFieldsWritten_ShouldThrowIntegrityException()
         {
             // Act
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 // ReSharper disable once RedundantArgumentDefaultValue
@@ -2053,7 +2053,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteRowEndAsync_WithDisposedStream_ShouldThrowException()
         {
             // Act
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
@@ -2272,7 +2272,7 @@ namespace Ncl.Common.Csv.Tests
         public void WriteField_WithValidHeaderButStreamDisposed_ShouldThrowException()
         {
             //Act
-            void TestCode()
+            static void TestCode()
             {
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
@@ -2356,7 +2356,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task WriteFieldAsync_WithValidHeaderButStreamDisposed_ShouldThrowException()
         {
             //Act
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 CsvStreamWriter csvStream = GetDefaultInstance();
@@ -2683,7 +2683,7 @@ namespace Ncl.Common.Csv.Tests
         [Fact]
         public void WriteField4_WithInvalidIndex_ShouldThrowArgumentOutOfRangeException()
         {
-            void TestCode()
+            static void TestCode()
             {
                 // Arrange
                 using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -2700,7 +2700,7 @@ namespace Ncl.Common.Csv.Tests
         [Fact]
         public void WriteField4_WithInvalidCount_ShouldThrowArgumentOutOfRangeException()
         {
-            void TestCode()
+            static void TestCode()
             {
                 // Arrange
                 using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -2803,7 +2803,7 @@ namespace Ncl.Common.Csv.Tests
         [Fact]
         public async Task WriteFieldAsync4_WithInvalidIndex_ShouldThrowArgumentOutOfRangeException()
         {
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -2820,7 +2820,7 @@ namespace Ncl.Common.Csv.Tests
         [Fact]
         public async Task WriteFieldAsync4_WithInvalidCount_ShouldThrowArgumentOutOfRangeException()
         {
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 using CsvStreamWriter csvStream = GetDefaultInstance();

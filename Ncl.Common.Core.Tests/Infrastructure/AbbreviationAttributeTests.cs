@@ -48,7 +48,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
         {
             //Arrange
             var firstInstance = new AbbreviationAttribute(first);
-            object secondInstance = (object)new AbbreviationAttribute(second); //Force as object to ensure test of Equals(object)
+            object secondInstance = new AbbreviationAttribute(second); //Force as object to ensure test of Equals(object)
 
             //Act
             bool result = firstInstance.Equals(secondInstance);
@@ -64,7 +64,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
         {
             //Arrange
             var firstInstance = new AbbreviationAttribute(first);
-            object secondInstance = (object)new AbbreviationAttribute(second); //Force as object to ensure test of Equals(object)
+            object secondInstance = new AbbreviationAttribute(second); //Force as object to ensure test of Equals(object)
 
             //Act
             bool result = firstInstance.Equals(secondInstance);
@@ -81,6 +81,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             string secondInstance = "";
 
             //Act
+            // ReSharper disable once SuspiciousTypeConversion.Global
             bool result = firstInstance.Equals(secondInstance);
 
             //Assert

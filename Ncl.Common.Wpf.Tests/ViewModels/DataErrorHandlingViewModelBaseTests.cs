@@ -459,7 +459,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             DataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
 
             bool isInvoked = false;
-            instance.ErrorsChanged += (sender, eventArgs) => isInvoked = true;
+            instance.ErrorsChanged += (_, _) => isInvoked = true;
 
             //Act
             instance.RemoveErrorImpl(PropertyName, DefaultErrorMessage);
@@ -796,7 +796,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             DataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
 
             bool isInvoked = false;
-            instance.ErrorsChanged += (sender, eventArgs) => isInvoked = true;
+            instance.ErrorsChanged += (_, _) => isInvoked = true;
 
             //Act
             instance.ClearErrorsImpl(PropertyName);
@@ -910,7 +910,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             DataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
 
             bool isInvoked = false;
-            instance.ErrorsChanged += (sender, eventArgs) => isInvoked = true;
+            instance.ErrorsChanged += (_, _) => isInvoked = true;
 
             //Act
             instance.ClearAllErrorsImpl();
@@ -1488,7 +1488,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             GenericDataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
 
             bool isInvoked = false;
-            instance.ErrorsChanged += (sender, eventArgs) => isInvoked = true;
+            instance.ErrorsChanged += (_, _) => isInvoked = true;
 
             //Act
             instance.RemoveErrorImpl(PropertyName, DefaultErrorMessage);
@@ -1825,7 +1825,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             GenericDataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
 
             bool isInvoked = false;
-            instance.ErrorsChanged += (sender, eventArgs) => isInvoked = true;
+            instance.ErrorsChanged += (_, _) => isInvoked = true;
 
             //Act
             instance.ClearErrorsImpl(PropertyName);
@@ -1939,7 +1939,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             GenericDataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
 
             bool isInvoked = false;
-            instance.ErrorsChanged += (sender, eventArgs) => isInvoked = true;
+            instance.ErrorsChanged += (_, _) => isInvoked = true;
 
             //Act
             instance.ClearAllErrorsImpl();

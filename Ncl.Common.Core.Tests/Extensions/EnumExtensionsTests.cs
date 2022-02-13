@@ -8,7 +8,7 @@ namespace Ncl.Common.Core.Tests.Extensions
     public class EnumExtensionsTests
     {
         private const string HasAttributesValueEnumDesc = "1st value";
-        private const string HasAttributesValueEnumAbbre = "1st";
+        private const string HasAttributesValueEnumAbbrev = "1st";
 
         [Fact]
         public void GetAttributeOfType_PresentAttributeShouldReturnValue()
@@ -109,7 +109,7 @@ namespace Ncl.Common.Core.Tests.Extensions
         public void GetAbbreviation_PresentAttributeShouldReturnValue()
         {
             //Arrange
-            const string expected = HasAttributesValueEnumAbbre;
+            const string expected = HasAttributesValueEnumAbbrev;
 
             //Act
             string actual = TestEnum.HasAttributesValue.GetAbbreviation();
@@ -145,7 +145,7 @@ namespace Ncl.Common.Core.Tests.Extensions
         public void GetAbbreviation1_PresentAttributeShouldReturnValue()
         {
             //Arrange
-            const string expected = HasAttributesValueEnumAbbre;
+            const string expected = HasAttributesValueEnumAbbrev;
 
             //Act
             TestEnum.HasAttributesValue.GetAbbreviation(out string actual);
@@ -183,7 +183,7 @@ namespace Ncl.Common.Core.Tests.Extensions
             None,
 
             [Description(HasAttributesValueEnumDesc)]
-            [Abbreviation(HasAttributesValueEnumAbbre)]
+            [Abbreviation(HasAttributesValueEnumAbbrev)]
             HasAttributesValue
         }
     }

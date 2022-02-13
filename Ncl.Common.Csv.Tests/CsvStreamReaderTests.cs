@@ -74,7 +74,7 @@ namespace Ncl.Common.Csv.Tests
             // Arrange
 
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamReader((Stream) null);
             }
@@ -182,7 +182,7 @@ namespace Ncl.Common.Csv.Tests
             // Arrange
 
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamReader((TextReader) null);
             }
@@ -276,7 +276,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamReader((string) null);
             }
@@ -290,7 +290,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamReader((string) null, separator: '\n');
             }
@@ -304,7 +304,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamReader((string) null, newLine: null);
             }
@@ -318,7 +318,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamReader((string) null, newLine: "");
             }
@@ -332,7 +332,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamReader((string) null, newLine: "\r\n\n");
             }
@@ -346,7 +346,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = new CsvStreamReader((string) null, newLine: "\r\"");
             }
@@ -373,7 +373,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamReader.Create((Stream) null);
             }
@@ -387,7 +387,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamReader.Create((Stream) null, separator: '\n');
             }
@@ -849,7 +849,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamReader.Create((TextReader) null);
             }
@@ -863,7 +863,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamReader.Create((TextReader) null, separator: '\n');
             }
@@ -1312,7 +1312,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamReader.Create((string) null);
             }
@@ -1326,7 +1326,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamReader.Create((string) null, separator: '\n');
             }
@@ -1340,7 +1340,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamReader.Create((string) null, newLine: null);
             }
@@ -1354,7 +1354,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamReader.Create((string) null, newLine: "");
             }
@@ -1368,7 +1368,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamReader.Create((string) null, newLine: "\r\n\n");
             }
@@ -1382,7 +1382,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 _ = CsvStreamReader.Create((string) null, newLine: "\r\"");
             }
@@ -2393,7 +2393,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task ReadFieldAsync_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
             // Act
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
@@ -2410,7 +2410,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task ReadFieldAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
             // Act
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
@@ -2557,7 +2557,7 @@ namespace Ncl.Common.Csv.Tests
         public void ReadRow_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
@@ -2574,7 +2574,7 @@ namespace Ncl.Common.Csv.Tests
         public void ReadRow_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
@@ -2667,7 +2667,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task ReadRowAsync_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
             // Act
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
@@ -2684,7 +2684,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task ReadRowAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
             // Act
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
@@ -2785,7 +2785,7 @@ namespace Ncl.Common.Csv.Tests
         public void ReadToEnd_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
@@ -2802,7 +2802,7 @@ namespace Ncl.Common.Csv.Tests
         public void ReadToEnd_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
             // Act
-            void TestCode()
+            static void TestCode()
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);
@@ -2903,7 +2903,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task ReadToEndAsync_WithStreamDisposed_ShouldThrowObjectDisposedException()
         {
             // Act
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ValidFieldWithNewLine);
@@ -2920,7 +2920,7 @@ namespace Ncl.Common.Csv.Tests
         public async Task ReadToEndAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
         {
             // Act
-            async Task TestCode()
+            static async Task TestCode()
             {
                 // Arrange
                 using CsvStreamReader csvStream = GetDefaultInstance(ExtraLongCsvContent);

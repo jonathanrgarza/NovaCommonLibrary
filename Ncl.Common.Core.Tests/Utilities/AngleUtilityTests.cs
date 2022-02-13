@@ -13,11 +13,11 @@ namespace Ncl.Common.Core.Tests.Utilities
         {
             // Act
             bool actual = AngleUtility.IsWithinNormalizeDegreeRange(value);
-            
+
             // Assert
             Assert.True(actual);
         }
-        
+
         [Theory]
         [InlineData(-90.0)]
         [InlineData(-0.1)]
@@ -27,11 +27,11 @@ namespace Ncl.Common.Core.Tests.Utilities
         {
             // Act
             bool actual = AngleUtility.IsWithinNormalizeDegreeRange(value);
-            
+
             // Assert
             Assert.False(actual);
         }
-        
+
         [Theory]
         [InlineData(0.0)]
         [InlineData(90.0)]
@@ -40,11 +40,11 @@ namespace Ncl.Common.Core.Tests.Utilities
         {
             // Act
             double actual = AngleUtility.GetNormalizeDegreeValue(value);
-            
+
             // Assert
             Assert.Equal(value, actual, 3);
         }
-        
+
         [Theory]
         [InlineData(-90.0, 270.0)]
         [InlineData(450.0, 90.0)]
@@ -53,11 +53,11 @@ namespace Ncl.Common.Core.Tests.Utilities
         {
             // Act
             double actual = AngleUtility.GetNormalizeDegreeValue(value);
-            
+
             // Assert
             Assert.Equal(expected, actual, 3);
         }
-        
+
         [Theory]
         [InlineData(0.0)]
         [InlineData(90.0)]
@@ -66,11 +66,11 @@ namespace Ncl.Common.Core.Tests.Utilities
         {
             // Act
             bool actual = AngleUtility.GetNormalizeDegreeValue(value, out _);
-            
+
             // Assert
             Assert.False(actual);
         }
-        
+
         [Theory]
         [InlineData(0.0)]
         [InlineData(90.0)]
@@ -79,11 +79,11 @@ namespace Ncl.Common.Core.Tests.Utilities
         {
             // Act
             _ = AngleUtility.GetNormalizeDegreeValue(value, out double actual);
-            
+
             // Assert
             Assert.Equal(value, actual, 3);
         }
-        
+
         [Theory]
         [InlineData(-90.0)]
         [InlineData(450.0)]
@@ -92,11 +92,11 @@ namespace Ncl.Common.Core.Tests.Utilities
         {
             // Act
             bool actual = AngleUtility.GetNormalizeDegreeValue(value, out _);
-            
+
             // Assert
             Assert.True(actual);
         }
-        
+
         [Theory]
         [InlineData(-90.0, 270.0)]
         [InlineData(450.0, 90.0)]
@@ -105,7 +105,7 @@ namespace Ncl.Common.Core.Tests.Utilities
         {
             // Act
             _ = AngleUtility.GetNormalizeDegreeValue(value, out double actual);
-            
+
             // Assert
             Assert.Equal(expected, actual, 3);
         }

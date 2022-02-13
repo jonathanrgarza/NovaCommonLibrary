@@ -47,12 +47,11 @@ namespace Ncl.Common.Core.Tests.Measurement
         [Fact]
         public void Measurement2_NullArgument_ShouldThrowException()
         {
-            //Arrange
-            MockMeasurement original = null;
-
+            //Assert
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var instance = new MockMeasurement(original);
+                //Act
+                _ = new MockMeasurement(null);
             });
         }
 
@@ -91,6 +90,7 @@ namespace Ncl.Common.Core.Tests.Measurement
         {
             var mock = new MockMeasurement();
 
+            // ReSharper disable once SuspiciousTypeConversion.Global
             bool actual = mock.Equals("test string");
 
             Assert.False(actual);
@@ -100,7 +100,7 @@ namespace Ncl.Common.Core.Tests.Measurement
         public void Equals_CompareToSameTypeDifferentValue_ShouldReturnFalse()
         {
             var mock = new MockMeasurement();
-            object mock2 = (object)new MockMeasurement(1.0, MockUoM.First);
+            object mock2 = new MockMeasurement(1.0, MockUoM.First);
 
             bool actual = mock.Equals(mock2);
 
@@ -111,7 +111,7 @@ namespace Ncl.Common.Core.Tests.Measurement
         public void Equals_CompareToSameTypeSameValue_ShouldReturnTrue()
         {
             var mock = new MockMeasurement(1.0, MockUoM.First);
-            object mock2 = (object)new MockMeasurement(1.0, MockUoM.First);
+            object mock2 = new MockMeasurement(1.0, MockUoM.First);
 
             bool actual = mock.Equals(mock2);
 
@@ -215,9 +215,8 @@ namespace Ncl.Common.Core.Tests.Measurement
         public void Add_NullOther_ShouldThrowException()
         {
             var mock = new MockMeasurement(3.5, MockUoM.First);
-            MockMeasurement mock2 = null;
 
-            Assert.Throws<ArgumentNullException>(() => { mock.Add(mock2); });
+            Assert.Throws<ArgumentNullException>(() => { mock.Add(null); });
         }
 
         [Fact]
@@ -296,7 +295,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                MockMeasurement result = mock + mock2;
+                _ = mock + mock2;
             });
         }
 
@@ -308,7 +307,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                MockMeasurement result = mock + mock2;
+                _ = mock + mock2;
             });
         }
 
@@ -350,9 +349,8 @@ namespace Ncl.Common.Core.Tests.Measurement
         public void Subtract_NullOther_ShouldThrowException()
         {
             var mock = new MockMeasurement(3.5, MockUoM.First);
-            MockMeasurement mock2 = null;
 
-            Assert.Throws<ArgumentNullException>(() => { mock.Subtract(mock2); });
+            Assert.Throws<ArgumentNullException>(() => { mock.Subtract(null); });
         }
 
         [Fact]
@@ -431,7 +429,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                MockMeasurement result = mock - mock2;
+                _ = mock - mock2;
             });
         }
 
@@ -443,7 +441,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                MockMeasurement result = mock - mock2;
+                _ = mock - mock2;
             });
         }
 
@@ -485,9 +483,8 @@ namespace Ncl.Common.Core.Tests.Measurement
         public void Multiply_NullOther_ShouldThrowException()
         {
             var mock = new MockMeasurement(3.5, MockUoM.First);
-            MockMeasurement mock2 = null;
 
-            Assert.Throws<ArgumentNullException>(() => { mock.Multiply(mock2); });
+            Assert.Throws<ArgumentNullException>(() => { mock.Multiply(null); });
         }
 
         [Fact]
@@ -566,7 +563,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                MockMeasurement result = mock * mock2;
+                _ = mock * mock2;
             });
         }
 
@@ -578,7 +575,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                MockMeasurement result = mock * mock2;
+                _ = mock * mock2;
             });
         }
 
@@ -620,9 +617,8 @@ namespace Ncl.Common.Core.Tests.Measurement
         public void Divide_NullOther_ShouldThrowException()
         {
             var mock = new MockMeasurement(3.5, MockUoM.First);
-            MockMeasurement mock2 = null;
 
-            Assert.Throws<ArgumentNullException>(() => { mock.Divide(mock2); });
+            Assert.Throws<ArgumentNullException>(() => { mock.Divide(null); });
         }
 
         [Fact]
@@ -633,7 +629,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                MockMeasurement result = mock.Divide(mock2);
+                _ = mock.Divide(mock2);
             });
         }
 
@@ -680,7 +676,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                MockMeasurement result = mock.Divide(otherValue, otherUnit);
+                _ = mock.Divide(otherValue, otherUnit);
             });
         }
 
@@ -726,7 +722,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                MockMeasurement result = mock / mock2;
+                _ = mock / mock2;
             });
         }
 
@@ -738,7 +734,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                MockMeasurement result = mock / mock2;
+                _ = mock / mock2;
             });
         }
 
@@ -750,7 +746,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                MockMeasurement result = mock / mock2;
+                _ = mock / mock2;
             });
         }
 
@@ -792,9 +788,8 @@ namespace Ncl.Common.Core.Tests.Measurement
         public void Modulus_NullOther_ShouldThrowException()
         {
             var mock = new MockMeasurement(3.5, MockUoM.First);
-            MockMeasurement mock2 = null;
 
-            Assert.Throws<ArgumentNullException>(() => { mock.Modulus(mock2); });
+            Assert.Throws<ArgumentNullException>(() => { mock.Modulus(null); });
         }
 
         [Fact]
@@ -805,7 +800,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                MockMeasurement result = mock.Modulus(mock2);
+                _ = mock.Modulus(mock2);
             });
         }
 
@@ -852,7 +847,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                MockMeasurement result = mock.Modulus(otherValue, otherUnit);
+                _ = mock.Modulus(otherValue, otherUnit);
             });
         }
 
@@ -898,7 +893,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                MockMeasurement result = mock % mock2;
+                _ = mock % mock2;
             });
         }
 
@@ -910,7 +905,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                MockMeasurement result = mock % mock2;
+                _ = mock % mock2;
             });
         }
 
@@ -922,7 +917,7 @@ namespace Ncl.Common.Core.Tests.Measurement
 
             Assert.Throws<DivideByZeroException>(() =>
             {
-                MockMeasurement result = mock % mock2;
+                _ = mock % mock2;
             });
         }
 

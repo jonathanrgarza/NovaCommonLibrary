@@ -42,12 +42,11 @@ namespace Ncl.Common.Core.Tests.Measurement
         [Fact]
         public void Temperature2_NullArgument_ShouldThrowException()
         {
-            //Arrange
-            Temperature original = null;
-
+            //Assert
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var instance = new Temperature(original);
+                //Act
+                _ = new Temperature(null);
             });
         }
 

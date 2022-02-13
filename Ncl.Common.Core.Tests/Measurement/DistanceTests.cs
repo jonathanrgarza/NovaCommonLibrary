@@ -42,12 +42,11 @@ namespace Ncl.Common.Core.Tests.Measurement
         [Fact]
         public void Distance2_NullArgument_ShouldThrowException()
         {
-            //Arrange
-            Distance original = null;
-
+            //Assert
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var instance = new Distance(original);
+                //Act
+                _ = new Distance(null);
             });
         }
 

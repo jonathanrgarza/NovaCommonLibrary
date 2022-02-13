@@ -42,12 +42,11 @@ namespace Ncl.Common.Core.Tests.Measurement
         [Fact]
         public void Angle2_NullArgument_ShouldThrowException()
         {
-            //Arrange
-            Angle original = null;
-
+            //Assert
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var instance = new Angle(original);
+                //Act
+                _ = new Angle(null);
             });
         }
 
