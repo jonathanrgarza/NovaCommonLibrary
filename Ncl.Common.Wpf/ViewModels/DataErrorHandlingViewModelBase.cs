@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
+using Ncl.Common.Core.Infrastructure;
 
 namespace Ncl.Common.Wpf.ViewModels
 {
@@ -12,22 +14,24 @@ namespace Ncl.Common.Wpf.ViewModels
     /// </summary>
     public abstract class DataErrorHandlingViewModelBase : ViewModelBase, INotifyDataErrorInfo
     {
-        private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
+        private readonly Dictionary<string, List<string>> _errors = new();
 
         /// <inheritdoc />
-        public IEnumerable GetErrors(string propertyName)
+        public IEnumerable GetErrors(string? propertyName)
         {
             if (string.IsNullOrEmpty(propertyName))
                 return GetErrorDictionaryAsReadOnly();
 
-            return _errors.TryGetValue(propertyName, out List<string> errorList) ? errorList.AsReadOnly() : null;
+            return _errors.TryGetValue(propertyName, out List<string>? errorList)
+                ? errorList.AsReadOnly()
+                : Enumerable.Empty<string>();
         }
 
         /// <inheritdoc />
         public bool HasErrors => _errors.Count > 0;
 
         /// <inheritdoc />
-        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
         /// <summary>
         ///     Adds an error message for a given property.
@@ -45,7 +49,7 @@ namespace Ncl.Common.Wpf.ViewModels
             GuardAgainstInvalidPropertyName(propertyName);
             GuardAgainstInvalidErrorMessage(errorMessage);
 
-            if (_errors.TryGetValue(propertyName, out List<string> propertyErrorList))
+            if (_errors.TryGetValue(propertyName, out List<string>? propertyErrorList))
             {
                 propertyErrorList.Add(errorMessage);
                 RaiseOnErrorChanged(propertyName);
@@ -74,7 +78,7 @@ namespace Ncl.Common.Wpf.ViewModels
             if (errorMessages == null)
                 throw new ArgumentNullException(nameof(errorMessages));
 
-            if (_errors.TryGetValue(propertyName, out List<string> propertyErrorList))
+            if (_errors.TryGetValue(propertyName, out List<string>? propertyErrorList))
             {
                 propertyErrorList.AddRange(errorMessages);
                 RaiseOnErrorChanged(propertyName);
@@ -105,7 +109,7 @@ namespace Ncl.Common.Wpf.ViewModels
             GuardAgainstInvalidPropertyName(propertyName);
             GuardAgainstInvalidErrorMessage(errorMessage);
 
-            if (!_errors.TryGetValue(propertyName, out List<string> propertyErrorList))
+            if (!_errors.TryGetValue(propertyName, out List<string>? propertyErrorList))
                 return false;
 
             bool removeStatus = propertyErrorList.Remove(errorMessage);
@@ -139,7 +143,7 @@ namespace Ncl.Common.Wpf.ViewModels
             GuardAgainstInvalidPropertyName(propertyName);
             GuardAgainstInvalidErrorMessage(errorMessage);
 
-            if (!_errors.TryGetValue(propertyName, out List<string> propertyErrorList))
+            if (!_errors.TryGetValue(propertyName, out List<string>? propertyErrorList))
             {
                 var newErrorList = new List<string> { errorMessage };
                 _errors.Add(propertyName, newErrorList);
@@ -169,7 +173,7 @@ namespace Ncl.Common.Wpf.ViewModels
             if (errorMessages == null)
                 throw new ArgumentNullException(nameof(errorMessages));
 
-            if (!_errors.TryGetValue(propertyName, out List<string> propertyErrorList))
+            if (!_errors.TryGetValue(propertyName, out List<string>? propertyErrorList))
             {
                 var newErrorList = new List<string>(errorMessages);
                 _errors.Add(propertyName, newErrorList);
@@ -267,12 +271,12 @@ namespace Ncl.Common.Wpf.ViewModels
         private ReadOnlyDictionary<string, IReadOnlyList<string>> GetErrorDictionaryAsReadOnly()
         {
             if (_errors.Count == 0)
-                return null;
+                return Empty<string, IReadOnlyList<string>>.ReadOnlyDictionary();
 
             var newDictionary = new Dictionary<string, IReadOnlyList<string>>(_errors.Count);
-            foreach (KeyValuePair<string, List<string>> keyValuePair in _errors)
+            foreach ((string? key, List<string>? value) in _errors)
             {
-                newDictionary.Add(keyValuePair.Key, keyValuePair.Value.AsReadOnly());
+                newDictionary.Add(key, value.AsReadOnly());
             }
 
             return new ReadOnlyDictionary<string, IReadOnlyList<string>>(newDictionary);
@@ -286,22 +290,24 @@ namespace Ncl.Common.Wpf.ViewModels
     /// <typeparam name="T">The type for the error objects.</typeparam>
     public abstract class DataErrorHandlingViewModelBase<T> : ViewModelBase, INotifyDataErrorInfo
     {
-        private readonly Dictionary<string, List<T>> _errors = new Dictionary<string, List<T>>();
+        private readonly Dictionary<string, List<T>> _errors = new();
 
         /// <inheritdoc />
-        public IEnumerable GetErrors(string propertyName)
+        public IEnumerable GetErrors(string? propertyName)
         {
             if (string.IsNullOrEmpty(propertyName))
                 return GetErrorDictionaryAsReadOnly();
 
-            return _errors.TryGetValue(propertyName, out List<T> errorList) ? errorList.AsReadOnly() : null;
+            return _errors.TryGetValue(propertyName, out List<T>? errorList)
+                ? errorList.AsReadOnly()
+                : Enumerable.Empty<string>();
         }
 
         /// <inheritdoc />
         public bool HasErrors => _errors.Count > 0;
 
         /// <inheritdoc />
-        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
         /// <summary>
         ///     Adds an error for a given property.
@@ -319,7 +325,7 @@ namespace Ncl.Common.Wpf.ViewModels
             GuardAgainstInvalidPropertyName(propertyName);
             GuardAgainstInvalidErrorObject(errorObject);
 
-            if (_errors.TryGetValue(propertyName, out List<T> propertyErrorList))
+            if (_errors.TryGetValue(propertyName, out List<T>? propertyErrorList))
             {
                 propertyErrorList.Add(errorObject);
                 RaiseOnErrorChanged(propertyName);
@@ -348,7 +354,7 @@ namespace Ncl.Common.Wpf.ViewModels
             if (errorObjects == null)
                 throw new ArgumentNullException(nameof(errorObjects));
 
-            if (_errors.TryGetValue(propertyName, out List<T> propertyErrorList))
+            if (_errors.TryGetValue(propertyName, out List<T>? propertyErrorList))
             {
                 propertyErrorList.AddRange(errorObjects);
                 RaiseOnErrorChanged(propertyName);
@@ -379,7 +385,7 @@ namespace Ncl.Common.Wpf.ViewModels
             GuardAgainstInvalidPropertyName(propertyName);
             GuardAgainstInvalidErrorObject(errorObject);
 
-            if (!_errors.TryGetValue(propertyName, out List<T> propertyErrorList))
+            if (!_errors.TryGetValue(propertyName, out List<T>? propertyErrorList))
                 return false;
 
             bool removeStatus = propertyErrorList.Remove(errorObject);
@@ -413,7 +419,7 @@ namespace Ncl.Common.Wpf.ViewModels
             GuardAgainstInvalidPropertyName(propertyName);
             GuardAgainstInvalidErrorObject(errorObject);
 
-            if (!_errors.TryGetValue(propertyName, out List<T> propertyErrorList))
+            if (!_errors.TryGetValue(propertyName, out List<T>? propertyErrorList))
             {
                 var newErrorList = new List<T> { errorObject };
                 _errors.Add(propertyName, newErrorList);
@@ -443,7 +449,7 @@ namespace Ncl.Common.Wpf.ViewModels
             if (errorObjects == null)
                 throw new ArgumentNullException(nameof(errorObjects));
 
-            if (!_errors.TryGetValue(propertyName, out List<T> propertyErrorList))
+            if (!_errors.TryGetValue(propertyName, out List<T>? propertyErrorList))
             {
                 var newErrorList = new List<T>(errorObjects);
                 _errors.Add(propertyName, newErrorList);
@@ -540,12 +546,12 @@ namespace Ncl.Common.Wpf.ViewModels
         private ReadOnlyDictionary<string, IReadOnlyList<T>> GetErrorDictionaryAsReadOnly()
         {
             if (_errors.Count == 0)
-                return null;
+                return Empty<string, IReadOnlyList<T>>.ReadOnlyDictionary();
 
             var newDictionary = new Dictionary<string, IReadOnlyList<T>>(_errors.Count);
-            foreach (KeyValuePair<string, List<T>> keyValuePair in _errors)
+            foreach ((string? key, List<T>? value) in _errors)
             {
-                newDictionary.Add(keyValuePair.Key, keyValuePair.Value.AsReadOnly());
+                newDictionary.Add(key, value.AsReadOnly());
             }
 
             return new ReadOnlyDictionary<string, IReadOnlyList<T>>(newDictionary);

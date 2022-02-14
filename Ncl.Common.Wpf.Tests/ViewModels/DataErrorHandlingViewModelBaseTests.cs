@@ -17,7 +17,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
         private const string ThirdErrorMessage = "Test error 3";
 
         [Fact]
-        public void GetError_WithPropertyThatHasError_ShouldReturnErrors()
+        public void GetErrors_WithPropertyThatHasError_ShouldReturnErrors()
         {
             //Arrange
             DataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
@@ -34,7 +34,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
         }
 
         [Fact]
-        public void GetError_WithNullPropertyNameAndErrors_ShouldReturnAllErrors()
+        public void GetErrors_WithNullPropertyNameAndErrors_ShouldReturnAllErrors()
         {
             //Arrange
             DataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
@@ -58,7 +58,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
         }
 
         [Fact]
-        public void GetError_WithEmptyPropertyNameAndErrors_ShouldReturnAllErrors()
+        public void GetErrors_WithEmptyPropertyNameAndErrors_ShouldReturnAllErrors()
         {
             //Arrange
             DataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
@@ -82,7 +82,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
         }
 
         [Fact]
-        public void GetError_WithNullPropertyNameAndErrors_ShouldReturnNull()
+        public void GetErrors_WithNullPropertyNameAndErrors_ShouldReturnEmpty()
         {
             //Arrange
             DataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
@@ -91,11 +91,11 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             IEnumerable actual = instance.GetErrors(null);
 
             //Assert
-            Assert.Null(actual);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public void GetError_WithEmptyPropertyNameAndNoErrors_ShouldReturnNull()
+        public void GetErrors_WithEmptyPropertyNameAndNoErrors_ShouldReturnEmptyEnumerable()
         {
             //Arrange
             DataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
@@ -104,7 +104,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             IEnumerable actual = instance.GetErrors(string.Empty);
 
             //Assert
-            Assert.Null(actual);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -378,7 +378,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             //Assert
             IEnumerable actual = instance.GetErrors(PropertyName);
 
-            Assert.Null(actual);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -759,7 +759,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             //Assert
             IEnumerable actual = instance.GetErrors(PropertyName);
 
-            Assert.Null(actual);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -819,7 +819,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             //Assert
             IEnumerable actual = instance.GetErrors(PropertyName);
 
-            Assert.Null(actual);
+            Assert.Empty(actual);
 
             IEnumerable errors = instance.GetErrors(SecondPropertyName);
             List<object> collection = errors.Cast<object>().ToList();
@@ -873,7 +873,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             //Assert
             IEnumerable actual = instance.GetErrors(PropertyName);
 
-            Assert.Null(actual);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -1046,7 +1046,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
         private const string ThirdErrorMessage = "Test error 3";
 
         [Fact]
-        public void GetError_WithPropertyThatHasError_ShouldReturnErrors()
+        public void GetErrors_WithPropertyThatHasError_ShouldReturnErrors()
         {
             //Arrange
             GenericDataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
@@ -1063,7 +1063,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
         }
 
         [Fact]
-        public void GetError_WithNullPropertyNameAndErrors_ShouldReturnAllErrors()
+        public void GetErrors_WithNullPropertyNameAndErrors_ShouldReturnAllErrors()
         {
             //Arrange
             GenericDataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
@@ -1087,7 +1087,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
         }
 
         [Fact]
-        public void GetError_WithEmptyPropertyNameAndErrors_ShouldReturnAllErrors()
+        public void GetErrors_WithEmptyPropertyNameAndErrors_ShouldReturnAllErrors()
         {
             //Arrange
             GenericDataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
@@ -1111,7 +1111,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
         }
 
         [Fact]
-        public void GetError_WithNullPropertyNameAndErrors_ShouldReturnNull()
+        public void GetErrors_WithNullPropertyNameAndErrors_ShouldReturnEmptyEnumerable()
         {
             //Arrange
             GenericDataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
@@ -1120,11 +1120,11 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             IEnumerable actual = instance.GetErrors(null);
 
             //Assert
-            Assert.Null(actual);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public void GetError_WithEmptyPropertyNameAndNoErrors_ShouldReturnNull()
+        public void GetErrors_WithEmptyPropertyNameAndNoErrors_ShouldReturnNull()
         {
             //Arrange
             GenericDataErrorHandlingViewModelBaseMock instance = GetDefaultInstance();
@@ -1133,7 +1133,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             IEnumerable actual = instance.GetErrors(string.Empty);
 
             //Assert
-            Assert.Null(actual);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -1407,7 +1407,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             //Assert
             IEnumerable actual = instance.GetErrors(PropertyName);
 
-            Assert.Null(actual);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -1788,7 +1788,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             //Assert
             IEnumerable actual = instance.GetErrors(PropertyName);
 
-            Assert.Null(actual);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -1848,7 +1848,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             //Assert
             IEnumerable actual = instance.GetErrors(PropertyName);
 
-            Assert.Null(actual);
+            Assert.Empty(actual);
 
             IEnumerable errors = instance.GetErrors(SecondPropertyName);
             List<object> collection = errors.Cast<object>().ToList();
@@ -1902,7 +1902,7 @@ namespace Ncl.Common.Wpf.Tests.ViewModels
             //Assert
             IEnumerable actual = instance.GetErrors(PropertyName);
 
-            Assert.Null(actual);
+            Assert.Empty(actual);
         }
 
         [Fact]

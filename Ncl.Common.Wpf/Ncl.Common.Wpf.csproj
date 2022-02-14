@@ -5,6 +5,8 @@
         <Title>Ncl.Common.Wpf</Title>
         <Authors>Jonathan Garza</Authors>
         <Company>Jonathan Garza</Company>
+	    <Nullable>enable</Nullable>
+	    <UseWPF>true</UseWPF>
     </PropertyGroup>
 
     <ItemGroup>

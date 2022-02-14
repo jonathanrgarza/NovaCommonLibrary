@@ -9,7 +9,7 @@ namespace Ncl.Common.Wpf.ViewModels
         //use the INotifyPropertyChanged interface; if that is preferred over extending from this base class.
 
         /// <inheritdoc />
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         ///     Raises the PropertyChanged event for the given property name.
@@ -20,7 +20,7 @@ namespace Ncl.Common.Wpf.ViewModels
         ///     Can specify <see cref="string.Empty" /> or <see langword="null"/> to 
         ///     signal all properties have changed.
         /// </param>
-        protected void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
         }
@@ -33,7 +33,7 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="value">The value to set, if different.</param>
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-        protected bool Set<T>(ref T current, T value, [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected bool Set<T>(ref T current, T value, [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             var equalityComparer = System.Collections.Generic.EqualityComparer<T>.Default;
             if (equalityComparer.Equals(current, value))
@@ -54,8 +54,8 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="onSetAction">The action to call when the field is set.</param>
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-        protected bool Set<T>(ref T current, T value, System.Action onSetAction,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected bool Set<T>(ref T current, T value, System.Action? onSetAction,
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (Set(ref current, value, name) == false)
                 return false;
@@ -75,8 +75,8 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="onSetAction">The action to call when the field is set.</param>
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-        protected bool SetAndCallFirst<T>(ref T current, T value, System.Action onSetAction,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected bool SetAndCallFirst<T>(ref T current, T value, System.Action? onSetAction,
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             var equalityComparer = System.Collections.Generic.EqualityComparer<T>.Default;
             if (equalityComparer.Equals(current, value))
@@ -98,7 +98,7 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
         protected bool SetDouble(ref double current, double value, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (IsDoubleEqual(current, value, decimals))
                 return false;
@@ -118,8 +118,8 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-        protected bool SetDouble(ref double current, double value, System.Action onSetAction, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected bool SetDouble(ref double current, double value, System.Action? onSetAction, int decimals = 3,
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (SetDouble(ref current, value, decimals, name) == false)
                 return false;
@@ -139,8 +139,8 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-        protected bool SetDoubleAndCallFirst(ref double current, double value, System.Action onSetAction, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected bool SetDoubleAndCallFirst(ref double current, double value, System.Action? onSetAction, int decimals = 3,
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (IsDoubleEqual(current, value, decimals))
                 return false;
@@ -160,7 +160,7 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
         protected bool SetFloat(ref float current, float value, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (IsFloatEqual(current, value, decimals))
                 return false;
@@ -180,8 +180,8 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-        protected bool SetFloat(ref float current, float value, System.Action onSetAction, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected bool SetFloat(ref float current, float value, System.Action? onSetAction, int decimals = 3,
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (SetFloat(ref current, value, decimals, name) == false)
                 return false;
@@ -201,8 +201,8 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-        protected bool SetFloatAndCallFirst(ref float current, float value, System.Action onSetAction, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected bool SetFloatAndCallFirst(ref float current, float value, System.Action? onSetAction, int decimals = 3,
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (IsFloatEqual(current, value, decimals))
                 return false;
@@ -222,7 +222,7 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
         protected bool SetDouble(ref double? current, double? value, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (IsDoubleEqual(current, value, decimals))
                 return false;
@@ -242,8 +242,8 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-        protected bool SetDouble(ref double? current, double? value, System.Action onSetAction, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected bool SetDouble(ref double? current, double? value, System.Action? onSetAction, int decimals = 3,
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (SetDouble(ref current, value, decimals, name) == false)
                 return false;
@@ -263,8 +263,8 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-        protected bool SetDoubleAndCallFirst(ref double? current, double? value, System.Action onSetAction, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected bool SetDoubleAndCallFirst(ref double? current, double? value, System.Action? onSetAction, int decimals = 3,
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (IsDoubleEqual(current, value, decimals))
                 return false;
@@ -284,7 +284,7 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
         protected bool SetFloat(ref float? current, float? value, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (IsFloatEqual(current, value, decimals))
                 return false;
@@ -304,8 +304,8 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-        protected bool SetFloat(ref float? current, float? value, System.Action onSetAction, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected bool SetFloat(ref float? current, float? value, System.Action? onSetAction, int decimals = 3,
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (SetFloat(ref current, value, decimals, name) == false)
                 return false;
@@ -325,8 +325,8 @@ namespace Ncl.Common.Wpf.ViewModels
         /// <param name="decimals">The number of decimals to use for the comparison. Minimum value allowed is zero (0).</param>
         /// <param name="name">The name of the property.</param>
         /// <returns><see langword="true"/> if the field's value changed, otherwise, <see langword="false"/>.</returns>
-        protected bool SetFloatAndCallFirst(ref float? current, float? value, System.Action onSetAction, int decimals = 3,
-            [System.Runtime.CompilerServices.CallerMemberName] string name = null)
+        protected bool SetFloatAndCallFirst(ref float? current, float? value, System.Action? onSetAction, int decimals = 3,
+            [System.Runtime.CompilerServices.CallerMemberName] string? name = null)
         {
             if (IsFloatEqual(current, value, decimals))
                 return false;

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31105.61
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Core", "Ncl.Common.Core\Ncl.Common.Core.csproj", "{2514F129-920B-486A-8E45-91C6C9897C36}"
 EndProject
@@ -9,11 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Core.Tests", "Nc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Csv", "Ncl.Common.Csv\Ncl.Common.Csv.csproj", "{74441457-67CB-49C0-A824-4C3ECDA05453}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ncl.Common.Csv.Tests", "Ncl.Common.Csv.Tests\Ncl.Common.Csv.Tests.csproj", "{F01DA28F-5C72-41B8-8166-4F71781DE414}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Csv.Tests", "Ncl.Common.Csv.Tests\Ncl.Common.Csv.Tests.csproj", "{F01DA28F-5C72-41B8-8166-4F71781DE414}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ncl.Common.Wpf", "Ncl.Common.Wpf\Ncl.Common.Wpf.csproj", "{82B93D8E-08B8-4264-ADC1-6CFC68EAFEB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Wpf", "Ncl.Common.Wpf\Ncl.Common.Wpf.csproj", "{82B93D8E-08B8-4264-ADC1-6CFC68EAFEB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ncl.Common.Wpf.Tests", "Ncl.Common.Wpf.Tests\Ncl.Common.Wpf.Tests.csproj", "{238E1F72-C87F-49AB-AE72-CC1FD505BD09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Wpf.Tests", "Ncl.Common.Wpf.Tests\Ncl.Common.Wpf.Tests.csproj", "{238E1F72-C87F-49AB-AE72-CC1FD505BD09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
