@@ -1,6 +1,6 @@
 using System.Windows.Input;
 
-namespace Ncl.Common.Wpf.Infrastructure
+namespace Ncl.Common.Core.UI
 {
     /// <summary>
     ///     The interface for a relay command which relays a command call by executing delegates.
@@ -42,13 +42,13 @@ namespace Ncl.Common.Wpf.Infrastructure
         /// <returns>
         ///     <see langword="true" /> if this command can be executed, otherwise, <see langword="false" />.
         /// </returns>
-        bool CanExecute(T? parameter);
+        bool CanExecute(T parameter);
 
         /// <summary>
         ///     Executes the command.
         /// </summary>
         /// <param name="parameter">The command parameter.</param>
-        void Execute(T? parameter);
+        void Execute(T parameter);
 
         /// <summary>
         ///     Raises the <see cref="IRelayCommand{T}.CanExecuteChanged" /> event so that listeners can update

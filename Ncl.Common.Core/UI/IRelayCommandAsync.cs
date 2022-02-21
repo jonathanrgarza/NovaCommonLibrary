@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Ncl.Common.Wpf.Infrastructure
+namespace Ncl.Common.Core.UI
 {
     /// <summary>
     ///     The interface for an asynchronous relay command which relays a command call by executing delegates.
@@ -44,14 +44,14 @@ namespace Ncl.Common.Wpf.Infrastructure
         /// <returns>
         ///     <see langword="true" /> if this command can be executed, otherwise, <see langword="false" />.
         /// </returns>
-        bool CanExecute(T? parameter);
+        bool CanExecute(T parameter);
 
         /// <summary>
         ///     Executes the command, asynchronously.
         /// </summary>
         /// <param name="parameter">The command parameter.</param>
         /// <returns>The <see cref="Task" /> which represents the asynchronous operation.</returns>
-        Task ExecuteAsync(T? parameter);
+        Task ExecuteAsync(T parameter);
 
         /// <summary>
         ///     Raises the <see cref="IRelayCommandAsync{T}.CanExecuteChanged" /> event so that listeners can update

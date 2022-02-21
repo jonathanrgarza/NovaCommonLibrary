@@ -4,7 +4,7 @@ using System.Windows.Input;
 using Ncl.Common.Core.Extensions;
 using Ncl.Common.Core.Infrastructure;
 
-namespace Ncl.Common.Wpf.Infrastructure
+namespace Ncl.Common.Core.UI
 {
     /// <summary>
     ///     Represents an asynchronous command which relays a command call by executing the given delegates.
@@ -12,8 +12,8 @@ namespace Ncl.Common.Wpf.Infrastructure
     /// </summary>
     public class RelayCommandAsync : IRelayCommandAsync
     {
-        private readonly Func<bool>? _canExecuteFunction;
-        private readonly Action<Exception>? _exceptionHandleAction;
+        private readonly Func<bool> _canExecuteFunction;
+        private readonly Action<Exception> _exceptionHandleAction;
         private readonly Func<Task> _executeFunction;
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         ///     A default value results in the command always return true for CanExecute. Default is null.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="executeFunction" /> is null.</exception>
-        public RelayCommandAsync(Func<Task> executeFunction, Func<bool>? canExecuteFunction = null)
+        public RelayCommandAsync(Func<Task> executeFunction, Func<bool> canExecuteFunction = null)
         {
             _executeFunction = executeFunction ?? throw new ArgumentNullException(nameof(executeFunction));
             _canExecuteFunction = canExecuteFunction;
@@ -44,8 +44,8 @@ namespace Ncl.Common.Wpf.Infrastructure
         ///     The exception handler delegate. If null, exceptions will be swallowed.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="executeFunction" /> is null.</exception>
-        public RelayCommandAsync(Func<Task> executeFunction, Func<bool>? canExecuteFunction,
-            Action<Exception>? exceptionHandlerAction)
+        public RelayCommandAsync(Func<Task> executeFunction, Func<bool> canExecuteFunction,
+            Action<Exception> exceptionHandlerAction)
         {
             _executeFunction = executeFunction ?? throw new ArgumentNullException(nameof(executeFunction));
             _canExecuteFunction = canExecuteFunction;
@@ -64,8 +64,8 @@ namespace Ncl.Common.Wpf.Infrastructure
         ///     The exception handler. If null, exceptions will be swallowed.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="executeFunction" /> is null.</exception>
-        public RelayCommandAsync(Func<Task> executeFunction, Func<bool>? canExecuteFunction,
-            IExceptionHandler? exceptionHandler)
+        public RelayCommandAsync(Func<Task> executeFunction, Func<bool> canExecuteFunction,
+            IExceptionHandler exceptionHandler)
         {
             _executeFunction = executeFunction ?? throw new ArgumentNullException(nameof(executeFunction));
             _canExecuteFunction = canExecuteFunction;
@@ -105,19 +105,19 @@ namespace Ncl.Common.Wpf.Infrastructure
         }
 
         /// <inheritdoc />
-        bool ICommand.CanExecute(object? parameter)
+        bool ICommand.CanExecute(object parameter)
         {
             return CanExecute();
         }
 
         /// <inheritdoc />
-        void ICommand.Execute(object? parameter)
+        void ICommand.Execute(object parameter)
         {
             ExecuteAsync().FireAndForgetSafe(_exceptionHandleAction);
         }
 
         /// <inheritdoc />
-        public event EventHandler? CanExecuteChanged;
+        public event EventHandler CanExecuteChanged;
     }
 
     /// <summary>
@@ -127,9 +127,9 @@ namespace Ncl.Common.Wpf.Infrastructure
     /// <typeparam name="T">The command parameter's type.</typeparam>
     public class RelayCommandAsync<T> : IRelayCommandAsync<T>
     {
-        private readonly Func<T?, bool>? _canExecuteFunction;
-        private readonly Action<Exception>? _exceptionHandleAction;
-        private readonly Func<T?, Task> _executeFunction;
+        private readonly Func<T, bool> _canExecuteFunction;
+        private readonly Action<Exception> _exceptionHandleAction;
+        private readonly Func<T, Task> _executeFunction;
 
         /// <summary>
         ///     Initializes a new instance of <see cref="RelayCommandAsync{T}" />.
@@ -140,7 +140,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         ///     A default value results in the command always return true for CanExecute. Default is null.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="executeFunction" /> is null.</exception>
-        public RelayCommandAsync(Func<T?, Task> executeFunction, Func<T?, bool>? canExecuteFunction = null)
+        public RelayCommandAsync(Func<T, Task> executeFunction, Func<T, bool> canExecuteFunction = null)
         {
             _executeFunction = executeFunction ?? throw new ArgumentNullException(nameof(executeFunction));
             _canExecuteFunction = canExecuteFunction;
@@ -158,8 +158,8 @@ namespace Ncl.Common.Wpf.Infrastructure
         ///     The exception handler delegate. If null, exceptions will be swallowed.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="executeFunction" /> is null.</exception>
-        public RelayCommandAsync(Func<T?, Task> executeFunction, Func<T?, bool>? canExecuteFunction,
-            Action<Exception>? exceptionHandlerAction)
+        public RelayCommandAsync(Func<T, Task> executeFunction, Func<T, bool> canExecuteFunction,
+            Action<Exception> exceptionHandlerAction)
         {
             _executeFunction = executeFunction ?? throw new ArgumentNullException(nameof(executeFunction));
             _canExecuteFunction = canExecuteFunction;
@@ -176,8 +176,8 @@ namespace Ncl.Common.Wpf.Infrastructure
         /// </param>
         /// <param name="exceptionHandler">The exception handler. If null, exceptions will be swallowed.</param>
         /// <exception cref="ArgumentNullException"><paramref name="executeFunction" /> is null.</exception>
-        public RelayCommandAsync(Func<T?, Task> executeFunction, Func<T?, bool>? canExecuteFunction,
-            IExceptionHandler? exceptionHandler)
+        public RelayCommandAsync(Func<T, Task> executeFunction, Func<T, bool> canExecuteFunction,
+            IExceptionHandler exceptionHandler)
         {
             _executeFunction = executeFunction ?? throw new ArgumentNullException(nameof(executeFunction));
             _canExecuteFunction = canExecuteFunction;
@@ -194,7 +194,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         /// <returns>
         ///     <see langword="true" /> if this command can be executed, otherwise, <see langword="false" />.
         /// </returns>
-        public bool CanExecute(T? parameter)
+        public bool CanExecute(T parameter)
         {
             return _canExecuteFunction == null || _canExecuteFunction(parameter);
         }
@@ -203,7 +203,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         ///     Executes the command.
         /// </summary>
         /// <param name="parameter">The command parameter.</param>
-        public Task ExecuteAsync(T? parameter)
+        public Task ExecuteAsync(T parameter)
         {
             return _executeFunction(parameter);
         }
@@ -218,18 +218,18 @@ namespace Ncl.Common.Wpf.Infrastructure
         }
 
         /// <inheritdoc />
-        bool ICommand.CanExecute(object? parameter)
+        bool ICommand.CanExecute(object parameter)
         {
-            return CanExecute((T?) parameter);
+            return CanExecute((T) parameter);
         }
 
         /// <inheritdoc />
-        void ICommand.Execute(object? parameter)
+        void ICommand.Execute(object parameter)
         {
-            ExecuteAsync((T?) parameter).FireAndForgetSafe(_exceptionHandleAction);
+            ExecuteAsync((T) parameter).FireAndForgetSafe(_exceptionHandleAction);
         }
 
         /// <inheritdoc />
-        public event EventHandler? CanExecuteChanged;
+        public event EventHandler CanExecuteChanged;
     }
 }

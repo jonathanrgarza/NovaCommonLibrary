@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Input;
 
-namespace Ncl.Common.Wpf.Infrastructure
+namespace Ncl.Common.Core.UI
 {
     /// <summary>
     ///     Represents a command which relays a command call by executing the given delegates.
@@ -9,7 +9,7 @@ namespace Ncl.Common.Wpf.Infrastructure
     /// </summary>
     public class RelayCommand : IRelayCommand
     {
-        private readonly Func<bool>? _canExecuteFunction;
+        private readonly Func<bool> _canExecuteFunction;
         private readonly Action _executeAction;
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         ///     A default value results in the command always return true for CanExecute. Default is null.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="executeAction" /> is null.</exception>
-        public RelayCommand(Action executeAction, Func<bool>? canExecuteFunction = null)
+        public RelayCommand(Action executeAction, Func<bool> canExecuteFunction = null)
         {
             _executeAction = executeAction ?? throw new ArgumentNullException(nameof(executeAction));
             _canExecuteFunction = canExecuteFunction;
@@ -56,19 +56,19 @@ namespace Ncl.Common.Wpf.Infrastructure
         }
 
         /// <inheritdoc />
-        bool ICommand.CanExecute(object? parameter)
+        bool ICommand.CanExecute(object parameter)
         {
             return CanExecute();
         }
 
         /// <inheritdoc />
-        void ICommand.Execute(object? parameter)
+        void ICommand.Execute(object parameter)
         {
             Execute();
         }
 
         /// <inheritdoc />
-        public event EventHandler? CanExecuteChanged;
+        public event EventHandler CanExecuteChanged;
     }
 
     /// <summary>
@@ -78,8 +78,8 @@ namespace Ncl.Common.Wpf.Infrastructure
     /// <typeparam name="T">The command parameter's type.</typeparam>
     public class RelayCommand<T> : IRelayCommand<T>
     {
-        private readonly Func<T?, bool>? _canExecuteFunction;
-        private readonly Action<T?> _executeAction;
+        private readonly Func<T, bool> _canExecuteFunction;
+        private readonly Action<T> _executeAction;
 
         /// <summary>
         ///     Initializes a new instance of <see cref="RelayCommand" />.
@@ -90,7 +90,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         ///     A default value results in the command always return true for CanExecute. Default is null.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="executeAction" /> is null.</exception>
-        public RelayCommand(Action<T?> executeAction, Func<T?, bool>? canExecuteFunction = null)
+        public RelayCommand(Action<T> executeAction, Func<T, bool> canExecuteFunction = null)
         {
             _executeAction = executeAction ?? throw new ArgumentNullException(nameof(executeAction));
             _canExecuteFunction = canExecuteFunction;
@@ -103,7 +103,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         /// <returns>
         ///     <see langword="true" /> if this command can be executed, otherwise, <see langword="false" />.
         /// </returns>
-        public bool CanExecute(T? parameter)
+        public bool CanExecute(T parameter)
         {
             return _canExecuteFunction == null || _canExecuteFunction(parameter);
         }
@@ -112,7 +112,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         ///     Executes the command.
         /// </summary>
         /// <param name="parameter">The command parameter.</param>
-        public void Execute(T? parameter)
+        public void Execute(T parameter)
         {
             _executeAction(parameter);
         }
@@ -127,18 +127,18 @@ namespace Ncl.Common.Wpf.Infrastructure
         }
 
         /// <inheritdoc />
-        bool ICommand.CanExecute(object? parameter)
+        bool ICommand.CanExecute(object parameter)
         {
-            return CanExecute((T?) parameter);
+            return CanExecute((T) parameter);
         }
 
         /// <inheritdoc />
-        void ICommand.Execute(object? parameter)
+        void ICommand.Execute(object parameter)
         {
-            Execute((T?) parameter);
+            Execute((T) parameter);
         }
 
         /// <inheritdoc />
-        public event EventHandler? CanExecuteChanged;
+        public event EventHandler CanExecuteChanged;
     }
 }

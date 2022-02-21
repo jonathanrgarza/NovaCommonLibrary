@@ -13,4 +13,8 @@
       <ProjectReference Include="..\Ncl.Common.Core\Ncl.Common.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Infrastructure\" />
+    </ItemGroup>
+
 </Project>
