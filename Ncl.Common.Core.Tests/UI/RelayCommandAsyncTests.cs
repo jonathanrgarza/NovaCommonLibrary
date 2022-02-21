@@ -2,10 +2,10 @@ using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Ncl.Common.Core.Infrastructure;
-using Ncl.Common.Wpf.Infrastructure;
+using Ncl.Common.Core.UI;
 using Xunit;
 
-namespace Ncl.Common.Wpf.Tests.Infrastructure
+namespace Ncl.Common.Core.Tests.UI
 {
     public class RelayCommandAsyncTests
     {

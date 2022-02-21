@@ -1,10 +1,10 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Ncl.Common.Wpf.ViewModels;
+using Ncl.Common.Core.UI;
 using Xunit;
 
-namespace Ncl.Common.Wpf.Tests.ViewModels
+namespace Ncl.Common.Core.Tests.UI
 {
     public class ViewModelBaseTests
     {

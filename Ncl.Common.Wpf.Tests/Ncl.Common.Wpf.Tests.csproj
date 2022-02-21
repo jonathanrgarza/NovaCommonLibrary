@@ -23,4 +23,9 @@
       <ProjectReference Include="..\Ncl.Common.Wpf\Ncl.Common.Wpf.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Infrastructure\" />
+      <Folder Include="ViewModels\" />
+    </ItemGroup>
+
 </Project>

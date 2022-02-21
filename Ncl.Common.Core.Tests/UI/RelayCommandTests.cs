@@ -1,9 +1,9 @@
 using System;
 using System.Windows.Input;
-using Ncl.Common.Wpf.Infrastructure;
+using Ncl.Common.Core.UI;
 using Xunit;
 
-namespace Ncl.Common.Wpf.Tests.Infrastructure
+namespace Ncl.Common.Core.Tests.UI
 {
     public class RelayCommandTests
     {
