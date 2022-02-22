@@ -23,15 +23,32 @@ namespace Ncl.Common.Core.Xml
 
         public bool TryDeserialize<T>(string path, out T result, out Exception exception)
         {
-            Type type = typeof(T);
-            if (TryDeserialize(path, type, out object resultObj, out exception))
+            result = default;
+
+            try
             {
-                result = (T) resultObj;
-                return true;
+                Guard.AgainstNullArgument(path, nameof(path));
+            }
+            catch (ArgumentNullException e)
+            {
+                exception = e;
+                return false;
             }
 
-            result = default;
-            return false;
+            try
+            {
+                //TODO: Double check create, maybe use FileStream
+                XmlReaderSettings settings = GetSecureXmlReaderSettings();
+                using (var xmlReader = XmlReader.Create(path, settings))
+                {
+                    return TryDeserialize(xmlReader, out result, out exception);
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
+            }
         }
 
         public object Deserialize(string path, Type type)
@@ -61,14 +78,23 @@ namespace Ncl.Common.Core.Xml
                 return false;
             }
 
-            XmlReaderSettings settings = GetSecureXmlReaderSettings();
-            using (var xmlReader = XmlReader.Create(path, settings))
+            try
             {
-                if (!TryDeserialize(xmlReader, type, out object resultObj, out exception))
-                    return false;
+                //TODO: Double check create, maybe use FileStream
+                XmlReaderSettings settings = GetSecureXmlReaderSettings();
+                using (var xmlReader = XmlReader.Create(path, settings))
+                {
+                    if (!TryDeserialize(xmlReader, type, out object resultObj, out exception))
+                        return false;
 
-                result = resultObj;
-                return true;
+                    result = resultObj;
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
             }
         }
 
@@ -87,15 +113,31 @@ namespace Ncl.Common.Core.Xml
 
         public bool TryDeserialize<T>(Stream stream, out T result, out Exception exception)
         {
-            Type type = typeof(T);
-            if (TryDeserialize(stream, type, out object resultObj, out exception))
+            result = default;
+
+            try
             {
-                result = (T) resultObj;
-                return true;
+                Guard.AgainstNullArgument(stream, nameof(stream));
+            }
+            catch (ArgumentNullException e)
+            {
+                exception = e;
+                return false;
             }
 
-            result = default;
-            return false;
+            try
+            {
+                XmlReaderSettings settings = GetSecureXmlReaderSettings();
+                using (var xmlReader = XmlReader.Create(stream, settings))
+                {
+                    return TryDeserialize(xmlReader, out result, out exception);
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
+            }
         }
 
         public object Deserialize(Stream stream, Type type)
@@ -125,14 +167,22 @@ namespace Ncl.Common.Core.Xml
                 return false;
             }
 
-            XmlReaderSettings settings = GetSecureXmlReaderSettings();
-            using (var xmlReader = XmlReader.Create(stream, settings))
+            try
             {
-                if (!TryDeserialize(xmlReader, type, out object resultObj, out exception))
-                    return false;
+                XmlReaderSettings settings = GetSecureXmlReaderSettings();
+                using (var xmlReader = XmlReader.Create(stream, settings))
+                {
+                    if (!TryDeserialize(xmlReader, type, out object resultObj, out exception))
+                        return false;
 
-                result = resultObj;
-                return true;
+                    result = resultObj;
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
             }
         }
 
@@ -151,15 +201,31 @@ namespace Ncl.Common.Core.Xml
 
         public bool TryDeserialize<T>(TextReader reader, out T result, out Exception exception)
         {
-            Type type = typeof(T);
-            if (TryDeserialize(reader, type, out object resultObj, out exception))
+            result = default;
+
+            try
             {
-                result = (T) resultObj;
-                return true;
+                Guard.AgainstNullArgument(reader, nameof(reader));
+            }
+            catch (ArgumentNullException e)
+            {
+                exception = e;
+                return false;
             }
 
-            result = default;
-            return false;
+            try
+            {
+                XmlReaderSettings settings = GetSecureXmlReaderSettings();
+                using (var xmlReader = XmlReader.Create(reader, settings))
+                {
+                    return TryDeserialize(xmlReader, out result, out exception);
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
+            }
         }
 
         public object Deserialize(TextReader reader, Type type)
@@ -189,23 +255,30 @@ namespace Ncl.Common.Core.Xml
                 return false;
             }
 
-            XmlReaderSettings settings = GetSecureXmlReaderSettings();
-            using (var xmlReader = XmlReader.Create(reader, settings))
+            try
             {
-                if (!TryDeserialize(xmlReader, type, out object resultObj, out exception))
-                    return false;
+                XmlReaderSettings settings = GetSecureXmlReaderSettings();
+                using (var xmlReader = XmlReader.Create(reader, settings))
+                {
+                    if (!TryDeserialize(xmlReader, type, out object resultObj, out exception))
+                        return false;
 
-                result = resultObj;
-                return true;
+                    result = resultObj;
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
             }
         }
 
         public T Deserialize<T>(XmlReader reader, bool skipSettingsCheck = false)
         {
-            Type type = typeof(T);
-            if (TryDeserialize(reader, type, out object result, out Exception exception,
+            if (TryDeserialize(reader, out T result, out Exception exception,
                     skipSettingsCheck))
-                return (T) result;
+                return result;
 
             throw exception;
         }
@@ -213,31 +286,41 @@ namespace Ncl.Common.Core.Xml
         public bool TryDeserialize<T>(XmlReader reader, out T result,
             bool skipSettingsCheck = false)
         {
-            Type type = typeof(T);
-            if (TryDeserialize(reader, type, out object resultObj, out _,
-                    skipSettingsCheck))
-            {
-                result = (T) resultObj;
-                return true;
-            }
-
-            result = default;
-            return false;
+            return TryDeserialize(reader, out result, out Exception _, skipSettingsCheck);
         }
 
         public bool TryDeserialize<T>(XmlReader reader, out T result, out Exception exception,
             bool skipSettingsCheck = false)
         {
-            Type type = typeof(T);
-            if (TryDeserialize(reader, type, out object resultObj, out exception,
-                    skipSettingsCheck))
+            result = default;
+            exception = null;
+            try
             {
-                result = (T) resultObj;
+                Guard.AgainstNullArgument(reader, nameof(reader));
+
+                if (!skipSettingsCheck)
+                {
+                    GuardAgainstInsecureSettings(reader.Settings);
+                }
+
+                Type type = typeof(T);
+
+                var xmlSerializer = new XmlSerializer(type);
+
+                if (!xmlSerializer.CanDeserialize(reader))
+                {
+                    throw new XmlException(
+                        $"XML content can not be deserialized into the given type '{type.FullName}'");
+                }
+
+                result = (T) xmlSerializer.Deserialize(reader);
                 return true;
             }
-
-            result = default;
-            return false;
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
+            }
         }
 
         public object Deserialize(XmlReader reader, Type type, bool skipSettingsCheck = false)
@@ -303,15 +386,33 @@ namespace Ncl.Common.Core.Xml
 
         public bool TryDeserializeFromString<T>(string xmlString, out T result, out Exception exception)
         {
-            Type type = typeof(T);
-            if (TryDeserializeFromString(xmlString, type, out object resultObj, out exception))
+            result = default;
+
+            try
             {
-                result = (T) resultObj;
-                return true;
+                Guard.AgainstNullArgument(xmlString, nameof(xmlString));
+            }
+            catch (ArgumentNullException e)
+            {
+                exception = e;
+                return false;
             }
 
-            result = default;
-            return false;
+            try
+            {
+                XmlReaderSettings settings = GetSecureXmlReaderSettings();
+
+                using (var stringReader = new StringReader(xmlString))
+                using (var xmlReader = XmlReader.Create(stringReader, settings))
+                {
+                    return TryDeserialize(xmlReader, out result, out exception);
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
+            }
         }
 
         public object DeserializeFromString(string xmlString, Type type)
@@ -341,16 +442,24 @@ namespace Ncl.Common.Core.Xml
                 return false;
             }
 
-            XmlReaderSettings settings = GetSecureXmlReaderSettings();
-
-            using (var stringReader = new StringReader(xmlString))
-            using (var xmlReader = XmlReader.Create(stringReader, settings))
+            try
             {
-                if (!TryDeserialize(xmlReader, type, out object resultObj, out exception))
-                    return false;
+                XmlReaderSettings settings = GetSecureXmlReaderSettings();
 
-                result = resultObj;
-                return true;
+                using (var stringReader = new StringReader(xmlString))
+                using (var xmlReader = XmlReader.Create(stringReader, settings))
+                {
+                    if (!TryDeserialize(xmlReader, type, out object resultObj, out exception))
+                        return false;
+
+                    result = resultObj;
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
             }
         }
 
@@ -369,9 +478,30 @@ namespace Ncl.Common.Core.Xml
 
         public bool TrySerialize<T>(string path, T obj, out Exception exception)
         {
-            Type type = typeof(T);
-            //TODO: Revisit generic goes to Type function, maybe make generic implementation also
-            return TrySerialize(path, obj, type, out exception);
+            try
+            {
+                Guard.AgainstNullArgument(path, nameof(path));
+            }
+            catch (ArgumentNullException e)
+            {
+                exception = e;
+                return false;
+            }
+
+            try
+            {
+                XmlWriterSettings settings = GetXmlWriterSettings();
+                //TODO: Double check create, maybe use FileStream
+                using (var xmlWriter = XmlWriter.Create(path, settings))
+                {
+                    return TrySerialize(xmlWriter, obj, out exception);
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
+            }
         }
 
         public void Serialize(string path, object obj, Type type)
@@ -399,11 +529,19 @@ namespace Ncl.Common.Core.Xml
                 return false;
             }
 
-            XmlWriterSettings settings = GetXmlWriterSettings();
-            //TODO: Double check create, maybe use FileStream
-            using (var xmlWriter = XmlWriter.Create(path, settings))
+            try
             {
-                return TrySerialize(xmlWriter, obj, type, out exception);
+                XmlWriterSettings settings = GetXmlWriterSettings();
+                //TODO: Double check create, maybe use FileStream
+                using (var xmlWriter = XmlWriter.Create(path, settings))
+                {
+                    return TrySerialize(xmlWriter, obj, type, out exception);
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
             }
         }
 
@@ -422,8 +560,29 @@ namespace Ncl.Common.Core.Xml
 
         public bool TrySerialize<T>(Stream stream, T obj, out Exception exception)
         {
-            Type type = typeof(T);
-            return TrySerialize(stream, obj, type, out exception);
+            try
+            {
+                Guard.AgainstNullArgument(stream, nameof(stream));
+            }
+            catch (ArgumentNullException e)
+            {
+                exception = e;
+                return false;
+            }
+
+            try
+            {
+                XmlWriterSettings settings = GetXmlWriterSettings();
+                using (var xmlWriter = XmlWriter.Create(stream, settings))
+                {
+                    return TrySerialize(xmlWriter, obj, out exception);
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
+            }
         }
 
         public void Serialize(Stream stream, object obj, Type type)
@@ -451,10 +610,18 @@ namespace Ncl.Common.Core.Xml
                 return false;
             }
 
-            XmlWriterSettings settings = GetXmlWriterSettings();
-            using (var xmlWriter = XmlWriter.Create(stream, settings))
+            try
             {
-                return TrySerialize(xmlWriter, obj, type, out exception);
+                XmlWriterSettings settings = GetXmlWriterSettings();
+                using (var xmlWriter = XmlWriter.Create(stream, settings))
+                {
+                    return TrySerialize(xmlWriter, obj, type, out exception);
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
             }
         }
 
@@ -473,8 +640,29 @@ namespace Ncl.Common.Core.Xml
 
         public bool TrySerialize<T>(TextWriter writer, T obj, out Exception exception)
         {
-            Type type = typeof(T);
-            return TrySerialize(writer, obj, type, out exception);
+            try
+            {
+                Guard.AgainstNullArgument(writer, nameof(writer));
+            }
+            catch (ArgumentNullException e)
+            {
+                exception = e;
+                return false;
+            }
+
+            try
+            {
+                XmlWriterSettings settings = GetXmlWriterSettings();
+                using (var xmlWriter = XmlWriter.Create(writer, settings))
+                {
+                    return TrySerialize(xmlWriter, obj, out exception);
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
+            }
         }
 
         public void Serialize(TextWriter writer, object obj, Type type)
@@ -502,17 +690,24 @@ namespace Ncl.Common.Core.Xml
                 return false;
             }
 
-            XmlWriterSettings settings = GetXmlWriterSettings();
-            using (var xmlWriter = XmlWriter.Create(writer, settings))
+            try
             {
-                return TrySerialize(xmlWriter, obj, type, out exception);
+                XmlWriterSettings settings = GetXmlWriterSettings();
+                using (var xmlWriter = XmlWriter.Create(writer, settings))
+                {
+                    return TrySerialize(xmlWriter, obj, type, out exception);
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
             }
         }
 
         public void Serialize<T>(XmlWriter writer, T obj)
         {
-            Type type = typeof(T);
-            if (TrySerialize(writer, obj, type, out Exception exception))
+            if (TrySerialize(writer, obj, out Exception exception))
                 return;
 
             throw exception;
@@ -520,14 +715,29 @@ namespace Ncl.Common.Core.Xml
 
         public bool TrySerialize<T>(XmlWriter writer, T obj)
         {
-            Type type = typeof(T);
-            return TrySerialize(writer, obj, type, out _);
+            return TrySerialize(writer, obj, out _);
         }
 
         public bool TrySerialize<T>(XmlWriter writer, T obj, out Exception exception)
         {
-            Type type = typeof(T);
-            return TrySerialize(writer, obj, type, out exception);
+            exception = null;
+            try
+            {
+                Guard.AgainstNullArgument(writer, nameof(writer));
+                Guard.AgainstNullArgument(obj, nameof(obj));
+
+                Type type = typeof(T);
+
+                var xmlSerializer = new XmlSerializer(type);
+
+                xmlSerializer.Serialize(writer, obj);
+                return true;
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
+            }
         }
 
         public void Serialize(XmlWriter writer, object obj, Type type)
@@ -579,8 +789,37 @@ namespace Ncl.Common.Core.Xml
 
         public bool TrySerializeToString<T>(T obj, out string xmlString, out Exception exception)
         {
-            Type type = typeof(T);
-            return TrySerializeToString(obj, type, out xmlString, out exception);
+            xmlString = default;
+
+            try
+            {
+                Guard.AgainstNullArgument(obj, nameof(obj));
+            }
+            catch (ArgumentNullException e)
+            {
+                exception = e;
+                return false;
+            }
+
+            try
+            {
+                XmlWriterSettings settings = GetXmlWriterSettings();
+
+                using (var stringWriter = new StringWriter())
+                using (var xmlWriter = XmlWriter.Create(stringWriter, settings))
+                {
+                    if (!TrySerialize(xmlWriter, obj, out exception))
+                        return false;
+
+                    xmlString = stringWriter.ToString();
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
+            }
         }
 
         public string SerializeToString(object obj, Type type)
@@ -610,16 +849,24 @@ namespace Ncl.Common.Core.Xml
                 return false;
             }
 
-            XmlWriterSettings settings = GetXmlWriterSettings();
-
-            using (var stringWriter = new StringWriter())
-            using (var xmlWriter = XmlWriter.Create(stringWriter, settings))
+            try
             {
-                if (!TrySerialize(xmlWriter, obj, type, out exception))
-                    return false;
+                XmlWriterSettings settings = GetXmlWriterSettings();
 
-                xmlString = stringWriter.ToString();
-                return true;
+                using (var stringWriter = new StringWriter())
+                using (var xmlWriter = XmlWriter.Create(stringWriter, settings))
+                {
+                    if (!TrySerialize(xmlWriter, obj, type, out exception))
+                        return false;
+
+                    xmlString = stringWriter.ToString();
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                return false;
             }
         }
 
