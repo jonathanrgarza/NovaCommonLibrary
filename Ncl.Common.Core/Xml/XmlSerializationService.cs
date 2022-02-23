@@ -260,7 +260,7 @@ namespace Ncl.Common.Core.Xml
         }
 
         /// <inheritdoc />
-        public bool TryReadObject(Stream stream, Type type, out object result, 
+        public bool TryReadObject(Stream stream, Type type, out object result,
             IEnumerable<Type> knownTypes)
         {
             DataContractSerializerSettings settings = GetDefaultDataContractSettings(knownTypes);
@@ -268,7 +268,7 @@ namespace Ncl.Common.Core.Xml
         }
 
         /// <inheritdoc />
-        public bool TryReadObject(Stream stream, Type type, out object result, 
+        public bool TryReadObject(Stream stream, Type type, out object result,
             DataContractSerializerSettings settings = null)
         {
             return TryReadObject(stream, type, out result, out Exception _, settings);

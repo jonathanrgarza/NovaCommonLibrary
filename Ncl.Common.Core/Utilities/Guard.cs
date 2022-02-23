@@ -18,8 +18,10 @@ namespace Ncl.Common.Core.Utilities
         /// </exception>
         public static void AgainstNullArgument<T>(T argument, string paramName)
         {
+#pragma warning disable IDE0041 // Use 'is null' check (not available in this version of .NET Standard)
             if (ReferenceEquals(argument, null))
                 throw new ArgumentNullException(paramName);
+#pragma warning restore IDE0041 // Use 'is null' check
         }
 
         /// <summary>
