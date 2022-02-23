@@ -65,7 +65,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
             }
             catch (ArgumentNullException e)
             {
@@ -139,7 +139,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
             }
             catch (ArgumentNullException e)
             {
@@ -260,9 +260,18 @@ namespace Ncl.Common.Core.Xml
         }
 
         /// <inheritdoc />
-        public bool TryReadObject(Stream stream, Type type, out object result)
+        public bool TryReadObject(Stream stream, Type type, out object result, 
+            IEnumerable<Type> knownTypes)
         {
-            return TryReadObject(stream, type, out result, out Exception _);
+            DataContractSerializerSettings settings = GetDefaultDataContractSettings(knownTypes);
+            return TryReadObject(stream, type, out result, out Exception _, settings);
+        }
+
+        /// <inheritdoc />
+        public bool TryReadObject(Stream stream, Type type, out object result, 
+            DataContractSerializerSettings settings = null)
+        {
+            return TryReadObject(stream, type, out result, out Exception _, settings);
         }
 
         /// <inheritdoc />
@@ -642,7 +651,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(xmlString, nameof(xmlString));
+                Guard.AgainstNullOrWhiteSpaceArgument(xmlString, nameof(xmlString));
             }
             catch (ArgumentNullException e)
             {
@@ -717,7 +726,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(xmlString, nameof(xmlString));
+                Guard.AgainstNullOrWhiteSpaceArgument(xmlString, nameof(xmlString));
             }
             catch (ArgumentNullException e)
             {
@@ -796,7 +805,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
             }
             catch (ArgumentNullException e)
             {
@@ -869,7 +878,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
             }
             catch (ArgumentNullException e)
             {
@@ -1490,7 +1499,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
             }
             catch (ArgumentNullException e)
             {
@@ -1536,7 +1545,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
             }
             catch (ArgumentNullException e)
             {
@@ -1877,7 +1886,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(xmlString, nameof(xmlString));
+                Guard.AgainstNullOrWhiteSpaceArgument(xmlString, nameof(xmlString));
             }
             catch (ArgumentNullException e)
             {
@@ -1925,7 +1934,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(xmlString, nameof(xmlString));
+                Guard.AgainstNullOrWhiteSpaceArgument(xmlString, nameof(xmlString));
             }
             catch (ArgumentNullException e)
             {
@@ -1974,7 +1983,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
             }
             catch (ArgumentNullException e)
             {
@@ -2017,7 +2026,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
             }
             catch (ArgumentNullException e)
             {
