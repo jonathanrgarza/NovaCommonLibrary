@@ -1,4 +1,5 @@
 ﻿using System;
+using Ncl.Common.Core.Extensions;
 
 namespace Ncl.Common.Core.Utilities
 {
@@ -16,9 +17,13 @@ namespace Ncl.Common.Core.Utilities
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="argument" /> is <see langword="null" />.
         /// </exception>
-        public static void AgainstNullArgument<T>(T argument, string paramName) where T : class
+        public static void AgainstNullArgument<T>(T argument, string paramName)
         {
-            if (argument is null)
+            Type type = typeof(T);
+            if (type.IsValueType && !type.IsNullableType()) //Check to prevent need to box value types
+                return;
+
+            if (ReferenceEquals(argument, null))
                 throw new ArgumentNullException(paramName);
         }
 
