@@ -16,12 +16,10 @@ namespace Ncl.Common.Core.Utilities
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="argument" /> is <see langword="null" />.
         /// </exception>
-        public static void AgainstNullArgument<T>(T argument, string paramName)
+        public static void AgainstNullArgument<T>(T argument, string paramName) where T : class
         {
-#pragma warning disable IDE0041 // Use 'is null' check (not available in this version of .NET Standard)
-            if (ReferenceEquals(argument, null))
+            if (argument is null)
                 throw new ArgumentNullException(paramName);
-#pragma warning restore IDE0041 // Use 'is null' check
         }
 
         /// <summary>

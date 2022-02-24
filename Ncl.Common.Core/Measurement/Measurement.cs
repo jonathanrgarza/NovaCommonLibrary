@@ -56,9 +56,9 @@ namespace Ncl.Common.Core.Measurement
         }
 
         /// <summary>
-        ///     Gets the value of this measurement.
+        ///     Gets if this measurement has a set value.
         /// </summary>
-        public double Value { get; }
+        public bool HasValue => double.IsNaN(Value);
 
         /// <summary>
         ///     Gets the units for this measurement.
@@ -66,9 +66,9 @@ namespace Ncl.Common.Core.Measurement
         public TUoM Unit { get; }
 
         /// <summary>
-        ///     Gets if this measurement has a set value.
+        ///     Gets the value of this measurement.
         /// </summary>
-        public bool HasValue => double.IsNaN(Value);
+        public double Value { get; }
 
         /// <inheritdoc />
         public bool Equals(T other)
@@ -84,7 +84,10 @@ namespace Ncl.Common.Core.Measurement
             return Equals(obj as T);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Gets a hash code for the current instance.
+        /// </summary>
+        /// <returns>A hash code for the current instance.</returns>
         public override int GetHashCode()
         {
             int hashCode = -177567199;
@@ -360,7 +363,7 @@ namespace Ncl.Common.Core.Measurement
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
 
-            return left.Add((T)right);
+            return left.Add((T) right);
         }
 
         public static T operator -(Measurement<T, TUoM> left, Measurement<T, TUoM> right)
@@ -368,7 +371,7 @@ namespace Ncl.Common.Core.Measurement
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
 
-            return left.Subtract((T)right);
+            return left.Subtract((T) right);
         }
 
         public static T operator *(Measurement<T, TUoM> left, Measurement<T, TUoM> right)
@@ -376,7 +379,7 @@ namespace Ncl.Common.Core.Measurement
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
 
-            return left.Multiply((T)right);
+            return left.Multiply((T) right);
         }
 
         public static T operator /(Measurement<T, TUoM> left, Measurement<T, TUoM> right)
@@ -384,7 +387,7 @@ namespace Ncl.Common.Core.Measurement
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
 
-            return left.Divide((T)right);
+            return left.Divide((T) right);
         }
 
         public static T operator %(Measurement<T, TUoM> left, Measurement<T, TUoM> right)
@@ -392,7 +395,7 @@ namespace Ncl.Common.Core.Measurement
             if (left == null)
                 throw new ArgumentNullException(nameof(left));
 
-            return left.Modulus((T)right);
+            return left.Modulus((T) right);
         }
     }
 }
