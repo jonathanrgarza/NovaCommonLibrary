@@ -12,6 +12,11 @@ namespace Ncl.Common.Core.Preferences
     public interface ISimplePreferenceService
     {
         /// <summary>
+        ///     Event that occurs when a preference value is changed via a set call.
+        /// </summary>
+        event EventHandler<PreferenceChangedEventArgs> PreferenceChanged;
+
+        /// <summary>
         ///     Gets the save directory path for a given preference type.
         /// </summary>
         /// <typeparam name="T">The preference type.</typeparam>
@@ -145,6 +150,11 @@ namespace Ncl.Common.Core.Preferences
         ///     A <see langword="null" /> value means this option is disabled.
         /// </summary>
         string FallbackDirectory { get; }
+
+        /// <summary>
+        ///     Event that occurs when a preference value is changed via a set call.
+        /// </summary>
+        event EventHandler<PreferenceChangedEventArgs> PreferenceChanged;
 
         /// <summary>
         ///     Gets the save directory path for a given preference type.

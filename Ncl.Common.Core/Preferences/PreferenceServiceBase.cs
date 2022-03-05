@@ -42,6 +42,9 @@ namespace Ncl.Common.Core.Preferences
         /// <inheritdoc />
         public abstract string FallbackDirectory { get; }
 
+        /// <inheritdoc cref="IPreferenceService.GetPreferenceFileName{T}" />
+        public event EventHandler<PreferenceChangedEventArgs> PreferenceChanged;
+
         /// <inheritdoc cref="IPreferenceService.GetPreferenceDirectoryPath{T}" />
         public string GetPreferenceDirectoryPath<T>() where T : class, IPreference
         {
@@ -190,22 +193,15 @@ namespace Ncl.Common.Core.Preferences
         public void SetPreference<T>(T preference) where T : class, IPreference
         {
             Type prefType = typeof(T);
+
             if (preference == null)
             {
                 //Remove any existing preference for this type
-                _preferences.Remove(prefType);
+                SetPreferenceCache(prefType, null);
                 return;
             }
 
-            if (!_preferences.TryGetValue(prefType, out PreferenceSaveInfo currentPreference))
-            {
-                _preferences[prefType] = new PreferenceSaveInfo(preference, GetPreferenceFilePath(prefType));
-                return;
-            }
-
-            currentPreference.Preference = preference;
-            currentPreference.SavePath = GetPreferenceFilePath(prefType);
-            //Changing either of these two properties should set IsDirty = true
+            SetPreferenceCache(prefType, preference);
         }
 
         /// <inheritdoc cref="IPreferenceService.SavePreference{T}" />
@@ -333,11 +329,7 @@ namespace Ncl.Common.Core.Preferences
             string preferenceSavePath = GetPreferenceFilePath(prefType);
             IPreference preference = LoadFromFilePath(prefType, preferenceSavePath);
 
-            PreferenceSaveInfo cacheInfo = SetPreferenceCache(prefType, preference, preferenceSavePath);
-            if (cacheInfo != null)
-            {
-                cacheInfo.IsDirty = false;
-            }
+            SetPreferenceCache(prefType, preference, preferenceSavePath);
 
             if (preference == null)
                 return GetDefaultPreference(prefType);
@@ -462,26 +454,83 @@ namespace Ncl.Common.Core.Preferences
         /// </summary>
         /// <param name="prefType">The preference type.</param>
         /// <param name="preference">The preference value.</param>
-        /// <param name="filePath">The preference file path.</param>
+        /// <param name="filePath">
+        ///     The preference file path. Not used if <paramref name="preference" /> is <see langword="null" />.
+        /// </param>
         /// <returns>The cache info instance.</returns>
         protected virtual PreferenceSaveInfo SetPreferenceCache(Type prefType, IPreference preference, string filePath)
         {
             if (preference == null)
             {
                 _preferences.Remove(prefType);
+                RaisePreferenceChanged(prefType, GetPreferenceFromCache(prefType), null);
                 return null;
             }
 
-            if (_preferences.TryGetValue(prefType, out PreferenceSaveInfo currentSaveInfo))
+            if (_preferences.TryGetValue(prefType, out PreferenceSaveInfo currentSaveInfo) && currentSaveInfo != null)
             {
+                IPreference oldPreference = currentSaveInfo.Preference;
+
                 currentSaveInfo.Preference = preference;
                 currentSaveInfo.SavePath = filePath;
+
+                RaisePreferenceChanged(prefType, oldPreference, preference);
                 return currentSaveInfo;
             }
 
-            var newSaveInfo = new PreferenceSaveInfo(preference, filePath);
+            var newSaveInfo = new PreferenceSaveInfo(preference, filePath)
+            {
+                IsDirty = false
+            };
             _preferences[prefType] = newSaveInfo;
+            RaisePreferenceChanged(prefType, null, preference);
             return newSaveInfo;
+        }
+
+        /// <summary>
+        ///     Sets the preference cache value for the given preference type.
+        /// </summary>
+        /// <param name="prefType">The preference type.</param>
+        /// <param name="preference">The preference value.</param>
+        /// <returns>The cache info instance.</returns>
+        protected virtual PreferenceSaveInfo SetPreferenceCache(Type prefType, IPreference preference)
+        {
+            if (preference == null)
+            {
+                _preferences.Remove(prefType);
+                RaisePreferenceChanged(prefType, GetPreferenceFromCache(prefType), null);
+                return null;
+            }
+
+            if (_preferences.TryGetValue(prefType, out PreferenceSaveInfo currentSaveInfo) && currentSaveInfo != null)
+            {
+                IPreference oldPreference = currentSaveInfo.Preference;
+
+                currentSaveInfo.Preference = preference;
+
+                RaisePreferenceChanged(prefType, oldPreference, preference);
+                return currentSaveInfo;
+            }
+
+            var newSaveInfo = new PreferenceSaveInfo(preference, null)
+            {
+                IsDirty = true
+            };
+            _preferences[prefType] = newSaveInfo;
+            RaisePreferenceChanged(prefType, null, preference);
+            return newSaveInfo;
+        }
+
+        /// <summary>
+        ///     Gets a preference from cache. Will not try to load the preference if it isn't in the cache.
+        /// </summary>
+        /// <param name="prefType">The preference type.</param>
+        /// <returns>The preference from cache or <see langword="null" />.</returns>
+        protected virtual IPreference GetPreferenceFromCache(Type prefType)
+        {
+            return _preferences.TryGetValue(prefType, out PreferenceSaveInfo preferenceInfo)
+                ? preferenceInfo?.Preference
+                : null;
         }
 
         /// <summary>
@@ -533,6 +582,23 @@ namespace Ncl.Common.Core.Preferences
             }
 
             _preferenceSaveLocations[prefType] = new SaveLocation(path, isDirectoryPath);
+        }
+
+        /// <summary>
+        ///     Raises a preference changed event with the given arguments.
+        /// </summary>
+        /// <param name="prefType">The preference type.</param>
+        /// <param name="oldValue">The previous value.</param>
+        /// <param name="newValue">The new value.</param>
+        protected void RaisePreferenceChanged(Type prefType, IPreference oldValue, IPreference newValue)
+        {
+            Guard.AgainstNullArgument(prefType, nameof(prefType));
+
+            if (EqualityComparer<IPreference>.Default.Equals(oldValue, newValue))
+                return;
+
+            var eventArgs = new PreferenceChangedEventArgs(prefType, oldValue, newValue);
+            PreferenceChanged?.Invoke(this, eventArgs);
         }
 
         /// <summary>
