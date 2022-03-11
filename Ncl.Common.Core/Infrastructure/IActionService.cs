@@ -153,5 +153,20 @@ namespace Ncl.Common.Core.Infrastructure
         ///     The <see cref="ActionService" /> is currently in use by a previous action operation.
         /// </exception>
         Task<bool?> PerformRedoAsync();
+
+        /// <summary>
+        ///     Clears the redo stack.
+        /// </summary>
+        void ClearRedoStack();
+
+        /// <summary>
+        ///     Clears the undo stack.
+        /// </summary>
+        void ClearUndoStack();
+
+        /// <summary>
+        ///     Clears both the undo and redo stack.
+        /// </summary>
+        void ClearStacks();
     }
 }

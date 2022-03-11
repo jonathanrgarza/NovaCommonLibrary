@@ -52,42 +52,42 @@ namespace Ncl.Common.Core.Infrastructure
             _redoStack = new LimitedStack<IUndoRedoAction>(_maxUndoActions);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string CurrentRedoDescription =>
             IsUndoRedoActionsDisabled || _redoStack.IsEmpty ? null : _redoStack.Peek()?.RedoDescription;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string CurrentUndoDescription =>
             IsUndoRedoActionsDisabled || _undoStack.IsEmpty ? null : _undoStack.Peek()?.UndoDescription;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool IsAsyncActionOngoing => _asyncTask != null && !_asyncTask.IsCompleted;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool? IsPendingRedoActionAsync =>
             IsUndoRedoActionsDisabled || _redoStack.IsEmpty
                 ? null
                 : (bool?) (_redoStack.Peek() is IUndoRedoAsynchronousAction);
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool? IsPendingUndoActionAsync =>
             IsUndoRedoActionsDisabled || _undoStack.IsEmpty
                 ? null
                 : (bool?) (_undoStack.Peek() is IUndoRedoAsynchronousAction);
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool IsRedoBufferEmpty => _redoStack.IsEmpty;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool IsUndoBufferEmpty => _undoStack.IsEmpty;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool IsUndoRedoActionsDisabled => _maxUndoActions == 0;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool IsUnlimitedUndoRedoActions => _maxUndoActions == UnlimitedUndoRedoActions;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public int MaxUndoActions
         {
             get => _maxUndoActions;
@@ -107,8 +107,7 @@ namespace Ncl.Common.Core.Infrastructure
                         convertedMax = LimitedStack<IUndoRedoAction>.UnlimitedCapacity;
                         break;
                     case 0:
-                        _undoStack.Clear();
-                        _redoStack.Clear();
+                        ClearStacks();
                         //Set to min capacity that is not zero (as that means unlimited capacity)
                         _undoStack.MaxCapacity = 1;
                         _redoStack.MaxCapacity = 1;
@@ -120,19 +119,19 @@ namespace Ncl.Common.Core.Infrastructure
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public int RedoBufferCount => _redoStack.Count;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public int UndoBufferCount => _undoStack.Count;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event EventHandler<ActionExecutionEventArgs> OnPostActionExecute;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event EventHandler<ActionExecutionEventArgs> OnPreActionExecute;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public void ExecuteAction(IUndoRedoAction action)
         {
             Guard.AgainstNullArgument(action, nameof(action));
@@ -144,13 +143,13 @@ namespace Ncl.Common.Core.Infrastructure
             if (!IsUndoRedoActionsDisabled)
             {
                 _undoStack.Push(action);
-                _redoStack.Clear();
+                ClearRedoStack();
             }
 
             RaiseOnPostActionExecute(ActionServiceExecutionType.Original, action, false);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public Task ExecuteActionAsync(IUndoRedoAsynchronousAction action)
         {
             Guard.AgainstNullArgument(action, nameof(action));
@@ -161,7 +160,7 @@ namespace Ncl.Common.Core.Infrastructure
             return asyncTask;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool PerformUndo()
         {
             if (IsUndoRedoActionsDisabled)
@@ -184,7 +183,7 @@ namespace Ncl.Common.Core.Infrastructure
             return true;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public Task<bool?> PerformUndoAsync()
         {
             CheckAsyncTaskInProgress();
@@ -194,7 +193,7 @@ namespace Ncl.Common.Core.Infrastructure
             return asyncTask;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool PerformRedo()
         {
             if (IsUndoRedoActionsDisabled)
@@ -217,7 +216,7 @@ namespace Ncl.Common.Core.Infrastructure
             return true;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public Task<bool?> PerformRedoAsync()
         {
             CheckAsyncTaskInProgress();
@@ -225,6 +224,31 @@ namespace Ncl.Common.Core.Infrastructure
             Task<bool?> asyncTask = PerformRedoAsyncInternal();
             _asyncTask = asyncTask;
             return asyncTask;
+        }
+
+        /// <summary>
+        ///     Clears the redo stack.
+        /// </summary>
+        public void ClearRedoStack()
+        {
+            _redoStack?.Clear();
+        }
+
+        /// <summary>
+        ///     Clears the undo stack.
+        /// </summary>
+        public void ClearUndoStack()
+        {
+            _undoStack?.Clear();
+        }
+
+        /// <summary>
+        ///     Clears both the undo and redo stack.
+        /// </summary>
+        public void ClearStacks()
+        {
+            _undoStack?.Clear();
+            _redoStack?.Clear();
         }
 
         /// <summary>
@@ -240,7 +264,7 @@ namespace Ncl.Common.Core.Infrastructure
             if (!IsUndoRedoActionsDisabled)
             {
                 _undoStack.Push(action);
-                _redoStack.Clear();
+                ClearRedoStack();
             }
 
             RaiseOnPostActionExecute(ActionServiceExecutionType.Original, action, true);
