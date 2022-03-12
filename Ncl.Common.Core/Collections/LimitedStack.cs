@@ -34,6 +34,7 @@ namespace Ncl.Common.Core.Collections
         /// </summary>
         public LimitedStack()
         {
+            Debug.Assert(DefaultMaxCapacity >= 0);
             _maxCapacity = DefaultMaxCapacity;
         }
 
@@ -42,8 +43,10 @@ namespace Ncl.Common.Core.Collections
         ///     a given max capacity and no entries.
         /// </summary>
         /// <param name="maxCapacity">The max capacity of the stack.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxCapacity" /> is negative.</exception>
         public LimitedStack(int maxCapacity)
         {
+            Guard.AgainstNegativeArgument(maxCapacity, nameof(maxCapacity));
             _maxCapacity = maxCapacity;
         }
 
@@ -53,6 +56,7 @@ namespace Ncl.Common.Core.Collections
         ///     If the collection's count is greater than <paramref name="maxCapacity" />, only the last elements are taken.
         /// </summary>
         /// <exception cref="ArgumentNullException"><paramref name="collection" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxCapacity" /> is negative.</exception>
         public LimitedStack(ICollection<T> collection, int maxCapacity = DefaultMaxCapacity) : this(maxCapacity)
         {
             PushRange(collection);
@@ -64,6 +68,7 @@ namespace Ncl.Common.Core.Collections
         ///     If the enumerable's count is greater than <paramref name="maxCapacity" />, only the last elements are taken.
         /// </summary>
         /// <exception cref="ArgumentNullException"><paramref name="enumerable" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxCapacity" /> is negative.</exception>
         public LimitedStack(IEnumerable<T> enumerable, int maxCapacity = DefaultMaxCapacity) : this(maxCapacity)
         {
             PushRange(enumerable);
@@ -87,6 +92,7 @@ namespace Ncl.Common.Core.Collections
         /// <summary>
         ///     Gets/Sets the max capacity of the stack.
         /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="value" /> is negative.</exception>
         public int MaxCapacity
         {
             get => _maxCapacity;
@@ -94,6 +100,8 @@ namespace Ncl.Common.Core.Collections
             {
                 if (_maxCapacity == value)
                     return;
+
+                Guard.AgainstNegativeArgument(value, nameof(MaxCapacity));
 
                 _maxCapacity = value;
                 PerformResize();

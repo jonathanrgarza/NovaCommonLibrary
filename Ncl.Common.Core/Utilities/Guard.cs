@@ -58,5 +58,141 @@ namespace Ncl.Common.Core.Utilities
                     paramName);
             }
         }
+
+        /// <summary>
+        ///     Guard against a negative <see cref="int" /> argument/parameter value.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <param name="paramName">The parameter's name.</param>
+        /// <exception cref="ArgumentOutOfRangeException ">
+        ///     <paramref name="argument" /> is less than zero.
+        /// </exception>
+        public static void AgainstNegativeArgument(int argument, string paramName)
+        {
+            if (argument < 0)
+            {
+                throw new ArgumentOutOfRangeException(paramName,
+                    "Value can not be negative");
+            }
+        }
+
+        /// <summary>
+        ///     Guard against a negative <see cref="long" /> argument/parameter value.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <param name="paramName">The parameter's name.</param>
+        /// <exception cref="ArgumentOutOfRangeException ">
+        ///     <paramref name="argument" /> is less than zero.
+        /// </exception>
+        public static void AgainstNegativeArgument(long argument, string paramName)
+        {
+            if (argument < 0)
+            {
+                throw new ArgumentOutOfRangeException(paramName,
+                    "Value can not be negative");
+            }
+        }
+
+        /// <summary>
+        ///     Guard against a negative <see cref="float" /> argument/parameter value.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <param name="paramName">The parameter's name.</param>
+        /// <exception cref="ArgumentOutOfRangeException ">
+        ///     <paramref name="argument" /> is less than zero.
+        /// </exception>
+        public static void AgainstNegativeArgument(float argument, string paramName)
+        {
+            if (argument < 0)
+            {
+                throw new ArgumentOutOfRangeException(paramName,
+                    "Value can not be negative");
+            }
+        }
+
+        /// <summary>
+        ///     Guard against a negative <see cref="double" /> argument/parameter value.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <param name="paramName">The parameter's name.</param>
+        /// <exception cref="ArgumentOutOfRangeException ">
+        ///     <paramref name="argument" /> is less than zero.
+        /// </exception>
+        public static void AgainstNegativeArgument(double argument, string paramName)
+        {
+            if (argument < 0)
+            {
+                throw new ArgumentOutOfRangeException(paramName,
+                    "Value can not be negative");
+            }
+        }
+
+        /// <summary>
+        ///     Guard against a zero or negative <see cref="int" /> argument/parameter value.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <param name="paramName">The parameter's name.</param>
+        /// <exception cref="ArgumentOutOfRangeException ">
+        ///     <paramref name="argument" /> is less than zero.
+        /// </exception>
+        public static void AgainstZeroOrLessArgument(int argument, string paramName)
+        {
+            if (argument <= 0)
+            {
+                throw new ArgumentOutOfRangeException(paramName,
+                    "Value can not be zero or negative");
+            }
+        }
+
+        /// <summary>
+        ///     Guard against a zero or negative <see cref="long" /> argument/parameter value.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <param name="paramName">The parameter's name.</param>
+        /// <exception cref="ArgumentOutOfRangeException ">
+        ///     <paramref name="argument" /> is less than zero.
+        /// </exception>
+        public static void AgainstZeroOrLessArgument(long argument, string paramName)
+        {
+            if (argument <= 0)
+            {
+                throw new ArgumentOutOfRangeException(paramName,
+                    "Value can not be zero or negative");
+            }
+        }
+
+        /// <summary>
+        ///     Guard against a zero or negative <see cref="float" /> argument/parameter value.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <param name="paramName">The parameter's name.</param>
+        /// <exception cref="ArgumentOutOfRangeException ">
+        ///     <paramref name="argument" /> is less than zero.
+        /// </exception>
+        public static void AgainstZeroOrLessArgument(float argument, string paramName)
+        {
+            if (argument <= 0)
+            {
+                throw new ArgumentOutOfRangeException(paramName,
+                    "Value can not be zero or negative");
+            }
+        }
+
+        /// <summary>
+        ///     Guard against a zero or negative <see cref="double" /> argument/parameter value.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <param name="paramName">The parameter's name.</param>
+        /// <exception cref="ArgumentOutOfRangeException ">
+        ///     <paramref name="argument" /> is less than zero.
+        /// </exception>
+        public static void AgainstZeroOrLessArgument(double argument, string paramName)
+        {
+            if (argument <= 0)
+            {
+                throw new ArgumentOutOfRangeException(paramName,
+                    "Value can not be zero or negative");
+            }
+        }
     }
 }
