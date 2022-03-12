@@ -36,8 +36,8 @@ namespace Ncl.Common.Core.Infrastructure
         {
             _maxUndoActions = DefaultMaxUndoRedoActions;
 
-            _undoStack = new LimitedStack<IUndoRedoAction>(_maxUndoActions);
-            _redoStack = new LimitedStack<IUndoRedoAction>(_maxUndoActions);
+            _undoStack = new LimitedStack<IUndoRedoAction>(DefaultMaxUndoRedoActions);
+            _redoStack = new LimitedStack<IUndoRedoAction>(DefaultMaxUndoRedoActions);
         }
 
         /// <summary>
@@ -48,8 +48,8 @@ namespace Ncl.Common.Core.Infrastructure
         {
             _maxUndoActions = maxActionCount;
 
-            _undoStack = new LimitedStack<IUndoRedoAction>(_maxUndoActions);
-            _redoStack = new LimitedStack<IUndoRedoAction>(_maxUndoActions);
+            _undoStack = new LimitedStack<IUndoRedoAction>(maxActionCount);
+            _redoStack = new LimitedStack<IUndoRedoAction>(maxActionCount);
         }
 
         /// <inheritdoc />
@@ -62,6 +62,9 @@ namespace Ncl.Common.Core.Infrastructure
 
         /// <inheritdoc />
         public bool IsAsyncActionOngoing => _asyncTask != null && !_asyncTask.IsCompleted;
+
+        /// <inheritdoc />
+        public bool IsActionExecuting { get; protected set; }
 
         /// <inheritdoc />
         public bool? IsPendingRedoActionAsync =>
@@ -137,16 +140,24 @@ namespace Ncl.Common.Core.Infrastructure
             Guard.AgainstNullArgument(action, nameof(action));
             CheckAsyncTaskInProgress();
 
-            RaiseOnPreActionExecute(ActionServiceExecutionType.Original, action, false);
-
-            action.Execute();
-            if (!IsUndoRedoActionsDisabled)
+            IsActionExecuting = true;
+            try
             {
-                _undoStack.Push(action);
-                ClearRedoStack();
-            }
+                RaiseOnPreActionExecute(ActionServiceExecutionType.Original, action, false);
 
-            RaiseOnPostActionExecute(ActionServiceExecutionType.Original, action, false);
+                action.Execute();
+                if (!IsUndoRedoActionsDisabled)
+                {
+                    _undoStack.Push(action);
+                    ClearRedoStack();
+                }
+
+                RaiseOnPostActionExecute(ActionServiceExecutionType.Original, action, false);
+            }
+            finally
+            {
+                IsActionExecuting = false;
+            }
         }
 
         /// <inheritdoc />
@@ -171,16 +182,24 @@ namespace Ncl.Common.Core.Infrastructure
 
             CheckAsyncTaskInProgress();
 
-            IUndoRedoAction action = _undoStack.Pop();
+            IsActionExecuting = true;
+            try
+            {
+                IUndoRedoAction action = _undoStack.Pop();
 
-            Debug.Assert(action != null);
-            RaiseOnPreActionExecute(ActionServiceExecutionType.Undo, action, false);
+                Debug.Assert(action != null);
+                RaiseOnPreActionExecute(ActionServiceExecutionType.Undo, action, false);
 
-            action.Undo();
-            _redoStack.Push(action);
+                action.Undo();
+                _redoStack.Push(action);
 
-            RaiseOnPostActionExecute(ActionServiceExecutionType.Undo, action, false);
-            return true;
+                RaiseOnPostActionExecute(ActionServiceExecutionType.Undo, action, false);
+                return true;
+            }
+            finally
+            {
+                IsActionExecuting = false;
+            }
         }
 
         /// <inheritdoc />
@@ -204,16 +223,24 @@ namespace Ncl.Common.Core.Infrastructure
 
             CheckAsyncTaskInProgress();
 
-            IUndoRedoAction action = _redoStack.Pop();
+            IsActionExecuting = true;
+            try
+            {
+                IUndoRedoAction action = _redoStack.Pop();
 
-            Debug.Assert(action != null);
-            RaiseOnPreActionExecute(ActionServiceExecutionType.Redo, action, false);
+                Debug.Assert(action != null);
+                RaiseOnPreActionExecute(ActionServiceExecutionType.Redo, action, false);
 
-            action.Redo();
-            _undoStack.Push(action);
+                action.Redo();
+                _undoStack.Push(action);
 
-            RaiseOnPostActionExecute(ActionServiceExecutionType.Redo, action, false);
-            return true;
+                RaiseOnPostActionExecute(ActionServiceExecutionType.Redo, action, false);
+                return true;
+            }
+            finally
+            {
+                IsActionExecuting = false;
+            }
         }
 
         /// <inheritdoc />
@@ -258,16 +285,24 @@ namespace Ncl.Common.Core.Infrastructure
         /// <returns>A <see cref="Task" /> that represents the asynchronous operation.</returns>
         protected async Task ExecuteActionAsyncInternal(IUndoRedoAsynchronousAction action)
         {
-            RaiseOnPreActionExecute(ActionServiceExecutionType.Original, action, true);
-
-            await action.ExecuteAsync();
-            if (!IsUndoRedoActionsDisabled)
+            IsActionExecuting = true;
+            try
             {
-                _undoStack.Push(action);
-                ClearRedoStack();
-            }
+                RaiseOnPreActionExecute(ActionServiceExecutionType.Original, action, true);
 
-            RaiseOnPostActionExecute(ActionServiceExecutionType.Original, action, true);
+                await action.ExecuteAsync();
+                if (!IsUndoRedoActionsDisabled)
+                {
+                    _undoStack.Push(action);
+                    ClearRedoStack();
+                }
+
+                RaiseOnPostActionExecute(ActionServiceExecutionType.Original, action, true);
+            }
+            finally
+            {
+                IsActionExecuting = false;
+            }
         }
 
         /// <summary>
@@ -287,20 +322,31 @@ namespace Ncl.Common.Core.Infrastructure
             if (_undoStack.IsEmpty)
                 return false;
 
+            if (IsPendingUndoActionAsync != true)
+                return null;
+
             IUndoRedoAction action = _undoStack.Pop();
 
             Debug.Assert(action != null);
+            Debug.Assert(action is IUndoRedoAsynchronousAction);
 
-            if (!(action is IUndoRedoAsynchronousAction asyncAction))
-                return null;
+            var asyncAction = (IUndoRedoAsynchronousAction) action;
 
-            RaiseOnPreActionExecute(ActionServiceExecutionType.Undo, action, true);
+            IsActionExecuting = true;
+            try
+            {
+                RaiseOnPreActionExecute(ActionServiceExecutionType.Undo, action, true);
 
-            await asyncAction.UndoAsync();
-            _redoStack.Push(action);
+                await asyncAction.UndoAsync();
+                _redoStack.Push(action);
 
-            RaiseOnPostActionExecute(ActionServiceExecutionType.Undo, action, true);
-            return true;
+                RaiseOnPostActionExecute(ActionServiceExecutionType.Undo, action, true);
+                return true;
+            }
+            finally
+            {
+                IsActionExecuting = false;
+            }
         }
 
         /// <summary>
@@ -320,20 +366,31 @@ namespace Ncl.Common.Core.Infrastructure
             if (_redoStack.IsEmpty)
                 return false;
 
+            if (IsPendingRedoActionAsync != true)
+                return null;
+
             IUndoRedoAction action = _redoStack.Pop();
 
             Debug.Assert(action != null);
+            Debug.Assert(action is IUndoRedoAsynchronousAction);
 
-            if (!(action is IUndoRedoAsynchronousAction asyncAction))
-                return null;
+            var asyncAction = (IUndoRedoAsynchronousAction) action;
 
-            RaiseOnPreActionExecute(ActionServiceExecutionType.Redo, action, true);
+            IsActionExecuting = true;
+            try
+            {
+                RaiseOnPreActionExecute(ActionServiceExecutionType.Redo, action, true);
 
-            await asyncAction.RedoAsync();
-            _redoStack.Push(action);
+                await asyncAction.RedoAsync();
+                _undoStack.Push(action);
 
-            RaiseOnPostActionExecute(ActionServiceExecutionType.Redo, action, true);
-            return true;
+                RaiseOnPostActionExecute(ActionServiceExecutionType.Redo, action, true);
+                return true;
+            }
+            finally
+            {
+                IsActionExecuting = false;
+            }
         }
 
         /// <summary>

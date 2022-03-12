@@ -20,6 +20,11 @@ namespace Ncl.Common.Core.Infrastructure
         string CurrentUndoDescription { get; }
 
         /// <summary>
+        ///     Gets if there is a action currently being executed.
+        /// </summary>
+        bool IsActionExecuting { get; }
+
+        /// <summary>
         ///     Gets if any asynchronous operation is currently ongoing.
         /// </summary>
         bool IsAsyncActionOngoing { get; }
