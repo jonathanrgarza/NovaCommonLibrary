@@ -65,7 +65,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
             }
             catch (ArgumentNullException e)
             {
@@ -139,7 +139,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
             }
             catch (ArgumentNullException e)
             {
@@ -217,7 +217,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(stream, nameof(stream));
+                Guard.AgainstNullArgument(nameof(stream), stream);
             }
             catch (ArgumentNullException e)
             {
@@ -290,7 +290,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(stream, nameof(stream));
+                Guard.AgainstNullArgument(nameof(stream), stream);
             }
             catch (ArgumentNullException e)
             {
@@ -367,7 +367,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(reader, nameof(reader));
+                Guard.AgainstNullArgument(nameof(reader), reader);
             }
             catch (ArgumentNullException e)
             {
@@ -440,7 +440,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(reader, nameof(reader));
+                Guard.AgainstNullArgument(nameof(reader), reader);
             }
             catch (ArgumentNullException e)
             {
@@ -513,7 +513,7 @@ namespace Ncl.Common.Core.Xml
             exception = null;
             try
             {
-                Guard.AgainstNullArgument(reader, nameof(reader));
+                Guard.AgainstNullArgument(nameof(reader), reader);
 
                 Type type = typeof(T);
                 DataContractSerializer dataContractSerializer = settings == null
@@ -581,8 +581,8 @@ namespace Ncl.Common.Core.Xml
             exception = null;
             try
             {
-                Guard.AgainstNullArgument(reader, nameof(reader));
-                Guard.AgainstNullArgument(type, nameof(type));
+                Guard.AgainstNullArgument(nameof(reader), reader);
+                Guard.AgainstNullArgument(nameof(type), type);
 
                 DataContractSerializer dataContractSerializer = settings == null
                     ? new DataContractSerializer(type)
@@ -651,7 +651,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(xmlString, nameof(xmlString));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(xmlString), xmlString);
             }
             catch (ArgumentNullException e)
             {
@@ -726,7 +726,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(xmlString, nameof(xmlString));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(xmlString), xmlString);
             }
             catch (ArgumentNullException e)
             {
@@ -805,7 +805,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
             }
             catch (ArgumentNullException e)
             {
@@ -878,7 +878,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
             }
             catch (ArgumentNullException e)
             {
@@ -947,7 +947,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(stream, nameof(stream));
+                Guard.AgainstNullArgument(nameof(stream), stream);
             }
             catch (ArgumentNullException e)
             {
@@ -1020,7 +1020,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(stream, nameof(stream));
+                Guard.AgainstNullArgument(nameof(stream), stream);
             }
             catch (ArgumentNullException e)
             {
@@ -1089,7 +1089,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(writer, nameof(writer));
+                Guard.AgainstNullArgument(nameof(writer), writer);
             }
             catch (ArgumentNullException e)
             {
@@ -1162,7 +1162,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(writer, nameof(writer));
+                Guard.AgainstNullArgument(nameof(writer), writer);
             }
             catch (ArgumentNullException e)
             {
@@ -1232,8 +1232,8 @@ namespace Ncl.Common.Core.Xml
             exception = null;
             try
             {
-                Guard.AgainstNullArgument(writer, nameof(writer));
-                Guard.AgainstNullArgument(obj, nameof(obj));
+                Guard.AgainstNullArgument(nameof(writer), writer);
+                Guard.AgainstNullArgument(nameof(obj), obj);
 
                 Type type = typeof(T);
 
@@ -1302,9 +1302,9 @@ namespace Ncl.Common.Core.Xml
             exception = null;
             try
             {
-                Guard.AgainstNullArgument(writer, nameof(writer));
-                Guard.AgainstNullArgument(obj, nameof(obj));
-                Guard.AgainstNullArgument(type, nameof(type));
+                Guard.AgainstNullArgument(nameof(writer), writer);
+                Guard.AgainstNullArgument(nameof(obj), obj);
+                Guard.AgainstNullArgument(nameof(type), type);
 
                 DataContractSerializer dataContractSerializer = settings == null
                     ? new DataContractSerializer(type)
@@ -1369,7 +1369,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(obj, nameof(obj));
+                Guard.AgainstNullArgument(nameof(obj), obj);
             }
             catch (ArgumentNullException e)
             {
@@ -1448,7 +1448,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(obj, nameof(obj));
+                Guard.AgainstNullArgument(nameof(obj), obj);
             }
             catch (ArgumentNullException e)
             {
@@ -1499,7 +1499,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
             }
             catch (ArgumentNullException e)
             {
@@ -1545,7 +1545,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
             }
             catch (ArgumentNullException e)
             {
@@ -1595,7 +1595,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(stream, nameof(stream));
+                Guard.AgainstNullArgument(nameof(stream), stream);
             }
             catch (ArgumentNullException e)
             {
@@ -1640,7 +1640,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(stream, nameof(stream));
+                Guard.AgainstNullArgument(nameof(stream), stream);
             }
             catch (ArgumentNullException e)
             {
@@ -1689,7 +1689,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(reader, nameof(reader));
+                Guard.AgainstNullArgument(nameof(reader), reader);
             }
             catch (ArgumentNullException e)
             {
@@ -1734,7 +1734,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(reader, nameof(reader));
+                Guard.AgainstNullArgument(nameof(reader), reader);
             }
             catch (ArgumentNullException e)
             {
@@ -1786,7 +1786,7 @@ namespace Ncl.Common.Core.Xml
             exception = null;
             try
             {
-                Guard.AgainstNullArgument(reader, nameof(reader));
+                Guard.AgainstNullArgument(nameof(reader), reader);
 
                 if (!skipSettingsCheck)
                 {
@@ -1838,8 +1838,8 @@ namespace Ncl.Common.Core.Xml
             exception = null;
             try
             {
-                Guard.AgainstNullArgument(reader, nameof(reader));
-                Guard.AgainstNullArgument(type, nameof(type));
+                Guard.AgainstNullArgument(nameof(reader), reader);
+                Guard.AgainstNullArgument(nameof(type), type);
 
                 if (!skipSettingsCheck)
                 {
@@ -1886,7 +1886,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(xmlString, nameof(xmlString));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(xmlString), xmlString);
             }
             catch (ArgumentNullException e)
             {
@@ -1934,7 +1934,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(xmlString, nameof(xmlString));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(xmlString), xmlString);
             }
             catch (ArgumentNullException e)
             {
@@ -1983,7 +1983,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
             }
             catch (ArgumentNullException e)
             {
@@ -2026,7 +2026,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullOrWhiteSpaceArgument(path, nameof(path));
+                Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
             }
             catch (ArgumentNullException e)
             {
@@ -2069,7 +2069,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(stream, nameof(stream));
+                Guard.AgainstNullArgument(nameof(stream), stream);
             }
             catch (ArgumentNullException e)
             {
@@ -2112,7 +2112,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(stream, nameof(stream));
+                Guard.AgainstNullArgument(nameof(stream), stream);
             }
             catch (ArgumentNullException e)
             {
@@ -2155,7 +2155,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(writer, nameof(writer));
+                Guard.AgainstNullArgument(nameof(writer), writer);
             }
             catch (ArgumentNullException e)
             {
@@ -2198,7 +2198,7 @@ namespace Ncl.Common.Core.Xml
         {
             try
             {
-                Guard.AgainstNullArgument(writer, nameof(writer));
+                Guard.AgainstNullArgument(nameof(writer), writer);
             }
             catch (ArgumentNullException e)
             {
@@ -2242,8 +2242,8 @@ namespace Ncl.Common.Core.Xml
             exception = null;
             try
             {
-                Guard.AgainstNullArgument(writer, nameof(writer));
-                Guard.AgainstNullArgument(obj, nameof(obj));
+                Guard.AgainstNullArgument(nameof(writer), writer);
+                Guard.AgainstNullArgument(nameof(obj), obj);
 
                 Type type = typeof(T);
 
@@ -2280,9 +2280,9 @@ namespace Ncl.Common.Core.Xml
             exception = null;
             try
             {
-                Guard.AgainstNullArgument(writer, nameof(writer));
-                Guard.AgainstNullArgument(obj, nameof(obj));
-                Guard.AgainstNullArgument(type, nameof(type));
+                Guard.AgainstNullArgument(nameof(writer), writer);
+                Guard.AgainstNullArgument(nameof(obj), obj);
+                Guard.AgainstNullArgument(nameof(type), type);
 
                 var xmlSerializer = new XmlSerializer(type);
 
@@ -2318,7 +2318,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(obj, nameof(obj));
+                Guard.AgainstNullArgument(nameof(obj), obj);
             }
             catch (ArgumentNullException e)
             {
@@ -2369,7 +2369,7 @@ namespace Ncl.Common.Core.Xml
 
             try
             {
-                Guard.AgainstNullArgument(obj, nameof(obj));
+                Guard.AgainstNullArgument(nameof(obj), obj);
             }
             catch (ArgumentNullException e)
             {
@@ -2440,7 +2440,7 @@ namespace Ncl.Common.Core.Xml
         /// <exception cref="ArgumentException"><paramref name="settings" /> has <see cref="DtdProcessing" />.Parse value.</exception>
         protected virtual void GuardAgainstInsecureSettings(XmlReaderSettings settings)
         {
-            Guard.AgainstNullArgument(settings, nameof(settings));
+            Guard.AgainstNullArgument(nameof(settings), settings);
 
             if (settings.DtdProcessing == DtdProcessing.Parse)
                 throw new ArgumentException("XML reader settings are not properly secure");

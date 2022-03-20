@@ -14,7 +14,7 @@ namespace Ncl.Common.Core.Events
         /// <param name="executionType">The execution type.</param>
         /// <param name="description">The action's description.</param>
         /// <param name="isAsync">If the action being executed is being performed asynchronously.</param>
-        public ActionExecutionEventArgs(ActionServiceExecutionType executionType, string description, bool isAsync)
+        public ActionExecutionEventArgs(ASExecutionType executionType, string description, bool isAsync)
         {
             ExecutionType = executionType;
             Description = description;
@@ -29,7 +29,7 @@ namespace Ncl.Common.Core.Events
         /// <summary>
         ///     Gets the execution type.
         /// </summary>
-        public ActionServiceExecutionType ExecutionType { get; }
+        public ASExecutionType ExecutionType { get; }
 
         /// <summary>
         ///     Gets if the action being executed is being performed asynchronously.

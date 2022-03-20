@@ -35,7 +35,7 @@ namespace Ncl.Common.Wpf.Preferences
         /// <exception cref="InvalidOperationException">An assembly name could not be found.</exception>
         public WindowsPreferenceService(IXmlSerializationService xmlSerializationService, string defaultDirectory)
         {
-            Guard.AgainstNullArgument(defaultDirectory, nameof(defaultDirectory));
+            Guard.AgainstNullArgument(nameof(defaultDirectory), defaultDirectory);
 
             XmlSerializationService = xmlSerializationService;
             DefaultDirectory = defaultDirectory;

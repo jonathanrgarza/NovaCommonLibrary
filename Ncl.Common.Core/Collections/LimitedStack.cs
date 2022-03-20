@@ -46,7 +46,7 @@ namespace Ncl.Common.Core.Collections
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxCapacity" /> is negative.</exception>
         public LimitedStack(int maxCapacity)
         {
-            Guard.AgainstNegativeArgument(maxCapacity, nameof(maxCapacity));
+            Guard.AgainstNegativeArgument(nameof(maxCapacity), maxCapacity);
             _maxCapacity = maxCapacity;
         }
 
@@ -101,7 +101,7 @@ namespace Ncl.Common.Core.Collections
                 if (_maxCapacity == value)
                     return;
 
-                Guard.AgainstNegativeArgument(value, nameof(MaxCapacity));
+                Guard.AgainstNegativeArgument(nameof(MaxCapacity), value);
 
                 _maxCapacity = value;
                 PerformResize();
@@ -189,7 +189,7 @@ namespace Ncl.Common.Core.Collections
         /// <exception cref="ArgumentNullException"><paramref name="collection" /> is <see langword="null" />.</exception>
         public void PushRange(ICollection<T> collection)
         {
-            Guard.AgainstNullArgument(collection, nameof(collection));
+            Guard.AgainstNullArgument(nameof(collection), collection);
 
             if (collection.Count == 0)
                 return;

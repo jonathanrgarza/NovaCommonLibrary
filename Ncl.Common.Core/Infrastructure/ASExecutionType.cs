@@ -1,9 +1,9 @@
 ﻿namespace Ncl.Common.Core.Infrastructure
 {
     /// <summary>
-    ///     The execution type of the current action.
+    ///     The execution type of the current action, for use with an Action Service (AS).
     /// </summary>
-    public enum ActionServiceExecutionType
+    public enum ASExecutionType
     {
         Original,
         Undo,

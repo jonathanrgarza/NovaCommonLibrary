@@ -18,7 +18,7 @@ namespace Ncl.Common.Core.Infrastructure
         public const int DefaultMaxUndoRedoActions = 25;
 
         /// <summary>
-        ///     The value which represents a
+        ///     The value which represents a unlimited undo/redo actions.
         /// </summary>
         public const int UnlimitedUndoRedoActions = -1;
 
@@ -44,12 +44,15 @@ namespace Ncl.Common.Core.Infrastructure
         ///     Initializes a new instance of <see cref="ActionService" />.
         /// </summary>
         /// <param name="maxActionCount">The maximum number of undo and redo actions.</param>
-        public ActionService(int maxActionCount)
+        public ActionService(int maxActionCount) : this()
         {
+            Guard.AgainstNegativeArgumentExceptOne(nameof(maxActionCount), maxActionCount);
             _maxUndoActions = maxActionCount;
 
-            _undoStack = new LimitedStack<IUndoRedoAction>(maxActionCount);
-            _redoStack = new LimitedStack<IUndoRedoAction>(maxActionCount);
+            int convertedMax = GetMaxCapacityFromMaxUndoAction(maxActionCount);
+            _undoStack = new LimitedStack<IUndoRedoAction>(convertedMax);
+            _redoStack = new LimitedStack<IUndoRedoAction>(convertedMax);
+
         }
 
         /// <inheritdoc />
@@ -99,22 +102,16 @@ namespace Ncl.Common.Core.Infrastructure
                 if (_maxUndoActions == value)
                     return;
 
+                Guard.AgainstNegativeArgumentExceptOne(nameof(MaxUndoActions), value);
                 CheckAsyncTaskInProgress();
 
                 _maxUndoActions = value;
 
-                int convertedMax = value;
-                switch (value)
+                int convertedMax = GetMaxCapacityFromMaxUndoAction(value);
+
+                if (value == 0)
                 {
-                    case UnlimitedUndoRedoActions:
-                        convertedMax = LimitedStack<IUndoRedoAction>.UnlimitedCapacity;
-                        break;
-                    case 0:
-                        ClearStacks();
-                        //Set to min capacity that is not zero (as that means unlimited capacity)
-                        _undoStack.MaxCapacity = 1;
-                        _redoStack.MaxCapacity = 1;
-                        return;
+                    ClearStacks();
                 }
 
                 _undoStack.MaxCapacity = convertedMax;
@@ -137,13 +134,13 @@ namespace Ncl.Common.Core.Infrastructure
         /// <inheritdoc />
         public void ExecuteAction(IUndoRedoAction action)
         {
-            Guard.AgainstNullArgument(action, nameof(action));
+            Guard.AgainstNullArgument(nameof(action), action);
             CheckAsyncTaskInProgress();
 
             IsActionExecuting = true;
             try
             {
-                RaiseOnPreActionExecute(ActionServiceExecutionType.Original, action, false);
+                RaiseOnPreActionExecute(ASExecutionType.Original, action, false);
 
                 action.Execute();
                 if (!IsUndoRedoActionsDisabled)
@@ -152,7 +149,7 @@ namespace Ncl.Common.Core.Infrastructure
                     ClearRedoStack();
                 }
 
-                RaiseOnPostActionExecute(ActionServiceExecutionType.Original, action, false);
+                RaiseOnPostActionExecute(ASExecutionType.Original, action, false);
             }
             finally
             {
@@ -163,7 +160,7 @@ namespace Ncl.Common.Core.Infrastructure
         /// <inheritdoc />
         public Task ExecuteActionAsync(IUndoRedoAsynchronousAction action)
         {
-            Guard.AgainstNullArgument(action, nameof(action));
+            Guard.AgainstNullArgument(nameof(action), action);
             CheckAsyncTaskInProgress();
 
             Task asyncTask = ExecuteActionAsyncInternal(action);
@@ -188,12 +185,12 @@ namespace Ncl.Common.Core.Infrastructure
                 IUndoRedoAction action = _undoStack.Pop();
 
                 Debug.Assert(action != null);
-                RaiseOnPreActionExecute(ActionServiceExecutionType.Undo, action, false);
+                RaiseOnPreActionExecute(ASExecutionType.Undo, action, false);
 
                 action.Undo();
                 _redoStack.Push(action);
 
-                RaiseOnPostActionExecute(ActionServiceExecutionType.Undo, action, false);
+                RaiseOnPostActionExecute(ASExecutionType.Undo, action, false);
                 return true;
             }
             finally
@@ -229,12 +226,12 @@ namespace Ncl.Common.Core.Infrastructure
                 IUndoRedoAction action = _redoStack.Pop();
 
                 Debug.Assert(action != null);
-                RaiseOnPreActionExecute(ActionServiceExecutionType.Redo, action, false);
+                RaiseOnPreActionExecute(ASExecutionType.Redo, action, false);
 
                 action.Redo();
                 _undoStack.Push(action);
 
-                RaiseOnPostActionExecute(ActionServiceExecutionType.Redo, action, false);
+                RaiseOnPostActionExecute(ASExecutionType.Redo, action, false);
                 return true;
             }
             finally
@@ -288,7 +285,7 @@ namespace Ncl.Common.Core.Infrastructure
             IsActionExecuting = true;
             try
             {
-                RaiseOnPreActionExecute(ActionServiceExecutionType.Original, action, true);
+                RaiseOnPreActionExecute(ASExecutionType.Original, action, true);
 
                 await action.ExecuteAsync();
                 if (!IsUndoRedoActionsDisabled)
@@ -297,7 +294,7 @@ namespace Ncl.Common.Core.Infrastructure
                     ClearRedoStack();
                 }
 
-                RaiseOnPostActionExecute(ActionServiceExecutionType.Original, action, true);
+                RaiseOnPostActionExecute(ASExecutionType.Original, action, true);
             }
             finally
             {
@@ -335,12 +332,12 @@ namespace Ncl.Common.Core.Infrastructure
             IsActionExecuting = true;
             try
             {
-                RaiseOnPreActionExecute(ActionServiceExecutionType.Undo, action, true);
+                RaiseOnPreActionExecute(ASExecutionType.Undo, action, true);
 
                 await asyncAction.UndoAsync();
                 _redoStack.Push(action);
 
-                RaiseOnPostActionExecute(ActionServiceExecutionType.Undo, action, true);
+                RaiseOnPostActionExecute(ASExecutionType.Undo, action, true);
                 return true;
             }
             finally
@@ -379,12 +376,12 @@ namespace Ncl.Common.Core.Infrastructure
             IsActionExecuting = true;
             try
             {
-                RaiseOnPreActionExecute(ActionServiceExecutionType.Redo, action, true);
+                RaiseOnPreActionExecute(ASExecutionType.Redo, action, true);
 
                 await asyncAction.RedoAsync();
                 _undoStack.Push(action);
 
-                RaiseOnPostActionExecute(ActionServiceExecutionType.Redo, action, true);
+                RaiseOnPostActionExecute(ASExecutionType.Redo, action, true);
                 return true;
             }
             finally
@@ -399,7 +396,7 @@ namespace Ncl.Common.Core.Infrastructure
         /// <param name="type">The execution type.</param>
         /// <param name="action">The action.</param>
         /// <param name="isAsync">If the action is being executed async.</param>
-        protected virtual void RaiseOnPreActionExecute(ActionServiceExecutionType type, IUndoRedoAction action,
+        protected virtual void RaiseOnPreActionExecute(ASExecutionType type, IUndoRedoAction action,
             bool isAsync)
         {
             if (OnPreActionExecute == null)
@@ -414,7 +411,7 @@ namespace Ncl.Common.Core.Infrastructure
         /// <param name="type">The execution type.</param>
         /// <param name="action">The action.</param>
         /// <param name="isAsync">If the action is being executed async.</param>
-        protected virtual void RaiseOnPostActionExecute(ActionServiceExecutionType type, IUndoRedoAction action,
+        protected virtual void RaiseOnPostActionExecute(ASExecutionType type, IUndoRedoAction action,
             bool isAsync)
         {
             if (OnPostActionExecute == null)
@@ -423,19 +420,47 @@ namespace Ncl.Common.Core.Infrastructure
             OnPostActionExecute.Invoke(this, eventArgs);
         }
 
-        protected static ActionExecutionEventArgs GetActionExecutionEventArgs(ActionServiceExecutionType type,
+        /// <summary>
+        ///     Gets the max capacity value from a max undo action value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The max capacity value.</returns>
+        protected static int GetMaxCapacityFromMaxUndoAction(int value)
+        {
+            int convertedMax = value;
+            switch (value)
+            {
+                case UnlimitedUndoRedoActions:
+                    convertedMax = LimitedStack<IUndoRedoAction>.UnlimitedCapacity;
+                    break;
+                case 0:
+                    //Set to min capacity that is not zero (as that means unlimited capacity)
+                    convertedMax = 1;
+                    break;
+            }
+
+            return convertedMax;
+        }
+
+        protected void CheckAsyncTaskInProgress()
+        {
+            if (_asyncTask != null && !_asyncTask.IsCompleted)
+                throw new InvalidOperationException("An asynchronous operation is already in progress");
+        }
+
+        protected static ActionExecutionEventArgs GetActionExecutionEventArgs(ASExecutionType type,
             IUndoRedoAction action, bool isAsync)
         {
             string description;
             switch (type)
             {
-                case ActionServiceExecutionType.Original:
+                case ASExecutionType.Original:
                     description = action.Description;
                     break;
-                case ActionServiceExecutionType.Undo:
+                case ASExecutionType.Undo:
                     description = action.UndoDescription;
                     break;
-                case ActionServiceExecutionType.Redo:
+                case ASExecutionType.Redo:
                     description = action.RedoDescription;
                     break;
                 default:
@@ -444,12 +469,6 @@ namespace Ncl.Common.Core.Infrastructure
 
             var eventArgs = new ActionExecutionEventArgs(type, description, isAsync);
             return eventArgs;
-        }
-
-        protected void CheckAsyncTaskInProgress()
-        {
-            if (_asyncTask != null && !_asyncTask.IsCompleted)
-                throw new InvalidOperationException("An asynchronous operation is already in progress");
         }
     }
 }

@@ -592,7 +592,7 @@ namespace Ncl.Common.Core.Preferences
         /// <param name="newValue">The new value.</param>
         protected void RaisePreferenceChanged(Type prefType, IPreference oldValue, IPreference newValue)
         {
-            Guard.AgainstNullArgument(prefType, nameof(prefType));
+            Guard.AgainstNullArgument(nameof(prefType), prefType);
 
             if (EqualityComparer<IPreference>.Default.Equals(oldValue, newValue))
                 return;
@@ -682,7 +682,7 @@ namespace Ncl.Common.Core.Preferences
             /// <param name="instance">The instance to copy.</param>
             public PreferenceSaveInfo(PreferenceSaveInfo instance)
             {
-                Guard.AgainstNullArgument(instance, nameof(instance));
+                Guard.AgainstNullArgument(nameof(instance), instance);
                 _preference = instance._preference;
                 _savePath = instance._savePath;
                 IsDirty = instance.IsDirty;
