@@ -149,6 +149,8 @@ namespace Ncl.Common.Core.Collections
 
             LimitedStackNode<T> currentHead = _head;
             LimitedStackNode<T> lastElement = currentHead._next;
+
+            // Create the new head
             var newHead = new LimitedStackNode<T>(this, value)
             {
                 _next = currentHead,
@@ -156,13 +158,15 @@ namespace Ncl.Common.Core.Collections
             };
 
             lastElement._next = newHead;
-
             currentHead._prev = newHead;
+
             if (count == 1)
             {
                 //The head's previous element was pointing to itself
                 currentHead._next = newHead;
             }
+
+            _head = newHead;
 
             count++;
             _version++;
@@ -170,7 +174,7 @@ namespace Ncl.Common.Core.Collections
             int maxCapacity = MaxCapacity;
             if (maxCapacity != UnlimitedCapacity && count > maxCapacity)
             {
-                RemoveLastNode(false);
+                RemoveLastNode();
                 return;
             }
 
@@ -219,7 +223,6 @@ namespace Ncl.Common.Core.Collections
             Debug.Assert(newHead != null && currentNode != null);
 
             LimitedStackNode<T> oldHead = _head;
-            LimitedStackNode<T> lastNode = oldHead._next;
             if (oldHead == null)
             {
                 _head = newHead;
@@ -228,18 +231,13 @@ namespace Ncl.Common.Core.Collections
                 return;
             }
 
+            LimitedStackNode<T> lastNode = oldHead._next;
+
             int maxCapacity = MaxCapacity;
             if (!EnsureEnoughRoom(count))
             {
                 oldHead = _head;
-                if (oldHead == null)
-                {
-                    _head = newHead;
-                    Count = count;
-                    _version++;
-                    return;
-                }
-
+                Debug.Assert(oldHead != null);
                 lastNode = oldHead._next;
             }
 
@@ -249,9 +247,10 @@ namespace Ncl.Common.Core.Collections
             lastNode._next = newHead;
             newHead._prev = lastNode;
 
+            _head = newHead;
             Count += count;
             _version++;
-            Debug.Assert(Count <= maxCapacity);
+            Debug.Assert(IsUnlimitedCapacity || Count <= maxCapacity);
         }
 
         /// <summary>
@@ -380,25 +379,11 @@ namespace Ncl.Common.Core.Collections
             return currentHead;
         }
 
-        private void RemoveLastNode(bool decrementCount)
+        private void RemoveLastNode()
         {
             if (_head == null)
             {
                 Debug.Fail("_head should not be null when trying to remove last node");
-                return;
-            }
-
-            if (Count == 1)
-            {
-                _head.Invalidate();
-                _head = null;
-                if (decrementCount)
-                {
-                    Count = 0;
-                }
-
-                _version++;
-
                 return;
             }
 
@@ -410,11 +395,6 @@ namespace Ncl.Common.Core.Collections
             nextLastNode._next = headNode;
 
             lastNode.Invalidate();
-
-            if (decrementCount)
-            {
-                Count--;
-            }
 
             _version++;
         }
@@ -472,7 +452,7 @@ namespace Ncl.Common.Core.Collections
                 return;
 
             //Resize
-            RemoveLastNodes(maxCapacity - count);
+            RemoveLastNodes(count - maxCapacity);
         }
 
         private void GenerateNodesFromEnumerable(IEnumerable<T> enumerable, out int count, out LimitedStackNode<T> head,
@@ -544,7 +524,7 @@ namespace Ncl.Common.Core.Collections
             if (totalCount <= maxCapacity)
                 return true;
 
-            RemoveLastNodes(maxCapacity - totalCount);
+            RemoveLastNodes(totalCount - maxCapacity);
             return false;
         }
 
@@ -622,9 +602,7 @@ namespace Ncl.Common.Core.Collections
                 get
                 {
                     if (_index < 0)
-                    {
-                        ThrowEnumerationNotStartedOrEnded();
-                    }
+                        ThrowEnumerationNotStartedOrEnded(); //No braces on purpose
 
                     return _currentElement.Value;
                 }
