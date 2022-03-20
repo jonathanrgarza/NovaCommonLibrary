@@ -40,7 +40,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void CsvStreamWriter_WithNullStream_ShouldThrowException()
+        public void CsvStreamWriter_WithNullStream_ShouldThrowArgumentNullException()
         {
             // Arrange
 
@@ -55,7 +55,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void CsvStreamWriter_WithInvalidSeparator_ShouldThrowException()
+        public void CsvStreamWriter_WithInvalidSeparator_ShouldThrowArgumentException()
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
@@ -84,7 +84,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void CsvStreamWriter1_WithNullStream_ShouldThrowException()
+        public void CsvStreamWriter1_WithNullStream_ShouldThrowArgumentNullException()
         {
             // Arrange
 
@@ -99,7 +99,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void CsvStreamWriter1_WithInvalidSeparator_ShouldThrowException()
+        public void CsvStreamWriter1_WithInvalidSeparator_ShouldThrowArgumentException()
         {
             // Arrange
             using StreamWriter stream = GetDefaultStreamWriter();
@@ -115,7 +115,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void CsvStreamWriter2_WithNullString_ShouldThrowException()
+        public void CsvStreamWriter2_WithNullString_ShouldThrowArgumentNullException()
         {
             // Arrange
             // Act
@@ -129,7 +129,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void CsvStreamWriter2_WithInvalidSeparator_ShouldThrowException()
+        public void CsvStreamWriter2_WithInvalidSeparator_ShouldThrowArgumentException()
         {
             // Arrange
             // Act
@@ -156,7 +156,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Create_WithNullStream_ShouldThrowException()
+        public void Create_WithNullStream_ShouldThrowArgumentNullException()
         {
             // Arrange
             // Act
@@ -170,7 +170,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Create_WithInvalidSeparator_ShouldThrowException()
+        public void Create_WithInvalidSeparator_ShouldThrowArgumentException()
         {
             // Arrange
             using MemoryStream stream = GetDefaultStream();
@@ -350,7 +350,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Create2_WithNullStream_ShouldThrowException()
+        public void Create2_WithNullStream_ShouldThrowArgumentNullException()
         {
             // Arrange
             // Act
@@ -364,7 +364,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Create2_WithInvalidSeparator_ShouldThrowException()
+        public void Create2_WithInvalidSeparator_ShouldThrowArgumentException()
         {
             // Arrange
             using StreamWriter stream = GetDefaultStreamWriter();
@@ -531,7 +531,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Create4_WithNullString_ShouldThrowException()
+        public void Create4_WithNullString_ShouldThrowArgumentNullException()
         {
             // Arrange
             // Act
@@ -545,7 +545,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Create4_WithInvalidSeparator_ShouldThrowException()
+        public void Create4_WithInvalidSeparator_ShouldThrowArgumentException()
         {
             // Arrange
             // Act
@@ -915,7 +915,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void Flush_WithDisposedStream_ShouldThrowException()
+        public void Flush_WithDisposedStream_ShouldThrowObjectDisposedException()
         {
             static void TestCode()
             {
@@ -931,6 +931,23 @@ namespace Ncl.Common.Csv.Tests
 
             // Assert
             Assert.Throws<ObjectDisposedException>(TestCode);
+        }
+
+        [Fact]
+        public void Flush_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            CsvStreamWriter csvStream = GetBlockingInstance();
+            _ = csvStream.WriteFieldAsync(ValidField);
+
+            void TestCode()
+            {
+                // Act
+                _ = csvStream.Flush();
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
         }
 
         [Fact]
@@ -953,7 +970,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public async Task FlushAsync_WithDisposedStream_ShouldThrowException()
+        public async Task FlushAsync_WithDisposedStream_ShouldThrowObjectDisposedException()
         {
             static async Task TestCode()
             {
@@ -969,6 +986,23 @@ namespace Ncl.Common.Csv.Tests
 
             // Assert
             await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
+        }
+
+        [Fact]
+        public async Task FlushAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            CsvStreamWriter csvStream = GetBlockingInstance();
+            _ = csvStream.WriteFieldAsync(ValidField);
+
+            async Task TestCode()
+            {
+                // Act
+                await csvStream.FlushAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
 
         [Fact]
@@ -1019,7 +1053,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void WriteHeader_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        public void WriteHeader_WithValidHeaderAfterFirstRow_ShouldThrowInvalidOperationException()
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -1030,6 +1064,23 @@ namespace Ncl.Common.Csv.Tests
             void TestCode()
             {
                 csvStream.WriteHeader(ValidHeader);
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
+        }
+
+        [Fact]
+        public void WriteHeader_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            CsvStreamWriter csvStream = GetBlockingInstance();
+            _ = csvStream.WriteHeaderAsync(ValidHeader);
+
+            void TestCode()
+            {
+                // Act
+                _ = csvStream.WriteHeader(ValidHeader);
             }
 
             // Assert
@@ -1083,7 +1134,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public async Task WriteHeaderAsync_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        public async Task WriteHeaderAsync_WithValidHeaderAfterFirstRow_ShouldThrowInvalidOperationException()
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -1102,9 +1153,26 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
+        public async Task WriteHeaderAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            CsvStreamWriter csvStream = GetBlockingInstance();
+            _ = csvStream.WriteHeaderAsync(ValidHeader);
+
+            async Task TestCode()
+            {
+                // Act
+                await csvStream.WriteHeaderAsync(ValidHeader);
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
+        }
+
+        [Fact]
         public void WriteHeaders_WithValidStrings_ShouldWriteHeaderEntries()
         {
-            string expected = $"{ValidHeader},{ValidHeader}";
+            const string expected = $"{ValidHeader},{ValidHeader}";
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
@@ -1148,7 +1216,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void WriteHeaders_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        public void WriteHeaders_WithValidHeaderAfterFirstRow_ShouldThrowInvalidOperationException()
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -1211,7 +1279,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public async Task WriteHeadersAsync_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        public async Task WriteHeadersAsync_WithValidHeaderAfterFirstRow_ShouldThrowInvalidOperationException()
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -1338,7 +1406,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void WriteHeaders2_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        public void WriteHeaders2_WithValidHeaderAfterFirstRow_ShouldThrowInvalidOperationException()
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -1464,7 +1532,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public async Task WriteHeadersAsync2_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        public async Task WriteHeadersAsync2_WithValidHeaderAfterFirstRow_ShouldThrowInvalidOperationException()
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -1528,7 +1596,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void WriteHeaderRow_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        public void WriteHeaderRow_WithValidHeaderAfterFirstRow_ShouldThrowInvalidOperationException()
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -1591,7 +1659,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public async Task WriteHeaderRowAsync_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        public async Task WriteHeaderRowAsync_WithValidHeaderAfterFirstRow_ShouldThrowInvalidOperationException()
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -1718,7 +1786,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void WriteHeaderRow2_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        public void WriteHeaderRow2_WithValidHeaderAfterFirstRow_ShouldThrowInvalidOperationException()
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -1844,7 +1912,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public async Task WriteHeaderRowAsync2_WithValidHeaderAfterFirstRow_ShouldThrowException()
+        public async Task WriteHeaderRowAsync2_WithValidHeaderAfterFirstRow_ShouldThrowInvalidOperationException()
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
@@ -1879,7 +1947,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void WriteRowEnd_WithDisposedStream_ShouldThrowException()
+        public void WriteRowEnd_WithDisposedStream_ShouldThrowObjectDisposedException()
         {
             // Act
             static void TestCode()
@@ -2032,7 +2100,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public async Task WriteRowEndAsync_WithNoFieldsWritten_ShouldThrowIntegrityException()
+        public async Task WriteRowEndAsync_WithNoFieldsWritten_ShouldThrowIntegrityViolatedException()
         {
             // Act
             static async Task TestCode()
@@ -2050,7 +2118,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public async Task WriteRowEndAsync_WithDisposedStream_ShouldThrowException()
+        public async Task WriteRowEndAsync_WithDisposedStream_ShouldThrowObjectDisposedException()
         {
             // Act
             static async Task TestCode()
@@ -2269,7 +2337,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public void WriteField_WithValidHeaderButStreamDisposed_ShouldThrowException()
+        public void WriteField_WithValidHeaderButStreamDisposed_ShouldThrowObjectDisposedException()
         {
             //Act
             static void TestCode()
@@ -2284,6 +2352,23 @@ namespace Ncl.Common.Csv.Tests
 
             // Assert
             Assert.Throws<ObjectDisposedException>(TestCode);
+        }
+
+        [Fact]
+        public void WriteField_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            CsvStreamWriter csvStream = GetBlockingInstance();
+            _ = csvStream.WriteFieldAsync(ValidField);
+
+            void TestCode()
+            {
+                // Act
+                _ = csvStream.WriteField(ValidField);
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
         }
 
         [Fact]
@@ -2353,7 +2438,7 @@ namespace Ncl.Common.Csv.Tests
         }
 
         [Fact]
-        public async Task WriteFieldAsync_WithValidHeaderButStreamDisposed_ShouldThrowException()
+        public async Task WriteFieldAsync_WithValidHeaderButStreamDisposed_ShouldThrowObjectDisposedException()
         {
             //Act
             static async Task TestCode()
@@ -2368,6 +2453,23 @@ namespace Ncl.Common.Csv.Tests
 
             // Assert
             await Assert.ThrowsAsync<ObjectDisposedException>(TestCode);
+        }
+
+        [Fact]
+        public async Task WriteFieldAsync_WithAsyncOperationRunning_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            CsvStreamWriter csvStream = GetBlockingInstance();
+            _ = csvStream.WriteFieldAsync(ValidField);
+
+            async Task TestCode()
+            {
+                // Act
+                await csvStream.WriteFieldAsync(ValidField);
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
 
         [Fact]
@@ -2661,7 +2763,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteField4_WithIncompleteHeaderRowValidFieldValue_ShouldWriteFieldOnNewRow()
         {
@@ -2765,7 +2867,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task WriteFieldAsync4_WithIncompleteHeaderRowValidFieldValue_ShouldWriteFieldOnNewRow()
         {
@@ -2885,7 +2987,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void WriteField5_WithIncompleteHeaderRowValidFieldValue_ShouldWriteFieldOnNewRow()
         {
@@ -2988,7 +3090,7 @@ namespace Ncl.Common.Csv.Tests
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public async Task WriteFieldAsync5_WithIncompleteHeaderRowValidFieldValue_ShouldWriteFieldOnNewRow()
         {
@@ -4033,6 +4135,14 @@ namespace Ncl.Common.Csv.Tests
                 integrityMode: integrityMode);
         }
 
+        private static CsvStreamWriter GetBlockingInstance(IntegrityMode integrityMode = IntegrityMode.Strict)
+        {
+            return new CsvStreamWriter(GetBlockingStream(),
+                    formatProvider: _englishUsCulture,
+                    integrityMode: integrityMode)
+                { AutoFlush = true }; // Must AutoFlush here as CsvStreamWriter will perform the Flush asynchronously
+        }
+
         private static StreamWriter GetDefaultStreamWriter()
         {
             return new StreamWriter(GetDefaultStream()) { AutoFlush = true };
@@ -4044,9 +4154,21 @@ namespace Ncl.Common.Csv.Tests
             return new StreamWriter(underlyingStream) { AutoFlush = true };
         }
 
+        private static StreamWriter GetBlockingStreamWriter()
+        {
+            return
+                new StreamWriter(
+                    GetBlockingStream()); // Do not AutoFlush here, as it seems to not perform the Flush asynchronously
+        }
+
         private static MemoryStream GetDefaultStream()
         {
             return new MemoryStream();
+        }
+
+        private static BlockingStream GetBlockingStream()
+        {
+            return new BlockingStream();
         }
     }
 }

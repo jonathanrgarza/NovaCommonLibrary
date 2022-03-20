@@ -68,8 +68,9 @@ namespace Ncl.Common.Core.Infrastructure
         bool IsUnlimitedUndoRedoActions { get; }
 
         /// <summary>
-        ///     Gets/Sets the maximum undo action kept.
+        ///     Gets/Sets the maximum undo/redo actions kept.
         /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="value"/> is less than -1.</exception>
         int MaxUndoActions { get; set; }
 
         /// <summary>
@@ -120,7 +121,7 @@ namespace Ncl.Common.Core.Infrastructure
         /// <exception cref="InvalidOperationException">
         ///     The <see cref="ActionService" /> is currently in use by a previous action operation.
         /// </exception>
-        bool PerformUndo();
+        bool Undo();
 
         /// <summary>
         ///     Executes the pending undo action's undo operation, asynchronously.
@@ -134,7 +135,7 @@ namespace Ncl.Common.Core.Infrastructure
         /// <exception cref="InvalidOperationException">
         ///     The <see cref="ActionService" /> is currently in use by a previous action operation.
         /// </exception>
-        Task<bool?> PerformUndoAsync();
+        Task<bool?> UndoAsync();
 
         /// <summary>
         ///     Executes the pending redo action's redo operation.
@@ -143,7 +144,7 @@ namespace Ncl.Common.Core.Infrastructure
         /// <exception cref="InvalidOperationException">
         ///     The <see cref="ActionService" /> is currently in use by a previous action operation.
         /// </exception>
-        bool PerformRedo();
+        bool Redo();
 
         /// <summary>
         ///     Executes the pending redo action's redo operation, asynchronously.
@@ -157,7 +158,7 @@ namespace Ncl.Common.Core.Infrastructure
         /// <exception cref="InvalidOperationException">
         ///     The <see cref="ActionService" /> is currently in use by a previous action operation.
         /// </exception>
-        Task<bool?> PerformRedoAsync();
+        Task<bool?> RedoAsync();
 
         /// <summary>
         ///     Clears the redo stack.

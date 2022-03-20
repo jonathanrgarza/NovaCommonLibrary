@@ -44,6 +44,7 @@ namespace Ncl.Common.Core.Infrastructure
         ///     Initializes a new instance of <see cref="ActionService" />.
         /// </summary>
         /// <param name="maxActionCount">The maximum number of undo and redo actions.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxActionCount" /> is less than -1.</exception>
         public ActionService(int maxActionCount) : this()
         {
             Guard.AgainstNegativeArgumentExceptOne(nameof(maxActionCount), maxActionCount);
@@ -52,7 +53,6 @@ namespace Ncl.Common.Core.Infrastructure
             int convertedMax = GetMaxCapacityFromMaxUndoAction(maxActionCount);
             _undoStack = new LimitedStack<IUndoRedoAction>(convertedMax);
             _redoStack = new LimitedStack<IUndoRedoAction>(convertedMax);
-
         }
 
         /// <inheritdoc />
@@ -104,6 +104,7 @@ namespace Ncl.Common.Core.Infrastructure
 
                 Guard.AgainstNegativeArgumentExceptOne(nameof(MaxUndoActions), value);
                 CheckAsyncTaskInProgress();
+                CheckActionExecuting();
 
                 _maxUndoActions = value;
 
@@ -136,6 +137,7 @@ namespace Ncl.Common.Core.Infrastructure
         {
             Guard.AgainstNullArgument(nameof(action), action);
             CheckAsyncTaskInProgress();
+            CheckActionExecuting();
 
             IsActionExecuting = true;
             try
@@ -148,13 +150,13 @@ namespace Ncl.Common.Core.Infrastructure
                     _undoStack.Push(action);
                     ClearRedoStack();
                 }
-
-                RaiseOnPostActionExecute(ASExecutionType.Original, action, false);
             }
             finally
             {
                 IsActionExecuting = false;
             }
+
+            RaiseOnPostActionExecute(ASExecutionType.Original, action, false);
         }
 
         /// <inheritdoc />
@@ -162,6 +164,7 @@ namespace Ncl.Common.Core.Infrastructure
         {
             Guard.AgainstNullArgument(nameof(action), action);
             CheckAsyncTaskInProgress();
+            CheckActionExecuting();
 
             Task asyncTask = ExecuteActionAsyncInternal(action);
             _asyncTask = asyncTask;
@@ -169,7 +172,7 @@ namespace Ncl.Common.Core.Infrastructure
         }
 
         /// <inheritdoc />
-        public bool PerformUndo()
+        public bool Undo()
         {
             if (IsUndoRedoActionsDisabled)
                 return false;
@@ -178,39 +181,42 @@ namespace Ncl.Common.Core.Infrastructure
                 return false;
 
             CheckAsyncTaskInProgress();
+            CheckActionExecuting();
 
             IsActionExecuting = true;
+            IUndoRedoAction action;
             try
             {
-                IUndoRedoAction action = _undoStack.Pop();
+                action = _undoStack.Pop();
 
                 Debug.Assert(action != null);
                 RaiseOnPreActionExecute(ASExecutionType.Undo, action, false);
 
                 action.Undo();
                 _redoStack.Push(action);
-
-                RaiseOnPostActionExecute(ASExecutionType.Undo, action, false);
-                return true;
             }
             finally
             {
                 IsActionExecuting = false;
             }
+
+            RaiseOnPostActionExecute(ASExecutionType.Undo, action, false);
+            return true;
         }
 
         /// <inheritdoc />
-        public Task<bool?> PerformUndoAsync()
+        public Task<bool?> UndoAsync()
         {
             CheckAsyncTaskInProgress();
+            CheckActionExecuting();
 
-            Task<bool?> asyncTask = PerformUndoAsyncInternal();
+            Task<bool?> asyncTask = UndoAsyncInternal();
             _asyncTask = asyncTask;
             return asyncTask;
         }
 
         /// <inheritdoc />
-        public bool PerformRedo()
+        public bool Redo()
         {
             if (IsUndoRedoActionsDisabled)
                 return false;
@@ -219,33 +225,36 @@ namespace Ncl.Common.Core.Infrastructure
                 return false;
 
             CheckAsyncTaskInProgress();
+            CheckActionExecuting();
 
             IsActionExecuting = true;
+            IUndoRedoAction action;
             try
             {
-                IUndoRedoAction action = _redoStack.Pop();
+                action = _redoStack.Pop();
 
                 Debug.Assert(action != null);
                 RaiseOnPreActionExecute(ASExecutionType.Redo, action, false);
 
                 action.Redo();
                 _undoStack.Push(action);
-
-                RaiseOnPostActionExecute(ASExecutionType.Redo, action, false);
-                return true;
             }
             finally
             {
                 IsActionExecuting = false;
             }
+
+            RaiseOnPostActionExecute(ASExecutionType.Redo, action, false);
+            return true;
         }
 
         /// <inheritdoc />
-        public Task<bool?> PerformRedoAsync()
+        public Task<bool?> RedoAsync()
         {
             CheckAsyncTaskInProgress();
+            CheckActionExecuting();
 
-            Task<bool?> asyncTask = PerformRedoAsyncInternal();
+            Task<bool?> asyncTask = RedoAsyncInternal();
             _asyncTask = asyncTask;
             return asyncTask;
         }
@@ -293,13 +302,13 @@ namespace Ncl.Common.Core.Infrastructure
                     _undoStack.Push(action);
                     ClearRedoStack();
                 }
-
-                RaiseOnPostActionExecute(ASExecutionType.Original, action, true);
             }
             finally
             {
                 IsActionExecuting = false;
             }
+
+            RaiseOnPostActionExecute(ASExecutionType.Original, action, true);
         }
 
         /// <summary>
@@ -311,7 +320,7 @@ namespace Ncl.Common.Core.Infrastructure
         ///     <see langword="false" /> if there was not one available and <see langword="null" /> if
         ///     the pending undo action does not support asynchronous undo.
         /// </returns>
-        protected async Task<bool?> PerformUndoAsyncInternal()
+        protected async Task<bool?> UndoAsyncInternal()
         {
             if (IsUndoRedoActionsDisabled)
                 return false;
@@ -336,14 +345,14 @@ namespace Ncl.Common.Core.Infrastructure
 
                 await asyncAction.UndoAsync();
                 _redoStack.Push(action);
-
-                RaiseOnPostActionExecute(ASExecutionType.Undo, action, true);
-                return true;
             }
             finally
             {
                 IsActionExecuting = false;
             }
+
+            RaiseOnPostActionExecute(ASExecutionType.Undo, action, true);
+            return true;
         }
 
         /// <summary>
@@ -355,7 +364,7 @@ namespace Ncl.Common.Core.Infrastructure
         ///     <see langword="false" /> if there was not one available and <see langword="null" /> if
         ///     the pending redo action does not support asynchronous redo.
         /// </returns>
-        protected async Task<bool?> PerformRedoAsyncInternal()
+        protected async Task<bool?> RedoAsyncInternal()
         {
             if (IsUndoRedoActionsDisabled)
                 return false;
@@ -380,14 +389,14 @@ namespace Ncl.Common.Core.Infrastructure
 
                 await asyncAction.RedoAsync();
                 _undoStack.Push(action);
-
-                RaiseOnPostActionExecute(ASExecutionType.Redo, action, true);
-                return true;
             }
             finally
             {
                 IsActionExecuting = false;
             }
+
+            RaiseOnPostActionExecute(ASExecutionType.Redo, action, true);
+            return true;
         }
 
         /// <summary>
@@ -440,6 +449,12 @@ namespace Ncl.Common.Core.Infrastructure
             }
 
             return convertedMax;
+        }
+
+        protected void CheckActionExecuting()
+        {
+            if (IsActionExecuting)
+                throw new InvalidOperationException("An action's execution is already in progress");
         }
 
         protected void CheckAsyncTaskInProgress()
