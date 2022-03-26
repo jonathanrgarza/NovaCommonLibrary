@@ -911,6 +911,697 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             Assert.Throws<InvalidOperationException>(TestCode);
         }
 
+        [Fact]
+        public void Undo_WithNoUndoActionsBuffered_ShouldDoNothing()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+
+            // Act
+            instance.Undo();
+
+            // Assert
+            Assert.True(instance.IsRedoBufferEmpty);
+        }
+
+        [Fact]
+        public void Undo_WithUndoRedoActionsDisabled_ShouldDoNothing()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            instance.MaxUndoActions = 0;
+
+            // Act
+            instance.Undo();
+
+            // Assert
+            Assert.True(instance.IsRedoBufferEmpty);
+        }
+
+        [Fact]
+        public void Undo_WithPendingUndoAction_ShouldExecuteAction()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetGenericAction(TestCode);
+            bool didExecute = false;
+            instance.ExecuteAction(action);
+            didExecute = false; //Reset to false after execute
+
+            void TestCode()
+            {
+                didExecute = true;
+            }
+
+            // Act
+            instance.Undo();
+
+            // Assert
+            Assert.True(didExecute);
+        }
+
+        [Fact]
+        public void Undo_WithPendingUndoAction_ShouldAddActionToRedo()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAction();
+            instance.ExecuteAction(action);
+
+            // Act
+            instance.Undo();
+
+            // Assert
+            Assert.False(instance.IsRedoBufferEmpty);
+        }
+
+        [Fact]
+        public void Undo_WithPendingUndoAction_ShouldRaiseOnPreActionExecute()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAction();
+            instance.ExecuteAction(action);
+
+            void TestCode()
+            {
+                // Act
+                instance.Undo();
+            }
+
+            // Assert
+            Assert.Raises<ActionExecutionEventArgs>(
+                handler => instance.OnPreActionExecute += handler,
+                handler => instance.OnPreActionExecute -= handler,
+                TestCode);
+        }
+
+        [Fact]
+        public void Undo_WithPendingUndoAction_ShouldRaiseOnPostActionExecute()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAction();
+            instance.ExecuteAction(action);
+
+            void TestCode()
+            {
+                // Act
+                instance.Undo();
+            }
+
+            // Assert
+            Assert.Raises<ActionExecutionEventArgs>(
+                handler => instance.OnPostActionExecute += handler,
+                handler => instance.OnPostActionExecute -= handler,
+                TestCode);
+        }
+
+        [Fact]
+        public void Undo_WithPendingUndoAction_ShouldResetIsActionExecutingOnException()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetGenericAction(() => { }, () => throw new Exception("test exception"));
+            instance.ExecuteAction(action);
+
+            void TestCode()
+            {
+                // Act
+                instance.Undo();
+            }
+
+            // Assert
+            Assert.Throws<Exception>(TestCode);
+            Assert.False(instance.IsActionExecuting);
+        }
+
+        [Fact]
+        public void Undo_WithOngoingAsyncAction_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAsynchronousAction action = GetBlockingAsyncAction();
+            instance.ExecuteAction(action);
+            instance.ExecuteActionAsync(action);
+
+            void TestCode()
+            {
+                // Act
+                instance.Undo();
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
+        }
+
+        [Fact]
+        public async Task UndoAsync_WithNoUndoActionsBuffered_ShouldDoNothing()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+
+            // Act
+            await instance.UndoAsync();
+
+            // Assert
+            Assert.True(instance.IsRedoBufferEmpty);
+        }
+
+        [Fact]
+        public async Task UndoAsync_WithUndoRedoActionsDisabled_ShouldDoNothing()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            instance.MaxUndoActions = 0;
+
+            // Act
+            await instance.UndoAsync();
+
+            // Assert
+            Assert.True(instance.IsRedoBufferEmpty);
+        }
+
+        [Fact]
+        public async Task UndoAsync_WithPendingUndoAsyncAction_ShouldExecuteAction()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetGenericAsyncAction(TestCode);
+            bool didExecute = false;
+            instance.ExecuteAction(action);
+            didExecute = false; //Reset to false after execute
+
+            Task TestCode()
+            {
+                didExecute = true;
+                return Task.CompletedTask;
+            }
+
+            // Act
+            await instance.UndoAsync();
+
+            // Assert
+            Assert.True(didExecute);
+        }
+
+        [Fact]
+        public async Task UndoAsync_WithPendingNonAsyncUndoAction_ShouldDoNothing()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetGenericAction(TestCode);
+            bool didExecute = false;
+            instance.ExecuteAction(action);
+            didExecute = false; //Reset to false after execute
+
+            void TestCode()
+            {
+                didExecute = true;
+            }
+
+            // Act
+            await instance.UndoAsync();
+
+            // Assert
+            Assert.False(didExecute);
+        }
+
+        [Fact]
+        public async Task UndoAsync_WithPendingUndoAsyncAction_ShouldAddActionToRedo()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAsyncAction();
+            instance.ExecuteAction(action);
+
+            // Act
+            await instance.UndoAsync();
+
+            // Assert
+            Assert.False(instance.IsRedoBufferEmpty);
+        }
+
+        [Fact]
+        public async Task UndoAsync_WithPendingUndoAsyncAction_ShouldRaiseOnPreActionExecute()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAsyncAction();
+            instance.ExecuteAction(action);
+
+            async Task TestCode()
+            {
+                // Act
+                await instance.UndoAsync();
+            }
+
+            // Assert
+            await Assert.RaisesAsync<ActionExecutionEventArgs>(
+                handler => instance.OnPreActionExecute += handler,
+                handler => instance.OnPreActionExecute -= handler,
+                TestCode);
+        }
+
+        [Fact]
+        public async Task UndoAsync_WithPendingUndoAsyncAction_ShouldRaiseOnPostActionExecute()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAsyncAction();
+            instance.ExecuteAction(action);
+
+            async Task TestCode()
+            {
+                // Act
+                await instance.UndoAsync();
+            }
+
+            // Assert
+            await Assert.RaisesAsync<ActionExecutionEventArgs>(
+                handler => instance.OnPostActionExecute += handler,
+                handler => instance.OnPostActionExecute -= handler,
+                TestCode);
+        }
+
+        [Fact]
+        public async Task UndoAsync_WithPendingUndoAsyncAction_ShouldResetIsActionExecutingOnException()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action =
+                GetGenericAsyncAction(() => Task.CompletedTask, () => throw new Exception("test exception"));
+            instance.ExecuteAction(action);
+
+            async Task TestCode()
+            {
+                // Act
+                await instance.UndoAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<Exception>(TestCode);
+            Assert.False(instance.IsActionExecuting);
+        }
+
+        [Fact]
+        public async Task UndoAsync_WithOngoingAsyncAction_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAsynchronousAction action = GetBlockingAsyncAction();
+            instance.ExecuteAction(action);
+#pragma warning disable CS4014
+            instance.ExecuteActionAsync(action);
+#pragma warning restore CS4014
+
+            async Task TestCode()
+            {
+                // Act
+                await instance.UndoAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
+        }
+
+        [Fact]
+        public void Redo_WithNoRedoActionsBuffered_ShouldDoNothing()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+
+            // Act
+            instance.Redo();
+
+            // Assert
+            Assert.True(instance.IsUndoBufferEmpty);
+        }
+
+        [Fact]
+        public void Redo_WithUndoRedoActionsDisabled_ShouldDoNothing()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            instance.MaxUndoActions = 0;
+
+            // Act
+            instance.Redo();
+
+            // Assert
+            Assert.True(instance.IsUndoBufferEmpty);
+        }
+
+        [Fact]
+        public void Redo_WithPendingRedoAction_ShouldExecuteAction()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetGenericAction(TestCode);
+            bool didExecute = false;
+            instance.ExecuteAction(action);
+            instance.Undo();
+            didExecute = false; //Reset to false after execute
+
+            void TestCode()
+            {
+                didExecute = true;
+            }
+
+            // Act
+            instance.Redo();
+
+            // Assert
+            Assert.True(didExecute);
+        }
+
+        [Fact]
+        public void Redo_WithPendingRedoAction_ShouldAddActionToUndo()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAction();
+            instance.ExecuteAction(action);
+            instance.Undo();
+
+            // Act
+            instance.Redo();
+
+            // Assert
+            Assert.False(instance.IsUndoBufferEmpty);
+        }
+
+        [Fact]
+        public void Redo_WithPendingRedoAction_ShouldRaiseOnPreActionExecute()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAction();
+            instance.ExecuteAction(action);
+            instance.Undo();
+
+            void TestCode()
+            {
+                // Act
+                instance.Redo();
+            }
+
+            // Assert
+            Assert.Raises<ActionExecutionEventArgs>(
+                handler => instance.OnPreActionExecute += handler,
+                handler => instance.OnPreActionExecute -= handler,
+                TestCode);
+        }
+
+        [Fact]
+        public void Redo_WithPendingRedoAction_ShouldRaiseOnPostActionExecute()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAction();
+            instance.ExecuteAction(action);
+            instance.Undo();
+
+            void TestCode()
+            {
+                // Act
+                instance.Redo();
+            }
+
+            // Assert
+            Assert.Raises<ActionExecutionEventArgs>(
+                handler => instance.OnPostActionExecute += handler,
+                handler => instance.OnPostActionExecute -= handler,
+                TestCode);
+        }
+
+        [Fact]
+        public void Redo_WithPendingRedoAction_ShouldResetIsActionExecutingOnException()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action =
+                GetGenericAction(() => { }, redoAction: () => throw new Exception("test exception"));
+            instance.ExecuteAction(action);
+            instance.Undo();
+
+            void TestCode()
+            {
+                // Act
+                instance.Redo();
+            }
+
+            // Assert
+            Assert.Throws<Exception>(TestCode);
+            Assert.False(instance.IsActionExecuting);
+        }
+
+        [Fact]
+        public void Redo_WithOngoingAsyncAction_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAsynchronousAction action = GetBlockingAsyncAction();
+            instance.ExecuteAction(action);
+            instance.Undo();
+            instance.ExecuteActionAsync(action);
+
+            void TestCode()
+            {
+                // Act
+                instance.Redo();
+            }
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(TestCode);
+        }
+
+        [Fact]
+        public async Task UndoAsync_WithNoRedoActionsBuffered_ShouldDoNothing()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+
+            // Act
+            await instance.RedoAsync();
+
+            // Assert
+            Assert.True(instance.IsUndoBufferEmpty);
+        }
+
+        [Fact]
+        public async Task RedoAsync_WithUndoRedoActionsDisabled_ShouldDoNothing()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            instance.MaxUndoActions = 0;
+
+            // Act
+            await instance.RedoAsync();
+
+            // Assert
+            Assert.True(instance.IsUndoBufferEmpty);
+        }
+
+        [Fact]
+        public async Task RedoAsync_WithPendingRedoAsyncAction_ShouldExecuteAction()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetGenericAsyncAction(TestCode);
+            bool didExecute = false;
+            instance.ExecuteAction(action);
+            instance.Undo();
+            didExecute = false; //Reset to false after execute
+
+            Task TestCode()
+            {
+                didExecute = true;
+                return Task.CompletedTask;
+            }
+
+            // Act
+            await instance.RedoAsync();
+
+            // Assert
+            Assert.True(didExecute);
+        }
+
+        [Fact]
+        public async Task RedoAsync_WithPendingNonAsyncRedoAction_ShouldDoNothing()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetGenericAction(TestCode);
+            bool didExecute = false;
+            instance.ExecuteAction(action);
+            instance.Undo();
+            didExecute = false; //Reset to false after execute
+
+            void TestCode()
+            {
+                didExecute = true;
+            }
+
+            // Act
+            await instance.RedoAsync();
+
+            // Assert
+            Assert.False(didExecute);
+        }
+
+        [Fact]
+        public async Task RedoAsync_WithPendingRedoAsyncAction_ShouldAddActionToUndo()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAsyncAction();
+            instance.ExecuteAction(action);
+            instance.Undo();
+
+            // Act
+            await instance.RedoAsync();
+
+            // Assert
+            Assert.False(instance.IsUndoBufferEmpty);
+        }
+
+        [Fact]
+        public async Task RedoAsync_WithPendingRedoAsyncAction_ShouldRaiseOnPreActionExecute()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAsyncAction();
+            instance.ExecuteAction(action);
+            instance.Undo();
+
+            async Task TestCode()
+            {
+                // Act
+                await instance.RedoAsync();
+            }
+
+            // Assert
+            await Assert.RaisesAsync<ActionExecutionEventArgs>(
+                handler => instance.OnPreActionExecute += handler,
+                handler => instance.OnPreActionExecute -= handler,
+                TestCode);
+        }
+
+        [Fact]
+        public async Task RedoAsync_WithPendingRedoAsyncAction_ShouldRaiseOnPostActionExecute()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAsyncAction();
+            instance.ExecuteAction(action);
+            instance.Undo();
+
+            async Task TestCode()
+            {
+                // Act
+                await instance.RedoAsync();
+            }
+
+            // Assert
+            await Assert.RaisesAsync<ActionExecutionEventArgs>(
+                handler => instance.OnPostActionExecute += handler,
+                handler => instance.OnPostActionExecute -= handler,
+                TestCode);
+        }
+
+        [Fact]
+        public async Task RedoAsync_WithPendingRedoAsyncAction_ShouldResetIsActionExecutingOnException()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetGenericAsyncAction(() => Task.CompletedTask,
+                redoAction: () => throw new Exception("test exception"));
+            instance.ExecuteAction(action);
+            instance.Undo();
+
+            async Task TestCode()
+            {
+                // Act
+                await instance.RedoAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<Exception>(TestCode);
+            Assert.False(instance.IsActionExecuting);
+        }
+
+        [Fact]
+        public async Task RedoAsync_WithOngoingAsyncAction_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAsynchronousAction action = GetBlockingAsyncAction();
+            instance.ExecuteAction(action);
+            instance.Undo();
+#pragma warning disable CS4014
+            instance.ExecuteActionAsync(action);
+#pragma warning restore CS4014
+
+            async Task TestCode()
+            {
+                // Act
+                await instance.RedoAsync();
+            }
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
+        }
+
+        [Fact]
+        public void ClearUndoStack_WithPopulatedUndoStack_ShouldClearUndoStack()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAction();
+            instance.ExecuteAction(action);
+
+            // Act
+            instance.ClearUndoStack();
+
+            // Assert
+            Assert.True(instance.IsUndoBufferEmpty);
+        }
+
+        [Fact]
+        public void ClearRedoStack_WithPopulatedRedoStack_ShouldClearRedoStack()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAction();
+            instance.ExecuteAction(action);
+            instance.Undo();
+
+            // Act
+            instance.ClearRedoStack();
+
+            // Assert
+            Assert.True(instance.IsRedoBufferEmpty);
+        }
+
+        [Fact]
+        public void ClearStacks_WithPopulatedStacks_ShouldClearStacks()
+        {
+            // Arrange
+            ActionService instance = GetDefaultInstance();
+            IUndoRedoAction action = GetDefaultSimpleAction();
+            instance.ExecuteAction(action);
+            instance.ExecuteAction(action);
+            instance.Undo();
+
+            // Act
+            instance.ClearStacks();
+
+            // Assert
+            Assert.True(instance.IsUndoBufferEmpty);
+            Assert.True(instance.IsRedoBufferEmpty);
+        }
+
         private static ActionService GetDefaultInstance()
         {
             return new ActionService();
