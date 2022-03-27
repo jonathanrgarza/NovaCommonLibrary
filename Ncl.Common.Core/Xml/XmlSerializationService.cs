@@ -66,15 +66,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (FileStream reader = File.OpenRead(path))
                 using (var xmlReader = XmlReader.Create(reader, xmlSettings))
@@ -140,15 +132,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (FileStream reader = File.OpenRead(path))
                 using (var xmlReader = XmlReader.Create(reader, xmlSettings))
@@ -218,15 +202,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(stream), stream);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (var xmlReader = XmlReader.Create(stream, xmlSettings))
                 {
@@ -291,15 +267,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(stream), stream);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (var xmlReader = XmlReader.Create(stream, xmlSettings))
                 {
@@ -368,15 +336,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(reader), reader);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (var xmlReader = XmlReader.Create(reader, xmlSettings))
                 {
@@ -441,15 +401,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(reader), reader);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (var xmlReader = XmlReader.Create(reader, xmlSettings))
                 {
@@ -652,15 +604,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullOrWhiteSpaceArgument(nameof(xmlString), xmlString);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
 
                 using (var stringReader = new StringReader(xmlString))
@@ -727,15 +671,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullOrWhiteSpaceArgument(nameof(xmlString), xmlString);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
 
                 using (var stringReader = new StringReader(xmlString))
@@ -806,15 +742,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(path, xmlSettings))
                 {
@@ -879,15 +807,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(path, xmlSettings))
                 {
@@ -948,15 +868,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(stream), stream);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(stream, xmlSettings))
                 {
@@ -1021,15 +933,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(stream), stream);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(stream, xmlSettings))
                 {
@@ -1090,15 +994,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(writer), writer);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(writer, xmlSettings))
                 {
@@ -1163,15 +1059,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(writer), writer);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(writer, xmlSettings))
                 {
@@ -1370,15 +1258,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(obj), obj);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
 
                 using (var stringWriter = new StringWriter())
@@ -1449,15 +1329,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(obj), obj);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
 
                 using (var stringWriter = new StringWriter())
@@ -1500,15 +1372,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (FileStream reader = File.OpenRead(path))
                 using (var xmlReader = XmlReader.Create(reader, xmlSettings))
@@ -1546,15 +1410,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (FileStream reader = File.OpenRead(path))
                 using (var xmlReader = XmlReader.Create(reader, xmlSettings))
@@ -1596,15 +1452,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(stream), stream);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (var xmlReader = XmlReader.Create(stream, xmlSettings))
                 {
@@ -1641,15 +1489,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(stream), stream);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (var xmlReader = XmlReader.Create(stream, xmlSettings))
                 {
@@ -1690,15 +1530,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(reader), reader);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (var xmlReader = XmlReader.Create(reader, xmlSettings))
                 {
@@ -1735,15 +1567,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(reader), reader);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
                 using (var xmlReader = XmlReader.Create(reader, xmlSettings))
                 {
@@ -1935,15 +1759,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullOrWhiteSpaceArgument(nameof(xmlString), xmlString);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlReaderSettings xmlSettings = GetSecureXmlReaderSettings();
 
                 using (var stringReader = new StringReader(xmlString))
@@ -1984,15 +1800,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(path, xmlSettings))
                 {
@@ -2027,15 +1835,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullOrWhiteSpaceArgument(nameof(path), path);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(path, xmlSettings))
                 {
@@ -2070,15 +1870,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(stream), stream);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(stream, xmlSettings))
                 {
@@ -2113,15 +1905,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(stream), stream);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(stream, xmlSettings))
                 {
@@ -2156,15 +1940,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(writer), writer);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(writer, xmlSettings))
                 {
@@ -2199,15 +1975,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(writer), writer);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
                 using (var xmlWriter = XmlWriter.Create(writer, xmlSettings))
                 {
@@ -2319,15 +2087,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(obj), obj);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
 
                 using (var stringWriter = new StringWriter())
@@ -2370,15 +2130,7 @@ namespace Ncl.Common.Core.Xml
             try
             {
                 Guard.AgainstNullArgument(nameof(obj), obj);
-            }
-            catch (ArgumentNullException e)
-            {
-                exception = e;
-                return false;
-            }
 
-            try
-            {
                 XmlWriterSettings xmlSettings = GetXmlWriterSettings();
 
                 using (var stringWriter = new StringWriter())
