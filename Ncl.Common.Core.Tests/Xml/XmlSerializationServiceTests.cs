@@ -111,7 +111,106 @@ namespace Ncl.Common.Core.Tests.Xml
             Assert.Throws<SerializationException>(TestCode);
         }
 
-        //
+        [Fact]
+        public void TryWriteObject_WithDefaultInstance_ShouldWriteXmlContentToStream()
+        {
+            // Arrange
+            var stream = new MemoryStream();
+            XmlSerializationService instance = GetInstance();
+            XmlDataContractStub dataInstance = GetDataContractDataInstance();
+
+            // Act
+            _ = instance.TryWriteObject(stream, dataInstance);
+            string actual = StringUtility.GetStringFromStream(stream);
+
+            // Assert
+            Assert.Equal(XmlDataContractStub.ExpectedDefaultXml, actual);
+        }
+
+        [Fact]
+        public void TryWriteObject_WithDefaultInstance_ShouldReturnTrue()
+        {
+            // Arrange
+            var stream = new MemoryStream();
+            XmlSerializationService instance = GetInstance();
+            XmlDataContractStub dataInstance = GetDataContractDataInstance();
+
+            // Act
+            bool actual = instance.TryWriteObject(stream, dataInstance);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public void TryWriteObject_WithNullStream_ShouldReturnFalse()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+            XmlDataContractStub dataInstance = GetDataContractDataInstance();
+
+            // Act
+            bool actual = instance.TryWriteObject((Stream) null, dataInstance);
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryWriteObject_WithNullValue_ShouldThrowArgumentNullException()
+        {
+            // Arrange
+            var stream = new MemoryStream();
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryWriteObject(stream, (object) null);
+            
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryReadObject_WithDefaultInstance_ShouldDeserializeObjectFromStream()
+        {
+            // Arrange
+            Stream stream = GetDataContractDataXmlStream();
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryReadObject<XmlDataContractStub>(stream, out _);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public void TryReadObject_WithNullStream_ShouldThrowArgumentNullException()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryReadObject<XmlDataContractStub>((Stream) null, out _);
+            
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryReadObject_WithInvalidXmlStream_ShouldThrowSerializationException()
+        {
+            // Arrange
+            Stream stream = GetInvalidDataContractDataXmlStream();
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryReadObject<XmlDataContractStub>(stream, out _);
+            
+            // Assert
+            Assert.False(actual);
+        }
+        
         [Fact]
         public void Serialize_WithDefaultInstance_ShouldWriteXmlContentToStream()
         {
@@ -227,6 +326,286 @@ namespace Ncl.Common.Core.Tests.Xml
 
             // Assert
             Assert.Throws<ArgumentException>(TestCode);
+        }
+
+        //////
+        [Fact]
+        public void TrySerialize_WithDefaultInstance_ShouldWriteXmlContentToStream()
+        {
+            // Arrange
+            var stream = new MemoryStream();
+            XmlSerializationService instance = GetInstance();
+            XmlSerializerStub dataInstance = GetXmlSerializerDataInstance();
+
+            // Act
+            _ = instance.TrySerialize(stream, dataInstance);
+            string actual = StringUtility.GetStringFromStream(stream);
+
+            // Assert
+            Assert.Equal(XmlSerializerStub.ExpectedDefaultXml, actual);
+        }
+
+        [Fact]
+        public void TrySerialize_WithDefaultInstance_ShouldReturnTrue()
+        {
+            // Arrange
+            var stream = new MemoryStream();
+            XmlSerializationService instance = GetInstance();
+            XmlSerializerStub dataInstance = GetXmlSerializerDataInstance();
+
+            // Act
+            bool actual = instance.TrySerialize(stream, dataInstance);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public void TrySerialize_WithNullStream_ShouldReturnFalse()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+            XmlSerializerStub dataInstance = GetXmlSerializerDataInstance();
+
+            //Act
+            bool actual = instance.TrySerialize((Stream) null, dataInstance);
+            
+            //Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TrySerialize_WithNullValue_ShouldReturnFalse()
+        {
+            // Arrange
+            var stream = new MemoryStream();
+            XmlSerializationService instance = GetInstance();
+
+            //Act
+            bool actual = instance.TrySerialize(stream, (object) null);
+
+            //Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryDeserialize_WithDefaultInstance_ShouldDeserializeObjectFromStream()
+        {
+            // Arrange
+            Stream stream = GetXmlSerializerDataXmlStream();
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            _ = instance.TryDeserialize(stream, out XmlSerializerStub actual);
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(DefaultIdValue, actual.Id);
+        }
+
+        [Fact]
+        public void TryDeserialize_WithDefaultInstance_ShouldReturnTrue()
+        {
+            // Arrange
+            Stream stream = GetXmlSerializerDataXmlStream();
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryDeserialize<XmlSerializerStub>(stream, out _);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public void TryDeserialize_WithNullStream_ShouldReturnFalse()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryDeserialize<XmlSerializerStub>((Stream) null, out _);
+            
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryDeserialize_WithInvalidXmlStream_ShouldReturnFalse()
+        {
+            // Arrange
+            Stream stream = GetInvalidXmlSerializerDataXmlStream();
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryDeserialize<XmlSerializerStub>(stream, out _);
+            
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryDeserialize_WithInsecureSettings_ShouldReturnFalse()
+        {
+            // Arrange
+            Stream stream = GetXmlSerializerDataXmlStream();
+            var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Parse };
+            var xmlReader = XmlReader.Create(stream, settings);
+            XmlSerializationService instance = GetInstance();
+            
+            // Act
+            bool actual = instance.TryDeserialize<XmlSerializerStub>(xmlReader, out _);
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void SerializeToString_WithDefaultInstance_ShouldWriteXmlContentToStream()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+            XmlSerializerStub dataInstance = GetXmlSerializerDataInstance();
+
+            // Act
+            string actual = instance.SerializeToString(dataInstance);
+
+            // Assert
+            Assert.Equal(XmlSerializerStub.ExpectedDefaultXml, actual);
+        }
+
+        [Fact]
+        public void SerializeToString_WithNullValue_ShouldThrowArgumentNullException()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+
+            void TestCode()
+            {
+                // Act
+                instance.SerializeToString((object) null);
+            }
+
+            // Assert
+            Assert.Throws<ArgumentNullException>(TestCode);
+        }
+
+        [Fact]
+        public void DeserializeFromString_WithDefaultString_ShouldDeserializeObjectFromStream()
+        {
+            // Arrange
+            const string xmlString = XmlSerializerStub.ExpectedDefaultXml;
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            var actual = instance.DeserializeFromString<XmlSerializerStub>(xmlString);
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(DefaultIdValue, actual.Id);
+        }
+
+        [Fact]
+        public void DeserializeFromString_WithInvalidXmlString_ShouldThrowXmlException()
+        {
+            // Arrange
+            const string xmlString = XmlSerializerStub.InvalidXml;
+            XmlSerializationService instance = GetInstance();
+
+            void TestCode()
+            {
+                // Act
+                _ = instance.DeserializeFromString<XmlSerializerStub>(xmlString);
+            }
+
+            // Assert
+            Assert.Throws<XmlException>(TestCode);
+        }
+
+        [Fact]
+        public void TrySerializeToString_WithDefaultInstance_ShouldWriteXmlContentToStream()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+            XmlSerializerStub dataInstance = GetXmlSerializerDataInstance();
+
+            // Act
+            _ = instance.TrySerializeToString(dataInstance, out string actual);
+
+            // Assert
+            Assert.Equal(XmlSerializerStub.ExpectedDefaultXml, actual);
+        }
+
+        [Fact]
+        public void TrySerializeToString_WithDefaultInstance_ShouldReturnTrue()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+            XmlSerializerStub dataInstance = GetXmlSerializerDataInstance();
+
+            // Act
+            bool actual = instance.TrySerializeToString(dataInstance, out _);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public void TrySerializeToString_WithNullValue_ShouldReturnFalse()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+
+            //Act
+            bool actual = instance.TrySerializeToString((object) null, out _);
+
+            //Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryDeserializeFromString_WithDefaultString_ShouldDeserializeObjectFromStream()
+        {
+            // Arrange
+            const string xmlString = XmlSerializerStub.ExpectedDefaultXml;
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            _ = instance.TryDeserializeFromString(xmlString, out XmlSerializerStub actual);
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(DefaultIdValue, actual.Id);
+        }
+
+        [Fact]
+        public void TryDeserializeFromString_WithDefaultString_ShouldReturnTrue()
+        {
+            // Arrange
+            const string xmlString = XmlSerializerStub.ExpectedDefaultXml;
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryDeserializeFromString<XmlSerializerStub>(xmlString, out _);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public void TryDeserializeFromString_WithInvalidXmlString_ShouldReturnFalse()
+        {
+            // Arrange
+            const string xmlString = XmlSerializerStub.InvalidXml;
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryDeserializeFromString<XmlSerializerStub>(xmlString, out _);
+
+            // Assert
+            Assert.False(actual);
         }
 
         //Utility functions
