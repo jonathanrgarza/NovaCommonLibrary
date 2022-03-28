@@ -165,7 +165,7 @@ namespace Ncl.Common.Core.Tests.Xml
 
             // Act
             bool actual = instance.TryWriteObject(stream, (object) null);
-            
+
             // Assert
             Assert.False(actual);
         }
@@ -192,7 +192,7 @@ namespace Ncl.Common.Core.Tests.Xml
 
             // Act
             bool actual = instance.TryReadObject<XmlDataContractStub>((Stream) null, out _);
-            
+
             // Assert
             Assert.False(actual);
         }
@@ -206,11 +206,142 @@ namespace Ncl.Common.Core.Tests.Xml
 
             // Act
             bool actual = instance.TryReadObject<XmlDataContractStub>(stream, out _);
-            
+
             // Assert
             Assert.False(actual);
         }
-        
+
+        [Fact]
+        public void WriteObjectToString_WithDefaultInstance_ShouldReturnXmlString()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+            XmlDataContractStub dataInstance = GetDataContractDataInstance();
+
+            // Act
+            string actual = instance.WriteObjectToString(dataInstance);
+
+            // Assert
+            Assert.Equal(XmlDataContractStub.ExpectedDefaultXmlUtf16, actual);
+        }
+
+        [Fact]
+        public void WriteObjectToString_WithNullValue_ShouldThrowArgumentNullException()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+
+            void TestCode()
+            {
+                // Act
+                instance.WriteObjectToString((object) null);
+            }
+
+            // Assert
+            Assert.Throws<ArgumentNullException>(TestCode);
+        }
+
+        [Fact]
+        public void ReadObjectFromString_WithDefaultXmlString_ShouldDeserializeObjectFromString()
+        {
+            // Arrange
+            const string xmlString = XmlDataContractStub.ExpectedDefaultXml;
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            var actual = instance.ReadObjectFromString<XmlDataContractStub>(xmlString);
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(DefaultIdValue, actual.Id);
+        }
+
+        [Fact]
+        public void ReadObjectFromString_WithInvalidXmlStream_ShouldThrowSerializationException()
+        {
+            // Arrange
+            const string xmlString = XmlDataContractStub.InvalidXml;
+            XmlSerializationService instance = GetInstance();
+
+            void TestCode()
+            {
+                // Act
+                _ = instance.ReadObjectFromString<XmlDataContractStub>(xmlString);
+            }
+
+            // Assert
+            Assert.Throws<SerializationException>(TestCode);
+        }
+
+        [Fact]
+        public void TryWriteObjectToString_WithDefaultInstance_ShouldReturnXmlContentAsString()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+            XmlDataContractStub dataInstance = GetDataContractDataInstance();
+
+            // Act
+            _ = instance.TryWriteObjectToString(dataInstance, out string actual);
+
+            // Assert
+            Assert.Equal(XmlDataContractStub.ExpectedDefaultXmlUtf16, actual);
+        }
+
+        [Fact]
+        public void TryWriteObjectToString_WithDefaultInstance_ShouldReturnTrue()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+            XmlDataContractStub dataInstance = GetDataContractDataInstance();
+
+            // Act
+            bool actual = instance.TryWriteObjectToString(dataInstance, out _);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public void TryWriteObjectToString_WithNullValue_ShouldThrowArgumentNullException()
+        {
+            // Arrange
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryWriteObjectToString((object) null, out _);
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void TryReadObjectFromString_WithDefaultInstance_ShouldDeserializeObjectFromString()
+        {
+            // Arrange
+            const string xmlString = XmlDataContractStub.ExpectedDefaultXml;
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryReadObjectFromString<XmlDataContractStub>(xmlString, out _);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public void TryReadObjectFromString_WithInvalidXmlString_ShouldThrowSerializationException()
+        {
+            // Arrange
+            const string xmlString = XmlDataContractStub.InvalidXml;
+            XmlSerializationService instance = GetInstance();
+
+            // Act
+            bool actual = instance.TryReadObject<XmlDataContractStub>(xmlString, out _);
+
+            // Assert
+            Assert.False(actual);
+        }
+
         [Fact]
         public void Serialize_WithDefaultInstance_ShouldWriteXmlContentToStream()
         {
@@ -328,7 +459,6 @@ namespace Ncl.Common.Core.Tests.Xml
             Assert.Throws<ArgumentException>(TestCode);
         }
 
-        //////
         [Fact]
         public void TrySerialize_WithDefaultInstance_ShouldWriteXmlContentToStream()
         {
@@ -369,7 +499,7 @@ namespace Ncl.Common.Core.Tests.Xml
 
             //Act
             bool actual = instance.TrySerialize((Stream) null, dataInstance);
-            
+
             //Assert
             Assert.False(actual);
         }
@@ -425,7 +555,7 @@ namespace Ncl.Common.Core.Tests.Xml
 
             // Act
             bool actual = instance.TryDeserialize<XmlSerializerStub>((Stream) null, out _);
-            
+
 
             // Assert
             Assert.False(actual);
@@ -440,7 +570,7 @@ namespace Ncl.Common.Core.Tests.Xml
 
             // Act
             bool actual = instance.TryDeserialize<XmlSerializerStub>(stream, out _);
-            
+
 
             // Assert
             Assert.False(actual);
@@ -454,7 +584,7 @@ namespace Ncl.Common.Core.Tests.Xml
             var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Parse };
             var xmlReader = XmlReader.Create(stream, settings);
             XmlSerializationService instance = GetInstance();
-            
+
             // Act
             bool actual = instance.TryDeserialize<XmlSerializerStub>(xmlReader, out _);
 
@@ -463,7 +593,7 @@ namespace Ncl.Common.Core.Tests.Xml
         }
 
         [Fact]
-        public void SerializeToString_WithDefaultInstance_ShouldWriteXmlContentToStream()
+        public void SerializeToString_WithDefaultInstance_ShouldReturnXmlContentAsString()
         {
             // Arrange
             XmlSerializationService instance = GetInstance();
@@ -473,7 +603,7 @@ namespace Ncl.Common.Core.Tests.Xml
             string actual = instance.SerializeToString(dataInstance);
 
             // Assert
-            Assert.Equal(XmlSerializerStub.ExpectedDefaultXml, actual);
+            Assert.Equal(XmlSerializerStub.ExpectedDefaultXmlUtf16, actual);
         }
 
         [Fact]
@@ -493,7 +623,7 @@ namespace Ncl.Common.Core.Tests.Xml
         }
 
         [Fact]
-        public void DeserializeFromString_WithDefaultString_ShouldDeserializeObjectFromStream()
+        public void DeserializeFromString_WithDefaultString_ShouldDeserializeObjectFromString()
         {
             // Arrange
             const string xmlString = XmlSerializerStub.ExpectedDefaultXml;
@@ -525,7 +655,7 @@ namespace Ncl.Common.Core.Tests.Xml
         }
 
         [Fact]
-        public void TrySerializeToString_WithDefaultInstance_ShouldWriteXmlContentToStream()
+        public void TrySerializeToString_WithDefaultInstance_ShouldReturnXmlContentAsString()
         {
             // Arrange
             XmlSerializationService instance = GetInstance();
@@ -535,7 +665,7 @@ namespace Ncl.Common.Core.Tests.Xml
             _ = instance.TrySerializeToString(dataInstance, out string actual);
 
             // Assert
-            Assert.Equal(XmlSerializerStub.ExpectedDefaultXml, actual);
+            Assert.Equal(XmlSerializerStub.ExpectedDefaultXmlUtf16, actual);
         }
 
         [Fact]
@@ -566,7 +696,7 @@ namespace Ncl.Common.Core.Tests.Xml
         }
 
         [Fact]
-        public void TryDeserializeFromString_WithDefaultString_ShouldDeserializeObjectFromStream()
+        public void TryDeserializeFromString_WithDefaultString_ShouldDeserializeObjectFromString()
         {
             // Arrange
             const string xmlString = XmlSerializerStub.ExpectedDefaultXml;
@@ -654,6 +784,12 @@ namespace Ncl.Common.Core.Tests.Xml
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<XmlSerializationServiceTests.XmlDataContractStub xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.datacontract.org/2004/07/Ncl.Common.Core.Tests.Xml\">\r\n  <Id>test_id</Id>\r\n</XmlSerializationServiceTests.XmlDataContractStub>";
 
             /// <summary>
+            ///     The expected XML string from a default instance of this class.
+            /// </summary>
+            public const string ExpectedDefaultXmlUtf16 =
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<XmlSerializationServiceTests.XmlDataContractStub xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.datacontract.org/2004/07/Ncl.Common.Core.Tests.Xml\">\r\n  <Id>test_id</Id>\r\n</XmlSerializationServiceTests.XmlDataContractStub>";
+
+            /// <summary>
             ///     The invalid XML string of this class.
             /// </summary>
             public const string InvalidXml =
@@ -680,6 +816,13 @@ namespace Ncl.Common.Core.Tests.Xml
             /// </summary>
             public const string ExpectedDefaultXml =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<XmlSerializerStub xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <Id>test_id</Id>\r\n</XmlSerializerStub>";
+
+            /// <summary>
+            ///     The expected XML string from a default instance of this class.
+            /// </summary>
+            public const string ExpectedDefaultXmlUtf16 =
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<XmlSerializerStub xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <Id>test_id</Id>\r\n</XmlSerializerStub>";
+
 
             /// <summary>
             ///     The invalid XML string of this class.

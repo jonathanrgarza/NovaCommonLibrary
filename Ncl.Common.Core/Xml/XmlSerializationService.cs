@@ -1267,6 +1267,7 @@ namespace Ncl.Common.Core.Xml
                     if (!TryWriteObject(xmlWriter, obj, out exception, settings))
                         return false;
 
+                    xmlWriter.Flush(); //Must flush to ensure XML is written to the StringWriter
                     xmlString = stringWriter.ToString();
                     return true;
                 }
@@ -1338,6 +1339,7 @@ namespace Ncl.Common.Core.Xml
                     if (!TryWriteObject(xmlWriter, obj, type, out exception, settings))
                         return false;
 
+                    xmlWriter.Flush(); //Must flush to ensure XML is written to the StringWriter
                     xmlString = stringWriter.ToString();
                     return true;
                 }
@@ -2096,6 +2098,7 @@ namespace Ncl.Common.Core.Xml
                     if (!TrySerialize(xmlWriter, obj, out exception))
                         return false;
 
+                    xmlWriter.Flush(); //Must flush to ensure XML is written to the StringWriter
                     xmlString = stringWriter.ToString();
                     return true;
                 }
@@ -2139,6 +2142,7 @@ namespace Ncl.Common.Core.Xml
                     if (!TrySerialize(xmlWriter, obj, type, out exception))
                         return false;
 
+                    xmlWriter.Flush(); //Must flush to ensure XML is written to the StringWriter
                     xmlString = stringWriter.ToString();
                     return true;
                 }

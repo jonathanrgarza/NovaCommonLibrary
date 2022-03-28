@@ -2311,7 +2311,7 @@ namespace Ncl.Common.Core.Xml
             DataContractSerializerSettings settings = null);
 
         /// <summary>
-        ///     Writes an object to a <see cref="string" /> of XML content
+        ///     Writes an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <typeparam name="T">The type of the object being serialized.</typeparam>
@@ -2326,7 +2326,7 @@ namespace Ncl.Common.Core.Xml
         string WriteObjectToString<T>(T obj, IEnumerable<Type> knownTypes);
 
         /// <summary>
-        ///     Writes an object to a <see cref="string" /> of XML content
+        ///     Writes an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <typeparam name="T">The type of the object being serialized.</typeparam>
@@ -2340,7 +2340,7 @@ namespace Ncl.Common.Core.Xml
         string WriteObjectToString<T>(T obj, DataContractSerializerSettings settings = null);
 
         /// <summary>
-        ///     Writes an object to a <see cref="string" /> of XML content
+        ///     Writes an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <param name="obj">The object being serialized.</param>
@@ -2355,7 +2355,7 @@ namespace Ncl.Common.Core.Xml
         string WriteObjectToString(object obj, Type type, IEnumerable<Type> knownTypes);
 
         /// <summary>
-        ///     Writes an object to a <see cref="string" /> of XML content
+        ///     Writes an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <param name="obj">The object being serialized.</param>
@@ -2369,7 +2369,7 @@ namespace Ncl.Common.Core.Xml
         string WriteObjectToString(object obj, Type type, DataContractSerializerSettings settings = null);
 
         /// <summary>
-        ///     Tries to write an object to a <see cref="string" /> of XML content
+        ///     Tries to write an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <typeparam name="T">The type of the object being serialized.</typeparam>
@@ -2386,7 +2386,7 @@ namespace Ncl.Common.Core.Xml
         bool TryWriteObjectToString<T>(T obj, out string xmlString, IEnumerable<Type> knownTypes);
 
         /// <summary>
-        ///     Tries to write an object to a <see cref="string" /> of XML content
+        ///     Tries to write an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <typeparam name="T">The type of the object being serialized.</typeparam>
@@ -2403,7 +2403,7 @@ namespace Ncl.Common.Core.Xml
             DataContractSerializerSettings settings = null);
 
         /// <summary>
-        ///     Tries to write an object to a <see cref="string" /> of XML content
+        ///     Tries to write an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <typeparam name="T">The type of the object being serialized.</typeparam>
@@ -2422,7 +2422,7 @@ namespace Ncl.Common.Core.Xml
             IEnumerable<Type> knownTypes);
 
         /// <summary>
-        ///     Tries to write an object to a <see cref="string" /> of XML content
+        ///     Tries to write an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <typeparam name="T">The type of the object being serialized.</typeparam>
@@ -2440,7 +2440,7 @@ namespace Ncl.Common.Core.Xml
             DataContractSerializerSettings settings = null);
 
         /// <summary>
-        ///     Tries to write an object to a <see cref="string" /> of XML content
+        ///     Tries to write an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <param name="obj">The object being serialized.</param>
@@ -2458,7 +2458,7 @@ namespace Ncl.Common.Core.Xml
             IEnumerable<Type> knownTypes);
 
         /// <summary>
-        ///     Tries to write an object to a <see cref="string" /> of XML content
+        ///     Tries to write an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <param name="obj">The object being serialized.</param>
@@ -2475,7 +2475,7 @@ namespace Ncl.Common.Core.Xml
             DataContractSerializerSettings settings = null);
 
         /// <summary>
-        ///     Tries to write an object to a <see cref="string" /> of XML content
+        ///     Tries to write an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <param name="obj">The object being serialized.</param>
@@ -2494,7 +2494,7 @@ namespace Ncl.Common.Core.Xml
             IEnumerable<Type> knownTypes);
 
         /// <summary>
-        ///     Tries to write an object to a <see cref="string" /> of XML content
+        ///     Tries to write an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="DataContractSerializer" />.
         /// </summary>
         /// <param name="obj">The object being serialized.</param>
@@ -3425,7 +3425,7 @@ namespace Ncl.Common.Core.Xml
         bool TrySerialize(XmlWriter writer, object obj, Type type, out Exception exception);
 
         /// <summary>
-        ///     Serializes an object to a <see cref="string" /> of XML content
+        ///     Serializes an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="XmlSerializer" />.
         /// </summary>
         /// <typeparam name="T">The type of the object being serialized.</typeparam>
@@ -3436,7 +3436,7 @@ namespace Ncl.Common.Core.Xml
         string SerializeToString<T>(T obj);
 
         /// <summary>
-        ///     Serializes an object to a <see cref="string" /> of XML content
+        ///     Serializes an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="XmlSerializer" />.
         /// </summary>
         /// <param name="obj">The object being serialized.</param>
@@ -3447,7 +3447,7 @@ namespace Ncl.Common.Core.Xml
         string SerializeToString(object obj, Type type);
 
         /// <summary>
-        ///     Tries to serialize an object to a <see cref="string" /> of XML content
+        ///     Tries to serialize an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="XmlSerializer" />.
         /// </summary>
         /// <typeparam name="T">The type of the object being serialized.</typeparam>
@@ -3460,7 +3460,7 @@ namespace Ncl.Common.Core.Xml
         bool TrySerializeToString<T>(T obj, out string xmlString);
 
         /// <summary>
-        ///     Tries to serialize an object to a <see cref="string" /> of XML content
+        ///     Tries to serialize an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="XmlSerializer" />.
         /// </summary>
         /// <typeparam name="T">The type of the object being serialized.</typeparam>
@@ -3474,7 +3474,7 @@ namespace Ncl.Common.Core.Xml
         bool TrySerializeToString<T>(T obj, out string xmlString, out Exception exception);
 
         /// <summary>
-        ///     Tries to serialize an object to a <see cref="string" /> of XML content
+        ///     Tries to serialize an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="XmlSerializer" />.
         /// </summary>
         /// <param name="obj">The object being serialized.</param>
@@ -3487,7 +3487,7 @@ namespace Ncl.Common.Core.Xml
         bool TrySerializeToString(object obj, Type type, out string xmlString);
 
         /// <summary>
-        ///     Tries to serialize an object to a <see cref="string" /> of XML content
+        ///     Tries to serialize an object to a <see cref="string" /> (UTF-16) of XML content
         ///     using <see cref="XmlSerializer" />.
         /// </summary>
         /// <param name="obj">The object being serialized.</param>
