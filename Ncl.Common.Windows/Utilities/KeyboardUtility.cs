@@ -55,6 +55,11 @@ namespace Ncl.Common.Windows.Utilities
         {
             _keyPressCallback = keyPressCallback ?? throw new ArgumentNullException(nameof(keyPressCallback));
 
+            if (_keyboardHookHandle != IntPtr.Zero)
+            {
+                StopKeyboardHook();
+            }
+
             using (var curProcess = Process.GetCurrentProcess())
             using (var curModule = curProcess.MainModule)
             {
@@ -93,11 +98,12 @@ namespace Ncl.Common.Windows.Utilities
                 return NativeMethods.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
 
             int vkCode = Marshal.ReadInt32(lParam);
+            var key = (VirtualKeyCodes)vkCode;
             bool shift = (NativeMethods.GetAsyncKeyState(VkShift) & 0x8000) != 0;
-            bool alt = (NativeMethods.GetAsyncKeyState(VkAlt) & 0x8000) != 0;
             bool ctrl = (NativeMethods.GetAsyncKeyState(VkControl) & 0x8000) != 0;
-
-            _keyPressCallback?.Invoke((VirtualKeyCodes)vkCode, shift, ctrl, alt);
+            bool alt = (NativeMethods.GetAsyncKeyState(VkAlt) & 0x8000) != 0;
+            //Debug.WriteLine($"Key: {key}, Shift: {shift}, Ctrl: {ctrl}, Alt: {alt}");
+            _keyPressCallback?.Invoke(key, shift, ctrl, alt);
             return NativeMethods.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
         }
 
@@ -139,7 +145,7 @@ namespace Ncl.Common.Windows.Utilities
             };
 
             int inputSize = Marshal.SizeOf(typeof(NativeMethods.INPUT));
-            uint result = NativeMethods.SendInput((uint)inputs.Length, ref inputs, inputSize);
+            uint result = NativeMethods.SendInput((uint)inputs.Length, inputs, inputSize);
 
             if (result == 0)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -185,7 +191,7 @@ namespace Ncl.Common.Windows.Utilities
 
             var inputs = inputList.ToArray();
             int inputSize = Marshal.SizeOf(typeof(NativeMethods.INPUT));
-            uint result = NativeMethods.SendInput((uint)inputs.Length, ref inputs, inputSize);
+            uint result = NativeMethods.SendInput((uint)inputs.Length, inputs, inputSize);
 
             if (result == 0)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -231,7 +237,7 @@ namespace Ncl.Common.Windows.Utilities
 
             var inputs = inputList.ToArray();
             int inputSize = Marshal.SizeOf(typeof(NativeMethods.INPUT));
-            uint result = NativeMethods.SendInput((uint)inputs.Length, ref inputs, inputSize);
+            uint result = NativeMethods.SendInput((uint)inputs.Length, inputs, inputSize);
 
             if (result == 0)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -262,7 +268,7 @@ namespace Ncl.Common.Windows.Utilities
             };
 
             int inputSize = Marshal.SizeOf(typeof(NativeMethods.INPUT));
-            uint result = NativeMethods.SendInput((uint)inputs.Length, ref inputs, inputSize);
+            uint result = NativeMethods.SendInput((uint)inputs.Length, inputs, inputSize);
 
             if (result == 0)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -290,7 +296,7 @@ namespace Ncl.Common.Windows.Utilities
                         }
                 }).ToArray();
             int inputSize = Marshal.SizeOf(typeof(NativeMethods.INPUT));
-            uint result = NativeMethods.SendInput((uint)inputs.Length, ref inputs, inputSize);
+            uint result = NativeMethods.SendInput((uint)inputs.Length, inputs, inputSize);
 
             if (result == 0)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -321,7 +327,7 @@ namespace Ncl.Common.Windows.Utilities
             };
 
             int inputSize = Marshal.SizeOf(typeof(NativeMethods.INPUT));
-            uint result = NativeMethods.SendInput((uint)inputs.Length, ref inputs, inputSize);
+            uint result = NativeMethods.SendInput((uint)inputs.Length, inputs, inputSize);
 
             if (result == 0)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -349,7 +355,7 @@ namespace Ncl.Common.Windows.Utilities
                         }
                 }).ToArray();
             int inputSize = Marshal.SizeOf(typeof(NativeMethods.INPUT));
-            uint result = NativeMethods.SendInput((uint)inputs.Length, ref inputs, inputSize);
+            uint result = NativeMethods.SendInput((uint)inputs.Length, inputs, inputSize);
 
             if (result == 0)
                 throw new Win32Exception(Marshal.GetLastWin32Error());

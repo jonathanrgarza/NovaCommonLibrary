@@ -449,7 +449,28 @@ namespace Ncl.Common.Windows.Native
         /// Note that neither GetLastError nor the return value will indicate the failure was caused by UIPI blocking.
         /// </returns>
         [DllImport("user32.dll", SetLastError = true)]
-        public static extern uint SendInput(uint nInputs, ref INPUT[] pInputs, int cbSize);
+        public static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
+        /// <summary>
+        /// Retrieves the extra message information for the current thread.
+        /// Extra message information is an application- or driver-defined value associated with the current thread's message queue.
+        /// </summary>
+        /// <returns>
+        /// The return value specifies the extra information. The meaning of the extra information is device specific.
+        /// </returns>
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetMessageExtraInfo();
+
+        /// <summary>
+        /// Sets the extra message information for the current thread.
+        /// Extra message information is an application- or driver-defined value associated with the current thread's message queue.
+        /// </summary>
+        /// <param name="lParam">The value to be associated with the current thread.</param>
+        /// <returns>
+        /// The return value is the previous value associated with the current thread.
+        /// </returns>
+        [DllImport("user32.dll")]
+        private static extern IntPtr SetMessageExtraInfo(IntPtr lParam);
 
         /// <summary>
         /// The INPUT type.
