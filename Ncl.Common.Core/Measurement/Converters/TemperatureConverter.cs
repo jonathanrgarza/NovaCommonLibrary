@@ -1,7 +1,6 @@
 ﻿using Ncl.Common.Core.Infrastructure;
-using Ncl.Common.Core.Measurement;
 
-namespace Ncl.Common.Core.Converters
+namespace Ncl.Common.Core.Measurement.Converters
 {
     /// <summary>
     ///     Utility class for converting temperatures.
