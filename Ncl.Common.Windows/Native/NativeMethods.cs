@@ -420,12 +420,109 @@ namespace Ncl.Common.Windows.Native
         /// A pointer to a variable that receives the number of bytes needed for the buffer pointed to by the TokenInformation parameter.
         /// If this value is larger than the value specified in the TokenInformationLength parameter, the function fails and stores no data in the buffer.
         /// If the value of the TokenInformationClass parameter is TokenDefaultDacl and the token has no default DACL,
-        /// the function sets the variable pointed to by ReturnLength to sizeof(TOKEN_DEFAULT_DACL) and sets the DefaultDacl member of the TOKEN_DEFAULT_DACL structure to NULL.
+        /// the function sets the variable pointed to by ReturnLength to sizeof(TOKEN_DEFAULT_DACL) and
+        /// sets the DefaultDacl member of the TOKEN_DEFAULT_DACL structure to NULL.
         /// </param>
         /// <returns>If the function succeeds, the return value is true, otherwise, false.</returns>
         [DllImport("advapi32.dll", SetLastError = true)]
         public static extern bool GetTokenInformation(IntPtr TokenHandle, TOKEN_INFORMATION_CLASS TokenInformationClass,
             out TOKEN_ELEVATION TokenInformation,
             uint TokenInformationLength, out uint ReturnLength);
+
+        /// <summary>
+        /// Synthesizes keystrokes, mouse motions, and button clicks.
+        /// </summary>
+        /// <param name="nInputs">The number of structures in the pInputs array.</param>
+        /// <param name="pInputs">
+        /// An array of INPUT structures.
+        /// Each structure represents an event to be inserted into the keyboard or mouse input stream.
+        /// </param>
+        /// <param name="cbSize">
+        /// The size, in bytes, of an INPUT structure.
+        /// If cbSize is not the size of an INPUT structure, the function fails.
+        /// </param>
+        /// <returns>
+        /// The function returns the number of events that it successfully inserted into the keyboard or mouse input stream.
+        /// If the function returns zero, the input was already blocked by another thread. To get extended error information, call GetLastError.
+        /// <br />
+        /// This function fails when it is blocked by UIPI.
+        /// Note that neither GetLastError nor the return value will indicate the failure was caused by UIPI blocking.
+        /// </returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern uint SendInput(uint nInputs, ref INPUT[] pInputs, int cbSize);
+
+        /// <summary>
+        /// The INPUT type.
+        /// </summary>
+        [Flags]
+        public enum InputType : uint
+        {
+            /// <summary>
+            /// The event is a mouse event. Use the mi structure of the union.
+            /// </summary>
+            Mouse = 0,
+            /// <summary>
+            /// The event is a keyboard event. Use the ki structure of the union.
+            /// </summary>
+            Keyboard = 1,
+            /// <summary>
+            /// The event is a hardware event. Use the hi structure of the union.
+            /// </summary>
+            Hardware = 2
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct INPUT
+        {
+            public InputType Type;
+            public InputUnion Data;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct InputUnion
+        {
+            [FieldOffset(0)] public MOUSEINPUT Mi;
+            [FieldOffset(0)] public KEYBDINPUT Ki;
+            [FieldOffset(0)] public HARDWAREINPUT Hi;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct KEYBDINPUT
+        {
+            public ushort WVk;
+            public ushort WScan;
+            public KeyEventF DwFlags;
+            public uint Time;
+            public IntPtr DwExtraInfo;
+        }
+
+        [Flags]
+        public enum KeyEventF : uint
+        {
+            KeyDown = 0x0000,
+            ExtendedKey = 0x0001,
+            KeyUp = 0x0002,
+            Unicode = 0x0004,
+            Scancode = 0x0008
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MOUSEINPUT
+        {
+            public int Dx;
+            public int Dy;
+            public uint MouseData;
+            public uint DwFlags;
+            public uint Time;
+            public IntPtr DwExtraInfo;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct HARDWAREINPUT
+        {
+            public uint UMsg;
+            public ushort WParamL;
+            public ushort WParamH;
+        }
     }
 }
