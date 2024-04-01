@@ -51,4 +51,38 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!-- Status Icons -->
+    <Ellipse x:Key="GreenStatusIcon" Width="20" Height="20">
+        <Ellipse.Fill>
+            <RadialGradientBrush>
+                <GradientStop Color="LightGreen" Offset="0.1" />
+                <GradientStop Color="Green" Offset="1" />
+            </RadialGradientBrush>
+        </Ellipse.Fill>
+    </Ellipse>
+    <Ellipse x:Key="YellowStatusIcon" Width="20" Height="20">
+        <Ellipse.Fill>
+            <RadialGradientBrush>
+                <GradientStop Color="Yellow" Offset="0.1" />
+                <GradientStop Color="Goldenrod" Offset="1" />
+            </RadialGradientBrush>
+        </Ellipse.Fill>
+    </Ellipse>
+    <Ellipse x:Key="RedStatusIcon" Width="20" Height="20">
+        <Ellipse.Fill>
+            <RadialGradientBrush>
+                <GradientStop Color="LightCoral" Offset="0.1" />
+                <GradientStop Color="Red" Offset="1" />
+            </RadialGradientBrush>
+        </Ellipse.Fill>
+    </Ellipse>
+    <Ellipse x:Key="GreyStatusIcon" Width="20" Height="20">
+        <Ellipse.Fill>
+            <RadialGradientBrush>
+                <GradientStop Color="LightGray" Offset="0.1" />
+                <GradientStop Color="Gray" Offset="1" />
+            </RadialGradientBrush>
+        </Ellipse.Fill>
+    </Ellipse>
 </ResourceDictionary>
