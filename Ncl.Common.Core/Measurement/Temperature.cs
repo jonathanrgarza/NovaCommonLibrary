@@ -1,6 +1,6 @@
 ﻿using System;
-using Ncl.Common.Core.Converters;
 using Ncl.Common.Core.Infrastructure;
+using Ncl.Common.Core.Measurement.Converters;
 
 namespace Ncl.Common.Core.Measurement
 {
