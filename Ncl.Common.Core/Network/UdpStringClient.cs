@@ -189,15 +189,19 @@ namespace Ncl.Common.Core.Network
                 Timer timer = null;
                 if (timeout > 0)
                 {
-                    timer = new Timer(timeout);
+                    timer = new Timer(timeout)
+                    {
+                        AutoReset = false
+                    };
                     timer.Elapsed += OnTimeout;
-                    timer.Start();
+                    
                 }
 
                 cts.Token.Register(CancelUdpOperation);
 
                 try
                 {
+                    timer?.Start();
                     int bytesSent = await UdpClient.SendAsync(messageBytes, messageBytes.Length, RemoteAddress)
                         .ConfigureAwait(false);
                     timer?.Stop();
@@ -245,15 +249,63 @@ namespace Ncl.Common.Core.Network
                 Timer timer = null;
                 if (timeout > 0)
                 {
-                    timer = new Timer(timeout);
+                    timer = new Timer(timeout)
+                    {
+                        AutoReset = false
+                    };
                     timer.Elapsed += OnTimeout;
-                    timer.Start();
                 }
 
                 cts.Token.Register(CancelUdpOperation);
 
                 try
                 {
+                    timer?.Start();
+                    var result = await UdpClient.ReceiveAsync().ConfigureAwait(false);
+                    timer?.Stop();
+                    return Encoding.GetString(result.Buffer);
+                }
+                catch (ObjectDisposedException)
+                {
+                    if (!cts.IsCancellationRequested)
+                        throw new TimeoutException();
+
+                    throw new OperationCanceledException(cts.Token);
+                }
+            }
+        }
+
+        public virtual async Task<string> SendAndReceive(string message, CancellationToken token, int timeout = Timeout.Infinite)
+        {
+            Guard.AgainstNullArgument(nameof(message), message);
+            Guard.AgainstDisposed(IsDisposed);
+
+            token.ThrowIfCancellationRequested();
+            
+            using (var cts = CancellationTokenSource.CreateLinkedTokenSource(token))
+            {
+                Timer timer = null;
+                if (timeout > 0)
+                {
+                    timer = new Timer(timeout)
+                    {
+                        AutoReset = false
+                    };
+                    timer.Elapsed += OnTimeout;
+                }
+
+                cts.Token.Register(CancelUdpOperation);
+
+                try
+                {
+                    byte[] messageBytes = Encoding.GetBytes(message);
+                    timer?.Start();
+                    await UdpClient.SendAsync(messageBytes, messageBytes.Length, RemoteAddress).ConfigureAwait(false);
+                    timer?.Stop();
+
+                    token.ThrowIfCancellationRequested();
+
+                    timer?.Start();
                     var result = await UdpClient.ReceiveAsync().ConfigureAwait(false);
                     timer?.Stop();
                     return Encoding.GetString(result.Buffer);
