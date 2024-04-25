@@ -59,6 +59,18 @@ namespace Ncl.Common.Core.Utilities
         }
 
         /// <summary>
+        ///    Guard against a disposed object.
+        /// </summary>
+        /// <param name="disposedValue">The disposed state.</param>
+        /// <exception cref="ObjectDisposedException"><paramref name="disposedValue" /> is <see langword="true" />.</exception>
+        public static void AgainstDisposed(bool disposedValue)
+        {
+            if (!disposedValue)
+                return;
+            throw new ObjectDisposedException("Object has been disposed.");
+        }
+
+        /// <summary>
         ///     Guard against a negative <see cref="int" /> argument/parameter value.
         /// </summary>
         /// <param name="paramName">The parameter's name.</param>
