@@ -11,14 +11,14 @@ using Timer = System.Timers.Timer;
 namespace Ncl.Common.Core.Network
 {
     /// <summary>
-    ///     Represents a UDP client that sends and receives string messages.
+    /// Represents a UDP client that sends and receives string messages.
     /// </summary>
     public class UdpStringClient : IDisposable
     {
         private Encoding _encoding = Encoding.UTF8;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="UdpStringClient" /> class with the specified port.
+        /// Initializes a new instance of the <see cref="UdpStringClient"/> class with the specified port.
         /// </summary>
         /// <param name="port">The port number to bind the UDP client to.</param>
         public UdpStringClient(int port)
@@ -29,7 +29,7 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="UdpStringClient" /> class with the specified IP address and port.
+        /// Initializes a new instance of the <see cref="UdpStringClient"/> class with the specified IP address and port.
         /// </summary>
         /// <param name="ipAddress">The IP address to send UDP messages to.</param>
         /// <param name="port">The port number to bind the UDP client to.</param>
@@ -41,8 +41,8 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="UdpStringClient" /> class with the specified IP address, port, and
-        ///     remote port.
+        /// Initializes a new instance of the <see cref="UdpStringClient"/> class with the specified IP address, port, and remote
+        /// port.
         /// </summary>
         /// <param name="ipAddress">The IP address to send UDP messages to.</param>
         /// <param name="port">The port number to bind the UDP client to.</param>
@@ -55,7 +55,7 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="UdpStringClient" /> class with the specified IP address and port.
+        /// Initializes a new instance of the <see cref="UdpStringClient"/> class with the specified IP address and port.
         /// </summary>
         /// <param name="ipAddress">The IP address to send UDP messages to.</param>
         /// <param name="port">The port number to bind the UDP client to.</param>
@@ -67,8 +67,8 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="UdpStringClient" /> class with the specified IP address, port, and
-        ///     remote port.
+        /// Initializes a new instance of the <see cref="UdpStringClient"/> class with the specified IP address, port, and remote
+        /// port.
         /// </summary>
         /// <param name="ipAddress">The IP address to send UDP messages to.</param>
         /// <param name="port">The port number to bind the UDP client to.</param>
@@ -81,17 +81,17 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Gets the port number that the UDP client is bound to.
+        /// Gets the port number that the UDP client is bound to.
         /// </summary>
         public int Port { get; private set; }
 
         /// <summary>
-        ///     Gets the remote IP endpoint that the UDP client sends/receives messages.
+        /// Gets the remote IP endpoint that the UDP client sends/receives messages.
         /// </summary>
         public IPEndPoint RemoteAddress { get; protected set; }
 
         /// <summary>
-        ///     Gets or sets the encoding used to convert string messages to bytes and vice versa.
+        /// Gets or sets the encoding used to convert string messages to bytes and vice versa.
         /// </summary>
         public Encoding Encoding
         {
@@ -112,12 +112,12 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Gets a value indicating whether the UDP client is active and connected.
+        /// Gets a value indicating whether the UDP client is active and connected.
         /// </summary>
         public bool IsActive => !IsDisposed && UdpClient.Client.Connected;
 
         /// <summary>
-        ///     Gets the number of bytes available to be read from the UDP client.
+        /// Gets the number of bytes available to be read from the UDP client.
         /// </summary>
         /// <exception cref="ObjectDisposedException">The instance is disposed.</exception>
         public int Available
@@ -135,12 +135,12 @@ namespace Ncl.Common.Core.Network
         protected bool IsDisposed { get; set; }
 
         /// <summary>
-        ///    Gets the underlying <see cref="UdpClient" /> instance used by the <see cref="UdpStringClient" />.
+        /// Gets the underlying <see cref="UdpClient"/> instance used by the <see cref="UdpStringClient"/>.
         /// </summary>
         protected UdpClient UdpClient { get; private set; }
 
         /// <summary>
-        ///     Releases all resources used by the <see cref="UdpStringClient" />.
+        /// Releases all resources used by the <see cref="UdpStringClient"/>.
         /// </summary>
         public void Dispose()
         {
@@ -150,11 +150,11 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Sends a string message asynchronously to the remote endpoint.
+        /// Sends a string message asynchronously to the remote endpoint.
         /// </summary>
         /// <param name="message">The string message to send.</param>
         /// <returns>A task representing the asynchronous operation. The task result represents the number of bytes sent.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="message" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="message"/> is <see langword="null"/>.</exception>
         /// <exception cref="ObjectDisposedException">The instance is disposed.</exception>
         public virtual async Task<int> SendAsync(string message)
         {
@@ -166,14 +166,14 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Sends a string message asynchronously to the remote endpoint with the option to cancel the operation and specify a
-        ///     timeout.
+        /// Sends a string message asynchronously to the remote endpoint with the option to cancel the operation and specify a
+        /// timeout.
         /// </summary>
         /// <param name="message">The string message to send.</param>
         /// <param name="token">The cancellation token to cancel the operation.</param>
-        /// <param name="timeout">The timeout value in milliseconds. Use <see cref="Timeout.Infinite" /> for no timeout.</param>
+        /// <param name="timeout">The timeout value in milliseconds. Use <see cref="Timeout.Infinite"/> for no timeout.</param>
         /// <returns>A task representing the asynchronous operation. The task result represents the number of bytes sent.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="message" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="message"/> is <see langword="null"/>.</exception>
         /// <exception cref="ObjectDisposedException">The instance is disposed.</exception>
         /// <exception cref="TimeoutException">The operation timed out.</exception>
         /// <exception cref="OperationCanceledException">The operation was canceled.</exception>
@@ -194,7 +194,6 @@ namespace Ncl.Common.Core.Network
                         AutoReset = false
                     };
                     timer.Elapsed += OnTimeout;
-                    
                 }
 
                 cts.Token.Register(CancelUdpOperation);
@@ -218,7 +217,7 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Receives a string message asynchronously from the UDP client.
+        /// Receives a string message asynchronously from the UDP client.
         /// </summary>
         /// <returns>A task representing the asynchronous operation. The task result represents the received string message.</returns>
         /// <exception cref="ObjectDisposedException">The instance is disposed.</exception>
@@ -231,11 +230,11 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Receives a string message asynchronously from the UDP client with the option to cancel the operation and specify a
-        ///     timeout.
+        /// Receives a string message asynchronously from the UDP client with the option to cancel the operation and specify a
+        /// timeout.
         /// </summary>
         /// <param name="token">The cancellation token to cancel the operation.</param>
-        /// <param name="timeout">The timeout value in milliseconds. Use <see cref="Timeout.Infinite" /> for no timeout.</param>
+        /// <param name="timeout">The timeout value in milliseconds. Use <see cref="Timeout.Infinite"/> for no timeout.</param>
         /// <returns>A task representing the asynchronous operation. The task result represents the received string message.</returns>
         /// <exception cref="ObjectDisposedException">The instance is disposed.</exception>
         /// <exception cref="TimeoutException">The operation timed out.</exception>
@@ -275,13 +274,25 @@ namespace Ncl.Common.Core.Network
             }
         }
 
-        public virtual async Task<string> SendAndReceive(string message, CancellationToken token, int timeout = Timeout.Infinite)
+        /// <summary>
+        /// Sends a string message asynchronously to the remote endpoint and receives a response.
+        /// </summary>
+        /// <param name="message">The string message to send.</param>
+        /// <param name="token">The cancellation token to cancel the operation.</param>
+        /// <param name="timeout">The timeout value in milliseconds. Use <see cref="Timeout.Infinite"/> for no timeout.</param>
+        /// <returns>A task representing the asynchronous operation. The task result represents the received string message.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="message"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ObjectDisposedException">The instance is disposed.</exception>
+        /// <exception cref="TimeoutException">The operation timed out.</exception>
+        /// <exception cref="OperationCanceledException">The operation was canceled.</exception>
+        public virtual async Task<string> SendAndReceive(string message, CancellationToken token,
+            int timeout = Timeout.Infinite)
         {
             Guard.AgainstNullArgument(nameof(message), message);
             Guard.AgainstDisposed(IsDisposed);
 
             token.ThrowIfCancellationRequested();
-            
+
             using (var cts = CancellationTokenSource.CreateLinkedTokenSource(token))
             {
                 Timer timer = null;
@@ -321,7 +332,7 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Event handler for the timeout event.
+        /// Event handler for the timeout event.
         /// </summary>
         /// <param name="sender">The timer instance.</param>
         /// <param name="e">The timer event arguments.</param>
@@ -333,7 +344,7 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Cancels the UDP operation by closing the UDP client and creating a new instance.
+        /// Cancels the UDP operation by closing the UDP client and creating a new instance.
         /// </summary>
         protected void CancelUdpOperation()
         {
@@ -341,7 +352,7 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///    Reconnects the UDP client by closing the current client and creating a new instance.
+        /// Reconnects the UDP client by closing the current client and creating a new instance.
         /// </summary>
         protected void ReconnectClient()
         {
@@ -350,7 +361,7 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///    Reconnects the UDP client by closing the current client and creating a new instance.
+        /// Reconnects the UDP client by closing the current client and creating a new instance.
         /// </summary>
         /// <param name="port">A new port to use.</param>
         protected void ReconnectClient(int port)
@@ -361,10 +372,10 @@ namespace Ncl.Common.Core.Network
         }
 
         /// <summary>
-        ///     Releases the unmanaged resources used by the <see cref="UdpStringClient" /> and optionally releases the managed
-        ///     resources.
+        /// Releases the unmanaged resources used by the <see cref="UdpStringClient"/> and optionally releases the managed
+        /// resources.
         /// </summary>
-        /// <param name="disposing">A value indicating whether the method is called from the <see cref="Dispose" /> method.</param>
+        /// <param name="disposing">A value indicating whether the method is called from the <see cref="Dispose"/> method.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (IsDisposed)
