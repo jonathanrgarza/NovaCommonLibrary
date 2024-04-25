@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Wpf", "Ncl.Commo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Wpf.Tests", "Ncl.Common.Wpf.Tests\Ncl.Common.Wpf.Tests.csproj", "{238E1F72-C87F-49AB-AE72-CC1FD505BD09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ncl.Common.Core.Modern", "Ncl.Common.Core.Modern\Ncl.Common.Core.Modern.csproj", "{ED3E0EC3-C693-455C-B54B-57D090049269}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Modern.Core", "Ncl.Common.Core.Modern\Ncl.Common.Modern.Core.csproj", "{ED3E0EC3-C693-455C-B54B-57D090049269}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
