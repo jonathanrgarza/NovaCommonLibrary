@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
-namespace Ncl.Common.Core.Modern.Utilities
+﻿namespace Ncl.Common.Modern.Core.Utilities
 {
     /// <summary>
     /// Provides utility methods for working with <see cref="ValueTask{T}"/> instances.
