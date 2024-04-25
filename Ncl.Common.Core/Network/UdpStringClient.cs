@@ -15,9 +15,7 @@ namespace Ncl.Common.Core.Network
     /// </summary>
     public class UdpStringClient : IDisposable
     {
-        private bool _disposedValue;
         private Encoding _encoding = Encoding.UTF8;
-        protected UdpClient UdpClient;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="UdpStringClient" /> class with the specified port.
@@ -85,7 +83,7 @@ namespace Ncl.Common.Core.Network
         /// <summary>
         ///     Gets the port number that the UDP client is bound to.
         /// </summary>
-        public int Port { get; }
+        public int Port { get; private set; }
 
         /// <summary>
         ///     Gets the remote IP endpoint that the UDP client sends/receives messages.
@@ -116,7 +114,7 @@ namespace Ncl.Common.Core.Network
         /// <summary>
         ///     Gets a value indicating whether the UDP client is active and connected.
         /// </summary>
-        public bool IsActive => !_disposedValue && UdpClient.Client.Connected;
+        public bool IsActive => !IsDisposed && UdpClient.Client.Connected;
 
         /// <summary>
         ///     Gets the number of bytes available to be read from the UDP client.
@@ -126,10 +124,20 @@ namespace Ncl.Common.Core.Network
         {
             get
             {
-                Guard.AgainstDisposed(_disposedValue);
+                Guard.AgainstDisposed(IsDisposed);
                 return UdpClient.Available;
             }
         }
+
+        /// <summary>
+        /// Gets/Sets the disposed state of the instance.
+        /// </summary>
+        protected bool IsDisposed { get; set; }
+
+        /// <summary>
+        ///    Gets the underlying <see cref="UdpClient" /> instance used by the <see cref="UdpStringClient" />.
+        /// </summary>
+        protected UdpClient UdpClient { get; private set; }
 
         /// <summary>
         ///     Releases all resources used by the <see cref="UdpStringClient" />.
@@ -151,7 +159,7 @@ namespace Ncl.Common.Core.Network
         public virtual async Task<int> SendAsync(string message)
         {
             Guard.AgainstNullArgument(nameof(message), message);
-            Guard.AgainstDisposed(_disposedValue);
+            Guard.AgainstDisposed(IsDisposed);
 
             byte[] messageBytes = Encoding.GetBytes(message);
             return await UdpClient.SendAsync(messageBytes, messageBytes.Length, RemoteAddress).ConfigureAwait(false);
@@ -173,7 +181,7 @@ namespace Ncl.Common.Core.Network
             int timeout = Timeout.Infinite)
         {
             Guard.AgainstNullArgument(nameof(message), message);
-            Guard.AgainstDisposed(_disposedValue);
+            Guard.AgainstDisposed(IsDisposed);
 
             byte[] messageBytes = Encoding.GetBytes(message);
             using (var cts = CancellationTokenSource.CreateLinkedTokenSource(token))
@@ -212,7 +220,7 @@ namespace Ncl.Common.Core.Network
         /// <exception cref="ObjectDisposedException">The instance is disposed.</exception>
         public virtual async Task<string> ReceiveAsync()
         {
-            Guard.AgainstDisposed(_disposedValue);
+            Guard.AgainstDisposed(IsDisposed);
 
             var result = await UdpClient.ReceiveAsync().ConfigureAwait(false);
             return Encoding.GetString(result.Buffer);
@@ -230,7 +238,7 @@ namespace Ncl.Common.Core.Network
         /// <exception cref="OperationCanceledException">The operation was canceled.</exception>
         public virtual async Task<string> ReceiveAsync(CancellationToken token, int timeout = Timeout.Infinite)
         {
-            Guard.AgainstDisposed(_disposedValue);
+            Guard.AgainstDisposed(IsDisposed);
 
             using (var cts = CancellationTokenSource.CreateLinkedTokenSource(token))
             {
@@ -277,8 +285,27 @@ namespace Ncl.Common.Core.Network
         /// </summary>
         protected void CancelUdpOperation()
         {
+            ReconnectClient();
+        }
+
+        /// <summary>
+        ///    Reconnects the UDP client by closing the current client and creating a new instance.
+        /// </summary>
+        protected void ReconnectClient()
+        {
             UdpClient.Close();
             UdpClient = new UdpClient(Port);
+        }
+
+        /// <summary>
+        ///    Reconnects the UDP client by closing the current client and creating a new instance.
+        /// </summary>
+        /// <param name="port">A new port to use.</param>
+        protected void ReconnectClient(int port)
+        {
+            UdpClient.Close();
+            UdpClient = new UdpClient(Port);
+            Port = port;
         }
 
         /// <summary>
@@ -288,12 +315,12 @@ namespace Ncl.Common.Core.Network
         /// <param name="disposing">A value indicating whether the method is called from the <see cref="Dispose" /> method.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposedValue)
+            if (IsDisposed)
                 return;
 
             if (disposing) UdpClient.Dispose();
 
-            _disposedValue = true;
+            IsDisposed = true;
         }
     }
 }
