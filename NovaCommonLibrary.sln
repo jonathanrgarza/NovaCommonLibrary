@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Wpf", "Ncl.Commo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Wpf.Tests", "Ncl.Common.Wpf.Tests\Ncl.Common.Wpf.Tests.csproj", "{238E1F72-C87F-49AB-AE72-CC1FD505BD09}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Modern.Core", "Ncl.Common.Core.Modern\Ncl.Common.Modern.Core.csproj", "{ED3E0EC3-C693-455C-B54B-57D090049269}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ncl.Common.Modern.Core", "Ncl.Common.Modern.Core\Ncl.Common.Modern.Core.csproj", "{A225DF1A-8BF9-41EE-AC4B-A39B186D3B02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +47,10 @@ Global
 		{238E1F72-C87F-49AB-AE72-CC1FD505BD09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{238E1F72-C87F-49AB-AE72-CC1FD505BD09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{238E1F72-C87F-49AB-AE72-CC1FD505BD09}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ED3E0EC3-C693-455C-B54B-57D090049269}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED3E0EC3-C693-455C-B54B-57D090049269}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED3E0EC3-C693-455C-B54B-57D090049269}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED3E0EC3-C693-455C-B54B-57D090049269}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A225DF1A-8BF9-41EE-AC4B-A39B186D3B02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A225DF1A-8BF9-41EE-AC4B-A39B186D3B02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A225DF1A-8BF9-41EE-AC4B-A39B186D3B02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A225DF1A-8BF9-41EE-AC4B-A39B186D3B02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
