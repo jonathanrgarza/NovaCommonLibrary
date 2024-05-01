@@ -86,9 +86,9 @@ namespace Ncl.Common.Core.Network
         public int Port { get; private set; }
 
         /// <summary>
-        /// Gets the remote IP endpoint that the UDP client sends/receives messages.
+        /// Gets/Sets the remote IP endpoint that the UDP client sends/receives messages.
         /// </summary>
-        public IPEndPoint RemoteAddress { get; protected set; }
+        public IPEndPoint RemoteAddress { get; set; }
 
         /// <summary>
         /// Gets or sets the encoding used to convert string messages to bytes and vice versa.
@@ -339,8 +339,7 @@ namespace Ncl.Common.Core.Network
         protected void OnTimeout(object sender, ElapsedEventArgs e)
         {
             (sender as Timer)?.Stop();
-            UdpClient.Close();
-            UdpClient = new UdpClient(Port);
+            CancelUdpOperation();
         }
 
         /// <summary>
@@ -354,7 +353,7 @@ namespace Ncl.Common.Core.Network
         /// <summary>
         /// Reconnects the UDP client by closing the current client and creating a new instance.
         /// </summary>
-        protected void ReconnectClient()
+        public void ReconnectClient()
         {
             UdpClient.Close();
             UdpClient = new UdpClient(Port);
@@ -364,7 +363,7 @@ namespace Ncl.Common.Core.Network
         /// Reconnects the UDP client by closing the current client and creating a new instance.
         /// </summary>
         /// <param name="port">A new port to use.</param>
-        protected void ReconnectClient(int port)
+        public void ReconnectClient(int port)
         {
             UdpClient.Close();
             UdpClient = new UdpClient(Port);
@@ -381,7 +380,10 @@ namespace Ncl.Common.Core.Network
             if (IsDisposed)
                 return;
 
-            if (disposing) UdpClient.Dispose();
+            if (disposing)
+            {
+                UdpClient.Dispose();
+            }
 
             IsDisposed = true;
         }
