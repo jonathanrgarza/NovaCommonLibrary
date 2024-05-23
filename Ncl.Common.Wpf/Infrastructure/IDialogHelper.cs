@@ -4,6 +4,9 @@ using Microsoft.Win32;
 
 namespace Ncl.Common.Wpf.Infrastructure;
 
+/// <summary>
+///  Represents a helper class for showing dialogs.
+/// </summary>
 public interface IDialogHelper
 {
     /// <summary>
@@ -45,7 +48,7 @@ public interface IDialogHelper
         bool overwritePrompt = true, bool createPrompt = false, bool checkPathExists = false,
         bool addExtension = true, bool validateNames = true,
         string? defaultExt = null, int filterIndex = 1, bool dereferenceLinks = false,
-        bool restoreDirectory = false, string? initialFileName = null);
+        bool restoreDirectory = false, bool addToRecent = false, string? initialFileName = null);
 
     /// <summary>
     ///     Shows a <see cref="OpenFileDialog" /> and returns the user selected file path,
@@ -58,7 +61,7 @@ public interface IDialogHelper
         bool checkFileExists = false, bool readOnlyChecked = false, bool showReadOnly = false,
         bool addExtension = true, bool validateNames = true,
         string? defaultExt = null, int filterIndex = 1, bool dereferenceLinks = false,
-        string? initialFileName = null);
+        bool addToRecent = false, string? initialFileName = null);
 
     /// <summary>
     ///     Shows a <see cref="OpenFileDialog" /> and returns the user selected file path(s),
@@ -71,5 +74,23 @@ public interface IDialogHelper
         bool checkFileExists = false, bool readOnlyChecked = false, bool showReadOnly = false,
         bool addExtension = true, bool validateNames = true,
         string? defaultExt = null, int filterIndex = 1, bool dereferenceLinks = false,
-        string? initialFileName = null);
+        bool addToRecent = false, string? initialFileName = null);
+
+    /// <summary>
+    ///    Shows a <see cref="OpenFolderDialog" /> and returns the user selected folder path,
+    ///   or an empty <see cref="string" /> on cancel.
+    /// </summary>
+    /// <returns>The folder path or an empty <see cref="string" /> on cancel.</returns>
+    string GetOpenFolderPath(string? title = null,
+        string? initialDirectory = null, string? rootDirectory = null,
+        bool validateNames = true, bool addToRecent = false, string? initialFolderName = null);
+
+    /// <summary>
+    ///    Shows a <see cref="OpenFolderDialog" /> and returns the user selected folder path(s),
+    ///   or an empty array on cancel.
+    /// </summary>
+    /// <returns>The folder path(s) or an empty array on cancel.</returns>
+    string[] GetMultiOpenFolderPath(string? title = null,
+        string? initialDirectory = null, string? rootDirectory = null,
+        bool validateNames = true, bool addToRecent = false, string? initialFolderName = null);
 }

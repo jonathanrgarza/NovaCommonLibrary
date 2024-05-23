@@ -5,12 +5,14 @@ using Microsoft.Win32;
 namespace Ncl.Common.Wpf.Infrastructure
 {
     /// <summary>
-    ///     Helper utility for dialogs, <see cref="SaveFileDialog" /> and <see cref="OpenFileDialog" />.
+    ///     Helper utility for dialogs, <see cref="SaveFileDialog" />, <see cref="OpenFileDialog" /> and
+    ///     <see cref="OpenFolderDialog"/>.
     /// </summary>
     public class DialogHelper : IDialogHelper
     {
         private OpenFileDialog? _openFileDialog;
         private SaveFileDialog? _saveFileDialog;
+        private OpenFolderDialog? _openFolderDialog;
 
         /// <summary>
         ///     Initializes a new instance of <see cref="DialogHelper" />.
@@ -47,11 +49,11 @@ namespace Ncl.Common.Wpf.Infrastructure
         /// </returns>
         public bool? ShowDialog(Window dialog)
         {
-            Window? owner = Owner;
+            var owner = Owner;
             if (owner == null)
                 return dialog.ShowDialog();
 
-            Window? previousOwner = dialog.Owner;
+            var previousOwner = dialog.Owner;
             try
             {
                 dialog.Owner = owner;
@@ -75,7 +77,7 @@ namespace Ncl.Common.Wpf.Infrastructure
         /// </returns>
         public bool? ShowDialog(CommonDialog dialog)
         {
-            Window? owner = Owner;
+            var owner = Owner;
             if (owner == null)
                 return dialog.ShowDialog();
 
@@ -93,15 +95,15 @@ namespace Ncl.Common.Wpf.Infrastructure
             bool overwritePrompt = true, bool createPrompt = false, bool checkPathExists = false,
             bool addExtension = true, bool validateNames = true,
             string? defaultExt = null, int filterIndex = 1, bool dereferenceLinks = false,
-            bool restoreDirectory = false, string? initialFileName = null)
+            bool restoreDirectory = false, bool addToRecent = false, string? initialFileName = null)
         {
             _saveFileDialog ??= new SaveFileDialog();
-            SaveFileDialog dialog = _saveFileDialog;
+            var dialog = _saveFileDialog;
 
             SetSaveFileDialogOptions(dialog, title, filter, initialDirectory,
                 overwritePrompt, createPrompt, checkPathExists,
                 addExtension, validateNames, defaultExt, filterIndex, dereferenceLinks,
-                restoreDirectory, initialFileName);
+                restoreDirectory, addToRecent, initialFileName);
 
             if (dialog.ShowDialog(Owner) != true)
                 return string.Empty;
@@ -120,14 +122,14 @@ namespace Ncl.Common.Wpf.Infrastructure
             bool checkFileExists = false, bool readOnlyChecked = false, bool showReadOnly = false,
             bool addExtension = true, bool validateNames = true,
             string? defaultExt = null, int filterIndex = 1, bool dereferenceLinks = false,
-            string? initialFileName = null)
+            bool addToRecent = false, string? initialFileName = null)
         {
             _openFileDialog ??= new OpenFileDialog();
-            OpenFileDialog dialog = _openFileDialog;
+            var dialog = _openFileDialog;
 
             SetOpenFileDialogOptions(dialog, false, title, filter, initialDirectory,
                 checkFileExists, readOnlyChecked, showReadOnly, addExtension, validateNames,
-                defaultExt, filterIndex, dereferenceLinks, initialFileName);
+                defaultExt, filterIndex, dereferenceLinks, addToRecent, initialFileName);
 
             if (dialog.ShowDialog(Owner) != true)
                 return string.Empty;
@@ -146,19 +148,51 @@ namespace Ncl.Common.Wpf.Infrastructure
             bool checkFileExists = false, bool readOnlyChecked = false, bool showReadOnly = false,
             bool addExtension = true, bool validateNames = true,
             string? defaultExt = null, int filterIndex = 1, bool dereferenceLinks = false,
-            string? initialFileName = null)
+            bool addToRecent = false, string? initialFileName = null)
         {
             _openFileDialog ??= new OpenFileDialog();
-            OpenFileDialog dialog = _openFileDialog;
+            var dialog = _openFileDialog;
 
             SetOpenFileDialogOptions(dialog, true, title, filter, initialDirectory,
                 checkFileExists, readOnlyChecked, showReadOnly, addExtension, validateNames,
-                defaultExt, filterIndex, dereferenceLinks, initialFileName);
+                defaultExt, filterIndex, dereferenceLinks, addToRecent, initialFileName);
 
             if (dialog.ShowDialog(Owner) != true)
-                return Array.Empty<string>();
+                return [];
 
             return dialog.FileNames;
+        }
+
+        public string GetOpenFolderPath(string? title = null,
+            string? initialDirectory = null, string? rootDirectory = null,
+            bool validateNames = true, bool addToRecent = false, string? initialFolderName = null)
+        {
+            _openFolderDialog ??= new OpenFolderDialog();
+            var dialog = _openFolderDialog;
+
+            SetOpenFolderDialogOptions(dialog, title, initialDirectory, false,
+                rootDirectory, validateNames, addToRecent, initialFolderName);
+
+            if (dialog.ShowDialog(Owner) != true)
+                return string.Empty;
+
+            return dialog.FolderName;
+        }
+
+        public string[] GetMultiOpenFolderPath(string? title = null,
+            string? initialDirectory = null, string? rootDirectory = null,
+            bool validateNames = true, bool addToRecent = false, string? initialFolderName = null)
+        {
+            _openFolderDialog ??= new OpenFolderDialog();
+            var dialog = _openFolderDialog;
+
+            SetOpenFolderDialogOptions(dialog, title, initialDirectory, true,
+                rootDirectory, validateNames, addToRecent, initialFolderName);
+
+            if (dialog.ShowDialog(Owner) != true)
+                return [];
+
+            return dialog.FolderNames;
         }
 
         protected static void SetSaveFileDialogOptions(SaveFileDialog dialog, string? title = null,
@@ -166,23 +200,27 @@ namespace Ncl.Common.Wpf.Infrastructure
             bool overwritePrompt = true, bool createPrompt = false, bool checkPathExists = false,
             bool addExtension = true, bool validateNames = true,
             string? defaultExt = null, int filterIndex = 1, bool dereferenceLinks = false,
-            bool restoreDirectory = false, string? initialFileName = null)
+            bool restoreDirectory = false, bool addToRecent = false, string? initialFileName = null)
         {
             dialog.Title = title;
-            dialog.Filter = filter;
+            dialog.Filter = filter ?? string.Empty;
             dialog.OverwritePrompt = overwritePrompt;
             dialog.CreatePrompt = createPrompt;
             //dialog.CheckFileExists = checkFileExists; //Ignored by SaveFileDialog
             dialog.CheckPathExists = checkPathExists;
             dialog.AddExtension = addExtension;
             dialog.ValidateNames = validateNames;
-            dialog.DefaultExt = defaultExt;
+            dialog.DefaultExt = defaultExt ?? string.Empty;
             dialog.FilterIndex = filterIndex;
             dialog.DereferenceLinks = dereferenceLinks;
             dialog.RestoreDirectory = restoreDirectory;
-            dialog.InitialDirectory = initialDirectory;
+            if (initialDirectory != null)
+            {
+                dialog.InitialDirectory = initialDirectory;
+            }
+            dialog.AddToRecent = addToRecent;
 
-            dialog.FileName = initialFileName;
+            dialog.FileName = initialFileName ?? string.Empty;
         }
 
         protected static void SetOpenFileDialogOptions(OpenFileDialog dialog, bool multiselect,
@@ -190,24 +228,44 @@ namespace Ncl.Common.Wpf.Infrastructure
             bool checkFileExists = false, bool readOnlyChecked = false, bool showReadOnly = false,
             bool addExtension = true, bool validateNames = true,
             string? defaultExt = null, int filterIndex = 1, bool dereferenceLinks = false,
-            string? initialFileName = null)
+            bool addToRecent = false, string? initialFileName = null)
         {
             dialog.Multiselect = multiselect;
             dialog.Title = title;
-            dialog.Filter = filter;
+            dialog.Filter = filter ?? string.Empty;
             dialog.CheckFileExists = checkFileExists;
             //dialog.CheckPathExists = checkPathExists; //Implied by CheckFileExists
             dialog.ReadOnlyChecked = readOnlyChecked;
             dialog.ShowReadOnly = showReadOnly;
             dialog.AddExtension = addExtension;
             dialog.ValidateNames = validateNames;
-            dialog.DefaultExt = defaultExt;
+            dialog.DefaultExt = defaultExt ?? string.Empty;
             dialog.FilterIndex = filterIndex;
             dialog.DereferenceLinks = dereferenceLinks;
             //dialog.RestoreDirectory = restoreDirectory; //Not for use with OpenFileDialog
-            dialog.InitialDirectory = initialDirectory;
+            if (initialDirectory != null)
+            {
+                dialog.InitialDirectory = initialDirectory;
+            }
+            dialog.AddToRecent = addToRecent;
 
-            dialog.FileName = initialFileName;
+            dialog.FileName = initialFileName ?? string.Empty;
+        }
+
+        protected static void SetOpenFolderDialogOptions(OpenFolderDialog dialog, string? title = null,
+            string? initialDirectory = null, bool multiselect = false, string? rootDirectory = null,
+            bool validateNames = true, bool addToRecent = false, string? initialFolderName = null)
+        {
+            dialog.Title = title;
+            if (initialDirectory != null)
+            {
+                dialog.InitialDirectory = initialDirectory;
+            }
+            dialog.Multiselect = multiselect;
+            dialog.RootDirectory = rootDirectory;
+            dialog.ValidateNames = validateNames;
+            dialog.AddToRecent = addToRecent;
+            dialog.FolderName = initialFolderName;
         }
     }
 }
