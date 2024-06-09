@@ -6,9 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:Ncl.Common.Wpf.Controls"
     mc:Ignorable="d" 
-    d:DesignHeight="450" d:DesignWidth="800">
+    d:DesignHeight="35" d:DesignWidth="35"
+    Width="35" Height="35">
     <UserControl.Resources>
-        <Style x:Key="StatusIndicatorStyle" TargetType="{x:Type Path}">
+        <Style x:Key="StatusIndicatorStyle" TargetType="{x:Type Ellipse}">
             <Style.Triggers>
                 <DataTrigger 
                     Binding="{Binding Status, RelativeSource={RelativeSource AncestorType=UserControl}}" 
@@ -18,6 +19,30 @@
                         <BeginStoryboard>
                             <Storyboard>
                                 <ColorAnimation Storyboard.TargetProperty="Fill.Color" To="Gray" Duration="0:0:0.5"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                </DataTrigger>
+                <DataTrigger
+                    Binding="{Binding Status, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    Value="{x:Static local:IndicatorStatus.Success}">
+                    <Setter Property="Fill" Value="Green"/>
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetProperty="Fill.Color" To="Green" Duration="0:0:0.5"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                </DataTrigger>
+                <DataTrigger 
+                    Binding="{Binding Status, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                    Value="{x:Static local:IndicatorStatus.Info}">
+                    <Setter Property="Fill" Value="Blue"/>
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetProperty="Fill.Color" To="Blue" Duration="0:0:0.5"/>
                             </Storyboard>
                         </BeginStoryboard>
                     </DataTrigger.EnterActions>
@@ -37,6 +62,18 @@
                 <DataTrigger 
                     Binding="{Binding Status, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     Value="{x:Static local:IndicatorStatus.Error}">
+                    <Setter Property="Fill" Value="OrangeRed"/>
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetProperty="Fill.Color" To="OrangeRed" Duration="0:0:0.5"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                </DataTrigger>
+                <DataTrigger 
+                    Binding="{Binding Status, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    Value="{x:Static local:IndicatorStatus.Faulted}">
                     <Setter Property="Fill" Value="Red"/>
                     <DataTrigger.EnterActions>
                         <BeginStoryboard>
@@ -46,20 +83,12 @@
                         </BeginStoryboard>
                     </DataTrigger.EnterActions>
                 </DataTrigger>
-                <DataTrigger
-                    Binding="{Binding Status, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    Value="{x:Static local:IndicatorStatus.Success}">
-                    <Setter Property="Fill" Value="Green"/>
-                    <DataTrigger.EnterActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <ColorAnimation Storyboard.TargetProperty="Fill.Color" To="Green" Duration="0:0:0.5"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </DataTrigger.EnterActions>
-                </DataTrigger>
+                
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <Path Style="{StaticResource StatusIndicatorStyle}" Data="M50,0 A50,50 0 1,1 0,50"/>
+    <Ellipse
+        Style="{StaticResource StatusIndicatorStyle}" 
+        Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
+        Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
 </UserControl>

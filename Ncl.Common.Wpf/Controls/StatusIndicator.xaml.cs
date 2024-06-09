@@ -19,6 +19,11 @@ public enum IndicatorStatus
     Success,
 
     /// <summary>
+    /// Info status.
+    /// </summary>
+    Info,
+
+    /// <summary>
     /// Warning status.
     /// </summary>
     Warning,
@@ -26,7 +31,12 @@ public enum IndicatorStatus
     /// <summary>
     /// Error status.
     /// </summary>
-    Error
+    Error,
+
+    /// <summary>
+    /// Faulted error status.
+    /// </summary>
+    Faulted
 }
 
 /// <summary>
@@ -39,8 +49,8 @@ public partial class StatusIndicator : UserControl
     /// </summary>
     public static readonly DependencyProperty StatusProperty = DependencyProperty.Register(
         nameof(Status),
-        typeof(string),
         typeof(IndicatorStatus),
+        typeof(StatusIndicator),
         new PropertyMetadata(IndicatorStatus.None));
 
     /// <summary>
