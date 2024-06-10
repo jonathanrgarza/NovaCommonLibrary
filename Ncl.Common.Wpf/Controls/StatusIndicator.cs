@@ -55,6 +55,21 @@ public class StatusIndicator : Control
         new PropertyMetadata(IndicatorStatus.None, OnStatusChanged));
 
     /// <summary>
+    /// Identifies the <see cref="UseAnimations"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty UseAnimationsProperty = DependencyProperty.Register(
+        nameof(UseAnimations), typeof(bool), typeof(StatusIndicator), new PropertyMetadata(true));
+
+    /// <summary>
+    /// Is the control using animations.
+    /// </summary>
+    public bool UseAnimations
+    {
+        get => (bool)GetValue(UseAnimationsProperty);
+        set => SetValue(UseAnimationsProperty, value);
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="StatusIndicator"/> class.
     /// </summary>
     static StatusIndicator()
@@ -93,28 +108,29 @@ public class StatusIndicator : Control
     /// <summary>
     /// Updates the visual state of the control.
     /// </summary>
-    /// <param name="useTransitions">Should transitions be used.</param>
+    /// <param name="useTransitions">Should transitions be used, if allowed by <see cref="UseAnimations"/>.</param>
     private void UpdateVisualState(bool useTransitions)
     {
+        bool useAnimations = UseAnimations && useTransitions;
         switch (Status)
         {
             case IndicatorStatus.None:
-                VisualStateManager.GoToState(this, "None", useTransitions);
+                VisualStateManager.GoToState(this, "None", useAnimations);
                 break;
             case IndicatorStatus.Success:
-                VisualStateManager.GoToState(this, "Success", useTransitions);
+                VisualStateManager.GoToState(this, "Success", useAnimations);
                 break;
             case IndicatorStatus.Info:
-                VisualStateManager.GoToState(this, "Info", useTransitions);
+                VisualStateManager.GoToState(this, "Info", useAnimations);
                 break;
             case IndicatorStatus.Warning:
-                VisualStateManager.GoToState(this, "Warning", useTransitions);
+                VisualStateManager.GoToState(this, "Warning", useAnimations);
                 break;
             case IndicatorStatus.Error:
-                VisualStateManager.GoToState(this, "Error", useTransitions);
+                VisualStateManager.GoToState(this, "Error", useAnimations);
                 break;
             case IndicatorStatus.Faulted:
-                VisualStateManager.GoToState(this, "Faulted", useTransitions);
+                VisualStateManager.GoToState(this, "Faulted", useAnimations);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
