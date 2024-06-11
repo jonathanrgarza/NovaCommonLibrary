@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -46,6 +47,11 @@ public enum IndicatorStatus
 public class StatusIndicator : Control
 {
     /// <summary>
+    /// The default duration of the animation.
+    /// </summary>
+    public static readonly Duration DefaultAnimationDuration = new(TimeSpan.FromSeconds(0.3));
+
+    /// <summary>
     /// Identifies the <see cref="Status"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty StatusProperty = DependencyProperty.Register(
@@ -61,13 +67,15 @@ public class StatusIndicator : Control
         nameof(UseAnimations), typeof(bool), typeof(StatusIndicator), new PropertyMetadata(true));
 
     /// <summary>
-    /// Is the control using animations.
+    /// Identifies the <see cref="AnimationDuration"/> dependency property.
     /// </summary>
-    public bool UseAnimations
-    {
-        get => (bool)GetValue(UseAnimationsProperty);
-        set => SetValue(UseAnimationsProperty, value);
-    }
+    public static readonly DependencyProperty AnimationDurationProperty = DependencyProperty.Register(
+        nameof(AnimationDuration),
+        typeof(Duration),
+        typeof(StatusIndicator),
+        new PropertyMetadata(DefaultAnimationDuration, OnAnimationDurationChanged));
+
+    private FrameworkElement? _rootElement;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StatusIndicator"/> class.
@@ -87,12 +95,32 @@ public class StatusIndicator : Control
         set => SetValue(StatusProperty, value);
     }
 
+    /// <summary>
+    /// Is the control using animations.
+    /// </summary>
+    public bool UseAnimations
+    {
+        get => (bool)GetValue(UseAnimationsProperty);
+        set => SetValue(UseAnimationsProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the duration of the animation.
+    /// </summary>
+    public Duration AnimationDuration
+    {
+        get => (Duration)GetValue(AnimationDurationProperty);
+        set => SetValue(AnimationDurationProperty, value);
+    }
+
     /// <inheritdoc/>
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
 
+        _rootElement = GetTemplateChild("PART_Root") as FrameworkElement;
         UpdateVisualState(false);
+        UpdateAnimationDurations();
     }
 
     /// <summary>
@@ -106,12 +134,24 @@ public class StatusIndicator : Control
     }
 
     /// <summary>
+    /// Called when the animation duration changes.
+    /// </summary>
+    /// <param name="d">The dependency object that changed.</param>
+    /// <param name="e">The event arguments.</param>
+    private static void OnAnimationDurationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((StatusIndicator)d).UpdateAnimationDurations();
+    }
+
+    /// <summary>
     /// Updates the visual state of the control.
     /// </summary>
     /// <param name="useTransitions">Should transitions be used, if allowed by <see cref="UseAnimations"/>.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Status is out of range.</exception>
     private void UpdateVisualState(bool useTransitions)
     {
         bool useAnimations = UseAnimations && useTransitions;
+
         switch (Status)
         {
             case IndicatorStatus.None:
@@ -133,7 +173,31 @@ public class StatusIndicator : Control
                 VisualStateManager.GoToState(this, "Faulted", useAnimations);
                 break;
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(Status));
+        }
+    }
+
+    private void UpdateAnimationDurations()
+    {
+        if (_rootElement == null)
+            return;
+
+        var groups = VisualStateManager.GetVisualStateGroups(_rootElement);
+        if (groups == null || groups.Count == 0)
+            return;
+
+        var group = groups[0] as VisualStateGroup;
+        if (group?.States is not IList<VisualState?> states || states.Count == 0)
+            return;
+
+        foreach (var state in states)
+        {
+            var storyboard = state?.Storyboard;
+            var animation = storyboard?.Children[0];
+            if (animation == null)
+                continue;
+
+            animation.Duration = AnimationDuration;
         }
     }
 }
