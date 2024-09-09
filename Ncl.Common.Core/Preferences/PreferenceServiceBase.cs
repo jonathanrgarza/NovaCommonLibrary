@@ -12,7 +12,7 @@ namespace Ncl.Common.Core.Preferences
     /// <summary>
     ///     The base class for a preference service.
     /// </summary>
-    public abstract class PreferenceServiceBase : IPreferenceService, ISimplePreferenceService
+    public abstract class PreferenceServiceBase : IPreferenceService, ICustomizablePreferenceService
     {
         /// <summary>
         ///     Holds the dictionary of factory preference instances (default preferences).
@@ -48,7 +48,7 @@ namespace Ncl.Common.Core.Preferences
         /// <inheritdoc cref="IPreferenceService.GetPreferenceDirectoryPath{T}" />
         public string GetPreferenceDirectoryPath<T>() where T : class, IPreference
         {
-            Type prefType = typeof(T);
+            var prefType = typeof(T);
             return GetPreferenceDirectoryPath(prefType);
         }
 
@@ -56,7 +56,7 @@ namespace Ncl.Common.Core.Preferences
         public void SetPreferenceDirectoryPath<T>(string directoryPath,
             bool invalidateCachedPreferences = false) where T : class, IPreference
         {
-            Type prefType = typeof(T);
+            var prefType = typeof(T);
 
             UpdatePreferenceSaveLocation(prefType, directoryPath, true);
 
@@ -68,7 +68,7 @@ namespace Ncl.Common.Core.Preferences
         /// <inheritdoc cref="IPreferenceService.GetPreferenceFileName{T}" />
         public string GetPreferenceFileName<T>() where T : class, IPreference
         {
-            Type prefType = typeof(T);
+            var prefType = typeof(T);
             return GetPreferenceFileName(prefType);
         }
 
@@ -86,7 +86,7 @@ namespace Ncl.Common.Core.Preferences
         public void SetPreferenceFilePath<T>(string filePath,
             bool invalidateCachedPreferences = false) where T : class, IPreference
         {
-            Type prefType = typeof(T);
+            var prefType = typeof(T);
 
             if (filePath.EndsWith(".xml", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -107,12 +107,12 @@ namespace Ncl.Common.Core.Preferences
             if (preferenceEnumerable is null)
                 throw new ArgumentNullException(nameof(preferenceEnumerable));
 
-            foreach (IPreference preference in preferenceEnumerable)
+            foreach (var preference in preferenceEnumerable)
             {
                 if (preference is null)
                     continue;
 
-                Type prefType = preference.GetType();
+                var prefType = preference.GetType();
                 _factoryPreferences[prefType] = preference.Clone();
             }
         }
@@ -130,12 +130,12 @@ namespace Ncl.Common.Core.Preferences
                 throw new DirectoryNotFoundException($"The directory does not exist: '{directoryPath}'");
 
             int count = 0;
-            List<string> xmlFiles = Directory.EnumerateFiles(directoryPath, "*.xml").ToList();
+            var xmlFiles = Directory.EnumerateFiles(directoryPath, "*.xml").ToList();
 
             if (xmlFiles.Count == 0)
                 return 0;
 
-            foreach (Type prefType in preferenceTypes)
+            foreach (var prefType in preferenceTypes)
             {
                 if (prefType is null)
                     continue;
@@ -152,7 +152,7 @@ namespace Ncl.Common.Core.Preferences
                     if (!name.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
                         continue;
 
-                    IPreference preference = LoadFromFilePath(prefType, xmlFile);
+                    var preference = LoadFromFilePath(prefType, xmlFile);
 
                     if (preference == null)
                         continue;
@@ -175,8 +175,8 @@ namespace Ncl.Common.Core.Preferences
         /// <inheritdoc cref="IPreferenceService.GetDefaultPreference{T}" />
         public T GetDefaultPreference<T>() where T : class, IPreference
         {
-            Type prefType = typeof(T);
-            if (_factoryPreferences.TryGetValue(prefType, out IPreference preference))
+            var prefType = typeof(T);
+            if (_factoryPreferences.TryGetValue(prefType, out var preference))
                 return (T) preference.Clone();
             return null;
         }
@@ -184,7 +184,7 @@ namespace Ncl.Common.Core.Preferences
         /// <inheritdoc cref="IPreferenceService.GetPreference{T}" />
         public T GetPreference<T>(bool forceLoadNew = false) where T : class, IPreference
         {
-            Type prefType = typeof(T);
+            var prefType = typeof(T);
 
             return (T) GetPreference(prefType, forceLoadNew);
         }
@@ -192,7 +192,7 @@ namespace Ncl.Common.Core.Preferences
         /// <inheritdoc cref="IPreferenceService.SetPreference{T}" />
         public void SetPreference<T>(T preference) where T : class, IPreference
         {
-            Type prefType = typeof(T);
+            var prefType = typeof(T);
 
             if (preference == null)
             {
@@ -207,7 +207,7 @@ namespace Ncl.Common.Core.Preferences
         /// <inheritdoc cref="IPreferenceService.SavePreference{T}" />
         public void SavePreference<T>() where T : class, IPreference
         {
-            Type prefType = typeof(T);
+            var prefType = typeof(T);
 
             SavePreference(prefType);
         }
@@ -215,7 +215,7 @@ namespace Ncl.Common.Core.Preferences
         /// <inheritdoc cref="IPreferenceService.SaveAllPreferences" />
         public void SaveAllPreferences()
         {
-            foreach (KeyValuePair<Type, PreferenceSaveInfo> preferenceSaveInfo in _preferences)
+            foreach (var preferenceSaveInfo in _preferences)
             {
                 if (!preferenceSaveInfo.Value.IsDirty)
                     continue;
@@ -231,7 +231,7 @@ namespace Ncl.Common.Core.Preferences
         /// <returns>The save directory path for the given preference type or <see langword="null" /> when none.</returns>
         protected string GetPreferenceDirectoryPath(Type prefType)
         {
-            if (_preferenceSaveLocations.TryGetValue(prefType, out SaveLocation saveLocation))
+            if (_preferenceSaveLocations.TryGetValue(prefType, out var saveLocation))
             {
                 if (saveLocation != null)
                 {
@@ -257,7 +257,7 @@ namespace Ncl.Common.Core.Preferences
         /// <returns>The file name for the given preference type.</returns>
         protected virtual string GetPreferenceFileName(Type prefType)
         {
-            if (!_preferenceSaveLocations.TryGetValue(prefType, out SaveLocation saveLocation))
+            if (!_preferenceSaveLocations.TryGetValue(prefType, out var saveLocation))
                 return $"{prefType.Name}.xml";
 
             if (saveLocation != null)
@@ -293,7 +293,7 @@ namespace Ncl.Common.Core.Preferences
         /// <returns>The default preference or <see langword="null" /> when none has been registered.</returns>
         protected IPreference GetDefaultPreference(Type prefType)
         {
-            return _factoryPreferences.TryGetValue(prefType, out IPreference preference) ? preference.Clone() : null;
+            return _factoryPreferences.TryGetValue(prefType, out var preference) ? preference.Clone() : null;
         }
 
         /// <summary>
@@ -309,7 +309,7 @@ namespace Ncl.Common.Core.Preferences
                 return GetPreferenceFromDefaultPath(prefType);
             }
 
-            if (!_preferences.TryGetValue(prefType, out PreferenceSaveInfo currentPreferencesInfo))
+            if (!_preferences.TryGetValue(prefType, out var currentPreferencesInfo))
                 return GetPreferenceFromDefaultPath(prefType);
 
             //Check save path
@@ -327,7 +327,7 @@ namespace Ncl.Common.Core.Preferences
         protected IPreference GetPreferenceFromDefaultPath(Type prefType)
         {
             string preferenceSavePath = GetPreferenceFilePath(prefType);
-            IPreference preference = LoadFromFilePath(prefType, preferenceSavePath);
+            var preference = LoadFromFilePath(prefType, preferenceSavePath);
 
             SetPreferenceCache(prefType, preference, preferenceSavePath);
 
@@ -373,7 +373,7 @@ namespace Ncl.Common.Core.Preferences
         /// </exception>
         protected void SavePreference(Type prefType)
         {
-            IPreference preferences = GetPreference(prefType);
+            var preferences = GetPreference(prefType);
 
             if (preferences is null)
                 return;
@@ -467,9 +467,9 @@ namespace Ncl.Common.Core.Preferences
                 return null;
             }
 
-            if (_preferences.TryGetValue(prefType, out PreferenceSaveInfo currentSaveInfo) && currentSaveInfo != null)
+            if (_preferences.TryGetValue(prefType, out var currentSaveInfo) && currentSaveInfo != null)
             {
-                IPreference oldPreference = currentSaveInfo.Preference;
+                var oldPreference = currentSaveInfo.Preference;
 
                 currentSaveInfo.Preference = preference;
                 currentSaveInfo.SavePath = filePath;
@@ -502,9 +502,9 @@ namespace Ncl.Common.Core.Preferences
                 return null;
             }
 
-            if (_preferences.TryGetValue(prefType, out PreferenceSaveInfo currentSaveInfo) && currentSaveInfo != null)
+            if (_preferences.TryGetValue(prefType, out var currentSaveInfo) && currentSaveInfo != null)
             {
-                IPreference oldPreference = currentSaveInfo.Preference;
+                var oldPreference = currentSaveInfo.Preference;
 
                 currentSaveInfo.Preference = preference;
 
@@ -528,7 +528,7 @@ namespace Ncl.Common.Core.Preferences
         /// <returns>The preference from cache or <see langword="null" />.</returns>
         protected virtual IPreference GetPreferenceFromCache(Type prefType)
         {
-            return _preferences.TryGetValue(prefType, out PreferenceSaveInfo preferenceInfo)
+            return _preferences.TryGetValue(prefType, out var preferenceInfo)
                 ? preferenceInfo?.Preference
                 : null;
         }
@@ -540,7 +540,7 @@ namespace Ncl.Common.Core.Preferences
         /// <param name="filePath">The new file path.</param>
         protected void UpdatePreferenceCacheSaveLocation(Type prefType, string filePath)
         {
-            if (!_preferences.TryGetValue(prefType, out PreferenceSaveInfo currentSaveInfo))
+            if (!_preferences.TryGetValue(prefType, out var currentSaveInfo))
                 return;
 
             if (currentSaveInfo == null)
@@ -569,7 +569,7 @@ namespace Ncl.Common.Core.Preferences
                 return;
             }
 
-            if (_preferenceSaveLocations.TryGetValue(prefType, out SaveLocation currentLocation))
+            if (_preferenceSaveLocations.TryGetValue(prefType, out var currentLocation))
             {
                 if (isDirectoryPath)
                 {
