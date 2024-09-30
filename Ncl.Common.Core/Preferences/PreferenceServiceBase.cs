@@ -51,7 +51,10 @@ namespace Ncl.Common.Core.Preferences
             UpdatePreferenceSaveLocation(prefType, directoryPath, true);
 
             if (!invalidateCachedPreferences)
+            {
                 return;
+            }
+
             UpdatePreferenceCacheSaveLocation(prefType, GetPreferenceFilePath(prefType));
         }
 
@@ -66,7 +69,9 @@ namespace Ncl.Common.Core.Preferences
             UpdatePreferenceSaveLocation(prefType, filePath, false);
 
             if (!invalidateCachedPreferences)
+            {
                 return;
+            }
 
             UpdatePreferenceCacheSaveLocation(prefType, GetPreferenceFilePath(prefType));
         }
@@ -75,12 +80,16 @@ namespace Ncl.Common.Core.Preferences
         public void RegisterDefaultPreferences(IEnumerable<IPreference> preferenceEnumerable)
         {
             if (preferenceEnumerable is null)
+            {
                 throw new ArgumentNullException(nameof(preferenceEnumerable));
+            }
 
             foreach (var preference in preferenceEnumerable)
             {
                 if (preference is null)
+                {
                     continue;
+                }
 
                 var prefType = preference.GetType();
                 _factoryPreferences[prefType] = preference.Clone();
@@ -92,23 +101,34 @@ namespace Ncl.Common.Core.Preferences
             string namePrefix = null)
         {
             if (directoryPath is null)
+            {
                 throw new ArgumentNullException(nameof(directoryPath));
+            }
+
             if (preferenceTypes is null)
+            {
                 throw new ArgumentNullException(nameof(preferenceTypes));
+            }
 
             if (!Directory.Exists(directoryPath))
+            {
                 throw new DirectoryNotFoundException($"The directory does not exist: '{directoryPath}'");
+            }
 
             int count = 0;
             var xmlFiles = Directory.EnumerateFiles(directoryPath, "*.xml").ToList();
 
             if (xmlFiles.Count == 0)
+            {
                 return 0;
+            }
 
             foreach (var prefType in preferenceTypes)
             {
                 if (prefType is null)
+                {
                     continue;
+                }
 
                 string name = namePrefix is null
                     ? GetPreferenceFileName(prefType)
@@ -120,12 +140,16 @@ namespace Ncl.Common.Core.Preferences
                     string fileName = Path.GetFileNameWithoutExtension(xmlFile);
 
                     if (!name.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+                    {
                         continue;
+                    }
 
                     var preference = LoadFromFilePath(prefType, xmlFile);
 
                     if (preference == null)
+                    {
                         continue;
+                    }
 
                     matchedPath = xmlFile;
                     _factoryPreferences[prefType] = preference;
@@ -133,7 +157,9 @@ namespace Ncl.Common.Core.Preferences
                 }
 
                 if (matchedPath == null)
+                {
                     continue;
+                }
 
                 xmlFiles.Remove(matchedPath);
                 count++;
@@ -164,7 +190,10 @@ namespace Ncl.Common.Core.Preferences
         {
             string directory = GetPreferenceDirectoryPath<T>();
             if (directory == null)
+            {
                 return null;
+            }
+
             string fileName = GetPreferenceFileName<T>();
             return Path.Combine(directory, fileName);
         }
@@ -174,7 +203,10 @@ namespace Ncl.Common.Core.Preferences
         {
             var prefType = typeof(T);
             if (_factoryPreferences.TryGetValue(prefType, out var preference))
+            {
                 return (T)preference.Clone();
+            }
+
             return null;
         }
 
@@ -215,7 +247,9 @@ namespace Ncl.Common.Core.Preferences
             foreach (var preferenceSaveInfo in _preferences)
             {
                 if (!preferenceSaveInfo.Value.IsDirty)
+                {
                     continue;
+                }
 
                 SavePreference(preferenceSaveInfo.Key);
             }
@@ -231,16 +265,20 @@ namespace Ncl.Common.Core.Preferences
             if (_preferenceSaveLocations.TryGetValue(prefType, out var saveLocation))
             {
                 if (saveLocation != null)
+                {
                     return saveLocation.IsDirectoryPath
                         ? saveLocation.DirectoryPath
                         : Path.GetDirectoryName(saveLocation.FilePath);
+                }
 
                 _preferenceSaveLocations.Remove(prefType);
             }
 
             string defaultDirectory = DefaultDirectory;
             if (defaultDirectory != null && Directory.Exists(defaultDirectory))
+            {
                 return defaultDirectory;
+            }
 
             return FallbackDirectory;
         }
@@ -253,12 +291,16 @@ namespace Ncl.Common.Core.Preferences
         protected virtual string GetPreferenceFileName(Type prefType)
         {
             if (!_preferenceSaveLocations.TryGetValue(prefType, out var saveLocation))
+            {
                 return $"{prefType.Name}.xml";
+            }
 
             if (saveLocation != null)
+            {
                 return saveLocation.IsFilePath
                     ? Path.GetFileName(saveLocation.FilePath)
                     : $"{prefType.Name}.xml";
+            }
 
             _preferenceSaveLocations.Remove(prefType);
 
@@ -274,7 +316,10 @@ namespace Ncl.Common.Core.Preferences
         {
             string directory = GetPreferenceDirectoryPath(prefType);
             if (directory == null)
+            {
                 return null;
+            }
+
             string fileName = GetPreferenceFileName(prefType);
             return Path.Combine(directory, fileName);
         }
@@ -300,15 +345,19 @@ namespace Ncl.Common.Core.Preferences
             if (forceLoadNew) return GetPreferenceFromDefaultPath(prefType);
 
             if (!_preferences.TryGetValue(prefType, out var currentPreferencesInfo))
+            {
                 return GetPreferenceFromDefaultPath(prefType);
+            }
 
             //Check save path
             if (currentPreferencesInfo == null ||
                 (currentPreferencesInfo.SavePath != null &&
                  currentPreferencesInfo.SavePath != GetPreferenceFilePath(prefType)))
+            {
                 return GetPreferenceFromDefaultPath(prefType);
+            }
 
-            return currentPreferencesInfo.Preference ?? GetDefaultPreference(prefType);
+            return currentPreferencesInfo.Preference.Clone() ?? GetDefaultPreference(prefType);
         }
 
         /// <summary>
@@ -324,7 +373,9 @@ namespace Ncl.Common.Core.Preferences
             SetPreferenceCache(prefType, preference, preferenceSavePath);
 
             if (preference == null)
+            {
                 return GetDefaultPreference(prefType);
+            }
 
             return preference.Clone();
         }
@@ -368,7 +419,9 @@ namespace Ncl.Common.Core.Preferences
             var preferences = GetPreference(prefType);
 
             if (preferences is null)
+            {
                 return;
+            }
 
             string filePath = GetPreferenceFilePath(prefType);
 
@@ -384,14 +437,24 @@ namespace Ncl.Common.Core.Preferences
         protected virtual IPreference LoadFromFilePath(Type prefType, string path)
         {
             if (path == null)
+            {
                 return null;
+            }
+
             if (prefType == null)
+            {
                 return null;
+            }
+
             if (!File.Exists(path))
+            {
                 return null;
+            }
 
             if (!XmlSerializationService.TryReadObject(path, prefType, out object result))
+            {
                 return null;
+            }
 
             var preferences = result as IPreference;
             preferences = preferences?.OnDeserialization();
@@ -495,22 +558,24 @@ namespace Ncl.Common.Core.Preferences
                 return null;
             }
 
+            var clonedPreference = preference.Clone();
             if (_preferences.TryGetValue(prefType, out var currentSaveInfo) && currentSaveInfo != null)
             {
                 var oldPreference = currentSaveInfo.Preference;
 
-                currentSaveInfo.Preference = preference;
+                // Update the current preference with a cloned one to avoid changes to the cached preference
+                currentSaveInfo.Preference = clonedPreference.Clone();
 
-                RaisePreferenceChanged(prefType, oldPreference, preference);
+                RaisePreferenceChanged(prefType, oldPreference, clonedPreference);
                 return currentSaveInfo;
             }
 
-            var newSaveInfo = new PreferenceSaveInfo(preference, null)
+            var newSaveInfo = new PreferenceSaveInfo(clonedPreference, null)
             {
                 IsDirty = true
             };
             _preferences[prefType] = newSaveInfo;
-            RaisePreferenceChanged(prefType, null, preference);
+            RaisePreferenceChanged(prefType, null, clonedPreference);
             return newSaveInfo;
         }
 
@@ -534,7 +599,9 @@ namespace Ncl.Common.Core.Preferences
         protected void UpdatePreferenceCacheSaveLocation(Type prefType, string filePath)
         {
             if (!_preferences.TryGetValue(prefType, out var currentSaveInfo))
+            {
                 return;
+            }
 
             if (currentSaveInfo == null)
             {
@@ -578,7 +645,7 @@ namespace Ncl.Common.Core.Preferences
         }
 
         /// <summary>
-        /// Raises a preference changed event with the given arguments.
+        /// Raises a preference changed event with the given arguments, if difference in values.
         /// </summary>
         /// <param name="prefType">The preference type.</param>
         /// <param name="oldValue">The previous value.</param>
@@ -588,7 +655,9 @@ namespace Ncl.Common.Core.Preferences
             Guard.AgainstNullArgument(nameof(prefType), prefType);
 
             if (EqualityComparer<IPreference>.Default.Equals(oldValue, newValue))
+            {
                 return;
+            }
 
             var eventArgs = new PreferenceChangedEventArgs(prefType, oldValue, newValue);
             PreferenceChanged?.Invoke(this, eventArgs);
@@ -695,7 +764,10 @@ namespace Ncl.Common.Core.Preferences
                 set
                 {
                     if (EqualityComparer<IPreference>.Default.Equals(_preference, value))
+                    {
                         return;
+                    }
+
                     _preference = value;
                     IsDirty = true;
                 }
@@ -710,7 +782,10 @@ namespace Ncl.Common.Core.Preferences
                 set
                 {
                     if (_savePath == value)
+                    {
                         return;
+                    }
+
                     _savePath = value;
                     IsDirty = true;
                 }
@@ -720,9 +795,15 @@ namespace Ncl.Common.Core.Preferences
             public bool Equals(PreferenceSaveInfo other)
             {
                 if (ReferenceEquals(null, other))
+                {
                     return false;
+                }
+
                 if (ReferenceEquals(this, other))
+                {
                     return true;
+                }
+
                 return EqualityComparer<IPreference>.Default.Equals(_preference, other._preference) &&
                        _savePath == other._savePath &&
                        IsDirty == other.IsDirty;
@@ -732,11 +813,20 @@ namespace Ncl.Common.Core.Preferences
             public override bool Equals(object obj)
             {
                 if (ReferenceEquals(null, obj))
+                {
                     return false;
+                }
+
                 if (ReferenceEquals(this, obj))
+                {
                     return true;
+                }
+
                 if (obj.GetType() != GetType())
+                {
                     return false;
+                }
+
                 return Equals((PreferenceSaveInfo)obj);
             }
 
