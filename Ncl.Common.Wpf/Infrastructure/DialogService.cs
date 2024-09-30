@@ -65,6 +65,44 @@ public class DialogService : IDialogService
     }
 
     /// <inheritdoc/>
+    public bool? ShowDialog<TViewModel>() where TViewModel : class
+    {
+        if (HandleSpecialDialogs && IsSpecialDialogVm<TViewModel>())
+        {
+            throw new InvalidOperationException(
+                $"Cannot show a special dialog without a data context. Use the other overload of ShowDialog.");
+        }
+
+        if (_mappings.TryGetValue(typeof(TViewModel), out var dialogFactory))
+        {
+            if (dialogFactory == null)
+            {
+                throw new InvalidOperationException(
+                    $"No dialog type registered for view model of type {typeof(TViewModel)}.");
+            }
+
+            var dialog = dialogFactory.Create();
+
+            // Assume the DataContext is set in the Window constructor by DI
+            if (dialog.DataContext == null)
+            {
+                throw new InvalidOperationException(
+                    $"DataContext is null after Window/Dialog creation for view model of type {typeof(TViewModel)}.");
+            }
+
+            bool? result = _windowManager.ShowDialog(dialog, true);
+            if (dialog.DataContext is IDialogViewModel dialogViewModel)
+            {
+                dialogViewModel.DialogResult = result;
+            }
+
+            return result;
+        }
+
+        throw new InvalidOperationException($"No dialog type registered for view model of type {typeof(TViewModel)}.");
+    }
+
+    /// <inheritdoc/>
     public bool IsRegistered<TViewModel>() where TViewModel : class
     {
         return _mappings.ContainsKey(typeof(TViewModel));
@@ -219,6 +257,19 @@ public class DialogService : IDialogService
 
         showDialog = null;
         return false;
+    }
+
+    /// <summary>
+    /// Checks if the view model is a special dialog view model.
+    /// </summary>
+    /// <typeparam name="TViewModel">The type of the view model.</typeparam>
+    /// <returns>true if <typeparamref name="TViewModel"/> is one of the special dialog view models, otherwise, false.</returns>
+    public bool IsSpecialDialogVm<TViewModel>()
+    {
+        return typeof(TViewModel) == typeof(SaveFileCommonDialogViewModel) ||
+               typeof(TViewModel) == typeof(OpenFileCommonDialogViewModel) ||
+               typeof(TViewModel) == typeof(OpenFolderCommonDialogViewModel) ||
+               typeof(TViewModel) == typeof(MessageBoxDialogViewModel);
     }
 
     /// <summary>
