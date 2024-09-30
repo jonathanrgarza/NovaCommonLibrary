@@ -174,7 +174,7 @@ namespace Ncl.Common.Core.Preferences
             bool invalidateCachedPreferences = false) where T : class, IPreference;
 
         /// <summary>
-        ///     Registers an enumerable of default preferences.
+        ///     Registers enumerable of default preferences.
         /// </summary>
         /// <param name="preferenceEnumerable">The preference enumerable.</param>
         /// <exception cref="ArgumentNullException"><paramref name="preferenceEnumerable" /> is <see langword="null" />.</exception>
