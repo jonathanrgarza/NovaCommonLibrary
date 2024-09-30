@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Windows;
 using Microsoft.Win32;
 using Ncl.Common.Wpf.ViewModels;
 
@@ -34,20 +36,28 @@ public class DialogService : IDialogService
     public bool? ShowDialog<TViewModel>(TViewModel dataContext) where TViewModel : class
     {
         if (HandleSpecialDialogs && ShowSpecialDialog(dataContext, out bool? showDialog))
+        {
             return showDialog;
+        }
 
         if (_mappings.TryGetValue(typeof(TViewModel), out var dialogFactory))
         {
             if (dialogFactory == null)
+            {
                 throw new InvalidOperationException(
                     $"No dialog type registered for view model of type {typeof(TViewModel)}.");
+            }
 
             var dialog = dialogFactory.Create();
 
             dialog.DataContext = dataContext;
 
-            bool? result = _windowManager.ShowDialog(dialog);
-            if (dataContext is IDialogViewModel dialogViewModel) dialogViewModel.DialogResult = result;
+            bool? result = _windowManager.ShowDialog(dialog, true);
+            if (dataContext is IDialogViewModel dialogViewModel)
+            {
+                dialogViewModel.DialogResult = result;
+            }
+
             return result;
         }
 
@@ -61,7 +71,7 @@ public class DialogService : IDialogService
     }
 
     /// <summary>
-    /// Shows a special dialog (SaveFileDialog, OpenFileDialog, OpenFolderDialog) based on the view model type.
+    /// Shows a special dialog (SaveFileDialog, OpenFileDialog, OpenFolderDialog or MessageBox) based on the view model type.
     /// </summary>
     /// <typeparam name="TViewModel">The type of the view model.</typeparam>
     /// <param name="dataContext">The data context of the view model.</param>
@@ -100,7 +110,7 @@ public class DialogService : IDialogService
                     ValidateNames = saveFileDialogViewModel.ValidateNames
                 };
 
-                bool? result = _windowManager.ShowDialog(dialog);
+                bool? result = _windowManager.ShowDialog(dialog, true);
 
                 // Update the view model with the results
                 saveFileDialogViewModel.FileNames = dialog.FileNames;
@@ -139,7 +149,7 @@ public class DialogService : IDialogService
                     ValidateNames = openFileDialogViewModel.ValidateNames
                 };
 
-                bool? result = _windowManager.ShowDialog(dialog);
+                bool? result = _windowManager.ShowDialog(dialog, true);
 
                 // Update the view model with the results
                 openFileDialogViewModel.FileNames = dialog.FileNames;
@@ -168,13 +178,41 @@ public class DialogService : IDialogService
                     ValidateNames = openFolderDialogViewModel.ValidateNames
                 };
 
-                bool? result = _windowManager.ShowDialog(dialog);
+                bool? result = _windowManager.ShowDialog(dialog, true);
 
                 // Update the view model with the results
                 openFolderDialogViewModel.FolderNames = dialog.FolderNames;
 
                 openFolderDialogViewModel.DialogResult = result;
                 showDialog = result;
+                return true;
+            }
+            case MessageBoxDialogViewModel messageBoxDialogViewModel:
+            {
+                var activeWindow = _windowManager.ActiveWindow;
+
+                MessageBoxResult result;
+                if (activeWindow == null)
+                {
+                    result = MessageBox.Show(messageBoxDialogViewModel.Text, messageBoxDialogViewModel.Caption,
+                        messageBoxDialogViewModel.Button, messageBoxDialogViewModel.Icon,
+                        messageBoxDialogViewModel.DefaultResult, messageBoxDialogViewModel.Options);
+                }
+                else
+                {
+                    result = MessageBox.Show(activeWindow, messageBoxDialogViewModel.Text,
+                        messageBoxDialogViewModel.Caption,
+                        messageBoxDialogViewModel.Button, messageBoxDialogViewModel.Icon,
+                        messageBoxDialogViewModel.DefaultResult, messageBoxDialogViewModel.Options);
+                }
+
+                messageBoxDialogViewModel.Result = result;
+                showDialog = result switch
+                {
+                    MessageBoxResult.OK or MessageBoxResult.Yes => true,
+                    MessageBoxResult.No => false,
+                    _ => null
+                };
                 return true;
             }
         }
