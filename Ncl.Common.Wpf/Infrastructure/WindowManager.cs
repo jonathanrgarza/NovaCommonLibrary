@@ -17,6 +17,7 @@ public class WindowManager : IWindowManager
     private readonly Dictionary<Type, IWindowFactory> _windowMappings = new();
 
     private Window? _activeWindow;
+    private Window? _mainWindow;
     private IReadOnlyCollectionWrapper<Window>? _readonlyOpenWindows;
 
     /// <inheritdoc/>
@@ -38,6 +39,21 @@ public class WindowManager : IWindowManager
     }
 
     /// <inheritdoc/>
+    public Window? MainWindow
+    {
+        get => _mainWindow;
+        private set
+        {
+            if (_mainWindow == value) return;
+
+            Debug.WriteLine($"Main Window Changed: {_mainWindow} -> {value}");
+
+            _mainWindow = value;
+            OnMainWindowChanged();
+        }
+    }
+
+    /// <inheritdoc/>
     public void ShowWindowFromViewModel<TViewModel, T>(TViewModel dataContext, bool assignParent = false)
         where TViewModel : class
     {
@@ -52,6 +68,24 @@ public class WindowManager : IWindowManager
     }
 
     /// <inheritdoc/>
+    public void ShowWindowFromViewModel<TViewModel, T>(bool assignParent = false)
+        where TViewModel : class
+    {
+        if (!_windowMappings.TryGetValue(typeof(TViewModel), out var windowFactory))
+        {
+            throw new InvalidOperationException($"No window registered for {typeof(TViewModel).Name}");
+        }
+
+        var window = windowFactory.Create();
+        if (window.DataContext == null)
+        {
+            throw new InvalidOperationException($"Window DataContext is null for {typeof(TViewModel).Name}");
+        }
+
+        ShowWindow(window, assignParent);
+    }
+
+    /// <inheritdoc/>
     public void ShowWindow(Window window, bool assignParent = false)
     {
         if (assignParent && ActiveWindow != null)
@@ -60,13 +94,16 @@ public class WindowManager : IWindowManager
         }
 
         _openWindows.Add(window);
+
+        window.Closed += OnWindowClosed;
+
+        window.Show();
+
+        MainWindow ??= window;
         ActiveWindow = window;
 
         window.Activated += OnWindowActivated;
         window.Deactivated += OnWindowDeactivated;
-        window.Closed += OnWindowClosed;
-
-        window.Show();
     }
 
     /// <inheritdoc/>
@@ -79,6 +116,7 @@ public class WindowManager : IWindowManager
 
         _openWindows.Add(window);
         ActiveWindow = window;
+        MainWindow ??= window;
         bool? result = window.ShowDialog();
         _openWindows.Remove(window);
         return result;
@@ -92,10 +130,11 @@ public class WindowManager : IWindowManager
         return result;
     }
 
-    /// <summary>
-    /// Occurs when the active window changes.
-    /// </summary>
+    /// <inheritdoc/>
     public event EventHandler<Window?>? ActiveWindowChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<Window?>? MainWindowChanged;
 
     /// <summary>
     /// Registers a window for a view model.
@@ -143,5 +182,10 @@ public class WindowManager : IWindowManager
     {
         // Do something when the active window changes
         ActiveWindowChanged?.Invoke(this, ActiveWindow);
+    }
+
+    private void OnMainWindowChanged()
+    {
+        MainWindowChanged?.Invoke(this, MainWindow);
     }
 }

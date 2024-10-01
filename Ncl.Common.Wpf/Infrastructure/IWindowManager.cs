@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using Microsoft.Win32;
 using Ncl.Common.Core.Collections;
 
@@ -12,12 +13,27 @@ public interface IWindowManager
     /// <summary>
     /// Gets the collection of open windows.
     /// </summary>
-    public IReadOnlyCollectionWrapper<Window> OpenWindows { get; }
+    IReadOnlyCollectionWrapper<Window> OpenWindows { get; }
 
     /// <summary>
     /// Gets the active window.
     /// </summary>
-    public Window? ActiveWindow { get; }
+    Window? ActiveWindow { get; }
+
+    /// <summary>
+    /// Gets the main window.
+    /// </summary>
+    Window? MainWindow { get; }
+
+    /// <summary>
+    /// Occurs when the active window changes.
+    /// </summary>
+    event EventHandler<Window?>? ActiveWindowChanged;
+
+    /// <summary>
+    /// Occurs when the main window changes.
+    /// </summary>
+    event EventHandler<Window?>? MainWindowChanged;
 
     /// <summary>
     /// Shows a window from a view model.
@@ -26,7 +42,21 @@ public interface IWindowManager
     /// <typeparam name="T">The type of the window.</typeparam>
     /// <param name="dataContext">The data context for the view model.</param>
     /// <param name="assignParent">Specifies whether to assign the parent window.</param>
+    /// <exception cref="InvalidOperationException">No window is registered for <typeparamref name="TViewModel"/>.</exception>
     void ShowWindowFromViewModel<TViewModel, T>(TViewModel dataContext, bool assignParent = false)
+        where TViewModel : class;
+
+    /// <summary>
+    /// Shows a window from a view model.
+    /// </summary>
+    /// <typeparam name="TViewModel">The type of the view model.</typeparam>
+    /// <typeparam name="T">The type of the window.</typeparam>
+    /// <param name="assignParent">Specifies whether to assign the parent window.</param>
+    /// <exception cref="InvalidOperationException">
+    /// No window is registered for <typeparamref name="TViewModel"/> -or-
+    /// window's DataContext is null after creation.
+    /// </exception>
+    void ShowWindowFromViewModel<TViewModel, T>(bool assignParent = false)
         where TViewModel : class;
 
     /// <summary>
