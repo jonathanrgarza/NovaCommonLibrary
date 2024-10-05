@@ -13,15 +13,20 @@ namespace Ncl.Common.Wpf.Infrastructure;
 /// </summary>
 public class WindowManager : IWindowManager
 {
+    private readonly Stack<Window> _openDialogs = [];
     private readonly HashSet<Window> _openWindows = [];
     private readonly Dictionary<Type, IWindowFactory> _windowMappings = new();
 
     private Window? _activeWindow;
     private Window? _mainWindow;
+    private IReadOnlyStack<Window>? _readonlyOpenDialogs;
     private IReadOnlyCollectionWrapper<Window>? _readonlyOpenWindows;
 
     /// <inheritdoc/>
     public IReadOnlyCollectionWrapper<Window> OpenWindows => _readonlyOpenWindows ??= _openWindows.AsReadOnly();
+
+    /// <inheritdoc/>
+    public IReadOnlyStack<Window> OpenDialogs => _readonlyOpenDialogs ??= _openDialogs.AsReadOnly();
 
     /// <inheritdoc/>
     public Window? ActiveWindow
@@ -46,7 +51,7 @@ public class WindowManager : IWindowManager
         {
             if (_mainWindow == value) return;
 
-            Debug.WriteLine($"Main Window Changed: {_mainWindow} -> {value}");
+            //Debug.WriteLine($"Main Window Changed: {_mainWindow} -> {value}");
 
             _mainWindow = value;
             OnMainWindowChanged();
@@ -100,7 +105,11 @@ public class WindowManager : IWindowManager
         window.Show();
 
         MainWindow ??= window;
-        ActiveWindow = window;
+
+        if (window.IsActive)
+        {
+            ActiveWindow = window;
+        }
 
         window.Activated += OnWindowActivated;
         window.Deactivated += OnWindowDeactivated;
@@ -115,10 +124,16 @@ public class WindowManager : IWindowManager
         }
 
         _openWindows.Add(window);
+        _openDialogs.Push(window);
+
         ActiveWindow = window;
         MainWindow ??= window;
+
         bool? result = window.ShowDialog();
+        // The OnWindowActivated will already have fired for the parent window, no need to remove ActiveWindow
         _openWindows.Remove(window);
+        _openDialogs.Pop();
+
         return result;
     }
 

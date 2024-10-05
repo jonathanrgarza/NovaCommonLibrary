@@ -13,7 +13,18 @@ public interface IWindowManager
     /// <summary>
     /// Gets the collection of open windows.
     /// </summary>
+    /// <remarks>
+    /// Does not include any open <see cref="CommonDialog"/>.
+    /// </remarks>
     IReadOnlyCollectionWrapper<Window> OpenWindows { get; }
+
+    /// <summary>
+    /// Gets the collection of open dialogs.
+    /// </summary>
+    /// <remarks>
+    /// Does not include any open <see cref="CommonDialog"/>.
+    /// </remarks>
+    IReadOnlyStack<Window> OpenDialogs { get; }
 
     /// <summary>
     /// Gets the active window.
@@ -67,7 +78,7 @@ public interface IWindowManager
     void ShowWindow(Window window, bool assignParent = false);
 
     /// <summary>
-    /// Shows a dialog window.
+    /// Shows a modal dialog window.
     /// </summary>
     /// <param name="window">The dialog window to show.</param>
     /// <param name="assignParent">Specifies whether to assign the parent window.</param>
@@ -75,7 +86,7 @@ public interface IWindowManager
     bool? ShowDialog(Window window, bool assignParent = false);
 
     /// <summary>
-    /// Shows a common dialog.
+    /// Shows a modal common dialog.
     /// </summary>
     /// <param name="dialog">The common dialog to show.</param>
     /// <param name="assignParent">Specifies whether to assign the parent window.</param>
