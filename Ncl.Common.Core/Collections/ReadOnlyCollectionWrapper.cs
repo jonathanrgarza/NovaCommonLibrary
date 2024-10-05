@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Ncl.Common.Core.Utilities;
 
 namespace Ncl.Common.Core.Collections
 {
@@ -25,25 +26,25 @@ namespace Ncl.Common.Core.Collections
         /// The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied
         /// from collection. The <see cref="T:System.Array"/> must have zero-based indexing.
         /// </param>
-        /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+        /// <param name="index">The zero-based index in <paramref name="array"/> at which copying begins.</param>
         /// <exception cref="T:System.ArgumentNullException">
         /// <paramref name="array"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// <paramref name="arrayIndex"/> is less than 0.
+        /// <paramref name="index"/> is less than 0.
         /// </exception>
         /// <exception cref="T:System.ArgumentException">
         /// The number of elements in the source collection is greater than the
-        /// available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.
+        /// available space from <paramref name="index"/> to the end of the destination <paramref name="array"/>.
         /// </exception>
-        void CopyTo(T[] array, int arrayIndex = 0);
+        void CopyTo(T[] array, int index = 0);
     }
 
     /// <summary>
     /// Wraps a collection and exposes it as readonly.
     /// </summary>
     /// <typeparam name="T">The type held by the collection.</typeparam>
-    public class ReadOnlyCollectionWrapper<T> : IReadOnlyCollection<T>, ICollection<T>, IReadOnlyCollectionWrapper<T>
+    public class ReadOnlyCollectionWrapper<T> : ICollection<T>, IReadOnlyCollectionWrapper<T>
     {
         private readonly ICollection<T> _collection;
 
@@ -51,8 +52,10 @@ namespace Ncl.Common.Core.Collections
         /// Initializes a new instance of the <see cref="ReadOnlyCollectionWrapper{T}"/> class.
         /// </summary>
         /// <param name="collection">The underlying collection.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="collection"/> is null.</exception>
         public ReadOnlyCollectionWrapper(ICollection<T> collection)
         {
+            Guard.AgainstNullArgument(nameof(collection), collection);
             _collection = collection;
         }
 
@@ -60,13 +63,13 @@ namespace Ncl.Common.Core.Collections
         public bool IsReadOnly => true;
 
         // <inheritdoc/>
-        public void Add(T item)
+        void ICollection<T>.Add(T item)
         {
             throw new NotSupportedException("Can not add to a readonly collection");
         }
 
         // <inheritdoc/>
-        public void Clear()
+        void ICollection<T>.Clear()
         {
             throw new NotSupportedException("Can not clear to a readonly collection");
         }
@@ -78,13 +81,13 @@ namespace Ncl.Common.Core.Collections
         }
 
         // <inheritdoc/>
-        public void CopyTo(T[] array, int arrayIndex = 0)
+        public void CopyTo(T[] array, int index = 0)
         {
-            _collection.CopyTo(array, arrayIndex);
+            _collection.CopyTo(array, index);
         }
 
         // <inheritdoc/>
-        public bool Remove(T item)
+        bool ICollection<T>.Remove(T item)
         {
             throw new NotSupportedException("Can not remove to a readonly collection");
         }

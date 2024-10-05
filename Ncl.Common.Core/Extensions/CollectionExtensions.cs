@@ -82,5 +82,16 @@ namespace Ncl.Common.Core.Extensions
         {
             return new ReadOnlyCollectionWrapper<T>(collection);
         }
+
+        /// <summary>
+        /// Converts the <paramref name="collection"/> to a read-only collection.
+        /// </summary>
+        /// <typeparam name="T">The type held by the collection.</typeparam>
+        /// <param name="collection">The collection.</param>
+        /// <returns>A readonly wrapper.</returns>
+        public static IReadOnlyStack<T> AsReadOnly<T>(this Stack<T> collection)
+        {
+            return new ReadOnlyStack<T>(collection);
+        }
     }
 }
