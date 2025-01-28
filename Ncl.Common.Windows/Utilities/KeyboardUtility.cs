@@ -12,49 +12,82 @@ namespace Ncl.Common.Windows.Utilities
     /// <summary>
     /// Utility class for handling keyboard input.
     /// </summary>
-    public static class KeyboardUtility
+    public class KeyboardUtility
     {
+        /// <summary>
+        /// The delegate for the hook status changed callback.
+        /// </summary>
+        /// <param name="hooked">The status of the hook.</param>
+        public delegate void HookStatusChangedHandler(bool hooked);
+
+        /// <summary>
+        /// The delegate for the key down callback.
+        /// </summary>
+        /// <param name="keyPressed">The virtual key code for the key.</param>
+        /// <param name="shiftHeld">The pressed status of the shift key.</param>
+        /// <param name="ctrlHeld">The pressed status of the ctrl key.</param>
+        /// <param name="altHeld">The pressed status of the alt key.</param>
+        public delegate void KeyDownHandler(VirtualKeyCodes keyPressed, bool shiftHeld, bool ctrlHeld, bool altHeld);
+
         // Constants for virtual key codes
         // https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
         /// <summary>
         /// The virtual key code for the shift key.
         /// </summary>
         public const int VkShift = 0x10;
+
         /// <summary>
         /// The virtual key code for the ctrl key.
         /// </summary>
         public const int VkControl = 0x11;
+
         /// <summary>
         /// The virtual key code for the alt key.
         /// </summary>
         public const int VkAlt = 0x12;
 
-        /// <summary>
-        /// The delegate for the key press callback.
-        /// </summary>
-        /// <param name="keyPressed">The virtual key code for the key pressed.</param>
-        /// <param name="shiftHeld">The pressed status of the shift key.</param>
-        /// <param name="ctrlHeld">The pressed status of the ctrl key.</param>
-        /// <param name="altHeld">The pressed status of the alt key.</param>
-        public delegate void OnKeyPress(VirtualKeyCodes keyPressed, bool shiftHeld, bool ctrlHeld, bool altHeld);
+        private static KeyboardUtility _instance;
+
+        private readonly NativeMethods.LowLevelKeyboardProc _keyboardHookCallbackDelegate;
 
         // Handle for the keyboard hook
-        private static IntPtr _keyboardHookHandle = IntPtr.Zero;
+        private IntPtr _keyboardHookHandle = IntPtr.Zero;
 
-        private static readonly NativeMethods.LowLevelKeyboardProc KeyboardHookCallbackDelegate = KeyboardHookCallback;
-        private static OnKeyPress _keyPressCallback;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KeyboardUtility"/> class.
+        /// </summary>
+        private KeyboardUtility()
+        {
+            _keyboardHookCallbackDelegate = KeyboardHookCallback;
+        }
+
+        /// <summary>
+        /// Gets the instance of the <see cref="KeyboardUtility"/>.
+        /// </summary>
+        public static KeyboardUtility Instance => _instance ?? (_instance = new KeyboardUtility());
+
+        /// <summary>
+        /// Gets a value indicating whether the keyboard hook is active.
+        /// </summary>
+        public bool IsHooked => _keyboardHookHandle != IntPtr.Zero;
+
+        /// <summary>
+        /// Occurs when the keyboard hook status changes.
+        /// </summary>
+        public event HookStatusChangedHandler HookStatusChanged;
+
+        /// <summary>
+        /// Occurs when a key is down.
+        /// </summary>
+        public event KeyDownHandler KeyDown;
 
         /// <summary>
         /// Start the keyboard hook.
         /// </summary>
-        /// <param name="keyPressCallback">The callback for when a key is pressed.</param>
-        /// <exception cref="ArgumentNullException">The callback is null.</exception>
         /// <exception cref="InvalidOperationException">Can not get the current process module.</exception>
         /// <exception cref="Win32Exception">A win32 exception occurs.</exception>
-        public static void StartKeyboardHook(OnKeyPress keyPressCallback)
+        public void StartKeyboardHook()
         {
-            _keyPressCallback = keyPressCallback ?? throw new ArgumentNullException(nameof(keyPressCallback));
-
             if (_keyboardHookHandle != IntPtr.Zero)
             {
                 StopKeyboardHook();
@@ -64,38 +97,52 @@ namespace Ncl.Common.Windows.Utilities
             using (var curModule = curProcess.MainModule)
             {
                 if (curModule == null)
+                {
                     throw new InvalidOperationException("Could not get the current process module");
+                }
 
                 _keyboardHookHandle = NativeMethods.SetWindowsHookEx(NativeMethods.WH_KEYBOARD_LL,
-                                       KeyboardHookCallbackDelegate,
-                                       NativeMethods.GetModuleHandle(curModule.ModuleName), 0);
+                    _keyboardHookCallbackDelegate,
+                    NativeMethods.GetModuleHandle(curModule.ModuleName), 0);
 
-                if (_keyboardHookHandle != IntPtr.Zero)
-                    return;
+                if (_keyboardHookHandle == IntPtr.Zero)
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
 
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+                HookStatusChanged?.Invoke(true);
             }
         }
 
         /// <summary>
         /// Stop the keyboard hook.
         /// </summary>
-        public static void StopKeyboardHook()
+        public void StopKeyboardHook()
         {
             if (_keyboardHookHandle == IntPtr.Zero)
+            {
                 return;
-
-            _keyPressCallback = null;
+            }
 
             NativeMethods.UnhookWindowsHookEx(_keyboardHookHandle);
             _keyboardHookHandle = IntPtr.Zero;
+
+            HookStatusChanged?.Invoke(false);
         }
 
-        // Keyboard hook callback
-        private static IntPtr KeyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        /// <summary>
+        /// The callback for the keyboard hook.
+        /// </summary>
+        /// <param name="nCode">Specifies a code the hook procedure uses to determine how to process the message.</param>
+        /// <param name="wParam">Specifies mouse message.</param>
+        /// <param name="lParam">Specifies message.</param>
+        /// <returns></returns>
+        private IntPtr KeyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode < 0 || wParam != (IntPtr)NativeMethods.WM_KEYDOWN)
+            {
                 return NativeMethods.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
+            }
 
             int vkCode = Marshal.ReadInt32(lParam);
             var key = (VirtualKeyCodes)vkCode;
@@ -103,7 +150,7 @@ namespace Ncl.Common.Windows.Utilities
             bool ctrl = (NativeMethods.GetAsyncKeyState(VkControl) & 0x8000) != 0;
             bool alt = (NativeMethods.GetAsyncKeyState(VkAlt) & 0x8000) != 0;
             //Debug.WriteLine($"Key: {key}, Shift: {shift}, Ctrl: {ctrl}, Alt: {alt}");
-            _keyPressCallback?.Invoke(key, shift, ctrl, alt);
+            KeyDown?.Invoke(key, shift, ctrl, alt);
             return NativeMethods.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
         }
 
@@ -159,31 +206,31 @@ namespace Ncl.Common.Windows.Utilities
         public static void SendKeyPress(IEnumerable<VirtualKeyCodes> keyCodes)
         {
             var virtualKeyCodesEnumerable = keyCodes as VirtualKeyCodes[] ?? keyCodes.ToArray();
-            var inputList = virtualKeyCodesEnumerable.Select(key => 
+            var inputList = virtualKeyCodesEnumerable.Select(key =>
                 new NativeMethods.INPUT
                 {
-                    Type = NativeMethods.InputType.Keyboard, 
-                    Data = 
+                    Type = NativeMethods.InputType.Keyboard,
+                    Data =
                         new NativeMethods.InputUnion
                         {
                             Ki = new NativeMethods.KEYBDINPUT
                             {
-                                WVk = (ushort)key, 
-                                WScan = 0, 
+                                WVk = (ushort)key,
+                                WScan = 0,
                                 DwFlags = NativeMethods.KeyEventF.KeyDown
                             }
                         }
                 }).ToList();
-            inputList.AddRange(virtualKeyCodesEnumerable.Select(key => 
+            inputList.AddRange(virtualKeyCodesEnumerable.Select(key =>
                 new NativeMethods.INPUT
                 {
-                    Type = NativeMethods.InputType.Keyboard, 
+                    Type = NativeMethods.InputType.Keyboard,
                     Data = new NativeMethods.InputUnion
                     {
                         Ki = new NativeMethods.KEYBDINPUT
                         {
                             WVk = (ushort)key,
-                            WScan = 0, 
+                            WScan = 0,
                             DwFlags = NativeMethods.KeyEventF.KeyUp
                         }
                     }
@@ -281,19 +328,19 @@ namespace Ncl.Common.Windows.Utilities
         /// <exception cref="Win32Exception">A Win32 exception occurs.</exception>
         public static void SendKeyDown(IEnumerable<VirtualKeyCodes> keyCodes)
         {
-            var inputs = keyCodes.Select(key => 
+            var inputs = keyCodes.Select(key =>
                 new NativeMethods.INPUT
                 {
-                    Type = NativeMethods.InputType.Keyboard, 
+                    Type = NativeMethods.InputType.Keyboard,
                     Data = new NativeMethods.InputUnion
+                    {
+                        Ki = new NativeMethods.KEYBDINPUT
                         {
-                            Ki = new NativeMethods.KEYBDINPUT
-                            {
-                                WVk = (ushort)key, 
-                                WScan = 0, 
-                                DwFlags = NativeMethods.KeyEventF.KeyDown
-                            }
+                            WVk = (ushort)key,
+                            WScan = 0,
+                            DwFlags = NativeMethods.KeyEventF.KeyDown
                         }
+                    }
                 }).ToArray();
             int inputSize = Marshal.SizeOf(typeof(NativeMethods.INPUT));
             uint result = NativeMethods.SendInput((uint)inputs.Length, inputs, inputSize);
@@ -340,19 +387,19 @@ namespace Ncl.Common.Windows.Utilities
         /// <exception cref="Win32Exception">A Win32 exception occurs.</exception>
         public static void SendKeyUp(IEnumerable<VirtualKeyCodes> keyCodes)
         {
-            var inputs = keyCodes.Select(key => 
+            var inputs = keyCodes.Select(key =>
                 new NativeMethods.INPUT
                 {
-                    Type = NativeMethods.InputType.Keyboard, 
+                    Type = NativeMethods.InputType.Keyboard,
                     Data = new NativeMethods.InputUnion
+                    {
+                        Ki = new NativeMethods.KEYBDINPUT
                         {
-                            Ki = new NativeMethods.KEYBDINPUT
-                            {
-                                WVk = (ushort)key, 
-                                WScan = 0, 
-                                DwFlags = NativeMethods.KeyEventF.KeyUp
-                            }
+                            WVk = (ushort)key,
+                            WScan = 0,
+                            DwFlags = NativeMethods.KeyEventF.KeyUp
                         }
+                    }
                 }).ToArray();
             int inputSize = Marshal.SizeOf(typeof(NativeMethods.INPUT));
             uint result = NativeMethods.SendInput((uint)inputs.Length, inputs, inputSize);
