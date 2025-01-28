@@ -19,7 +19,7 @@ namespace Ncl.Common.Core.Utilities
         /// </exception>
         public static void AgainstNullArgument<T>(string paramName, T argument)
         {
-            Type type = typeof(T);
+            var type = typeof(T);
             if (type.IsValueType && !type.IsNullableType()) //Check to prevent need to box value types
                 return;
 
