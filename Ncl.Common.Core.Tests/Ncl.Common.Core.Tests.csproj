@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
 
         <IsPackable>false</IsPackable>
     </PropertyGroup>
@@ -21,10 +21,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Ncl.Common.Core\Ncl.Common.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Models\" />
     </ItemGroup>
 
 </Project>
