@@ -7,8 +7,10 @@ using System.Text;
 
 namespace Ncl.Common.Windows.Native
 {
-
-    public class NativeMethods
+    /// <summary>
+    /// A collection of native windows methods.
+    /// </summary>
+    public static class NativeMethods
     {
         /// <summary>
         /// Hides the window and activates another window.
@@ -304,14 +306,12 @@ namespace Ncl.Common.Windows.Native
         /// Gets the cursor's position.
         /// </summary>
         /// <returns>The cursor's current position.</returns>
-        public static Point GetCursorPosition()
+        public static Point? GetCursorPosition()
         {
-            GetCursorPos(out POINT lpPoint);
-            // NOTE: If you need error handling
-            // bool success = GetCursorPos(out lpPoint);
-            // if (!success)
+            if (!GetCursorPos(out var lpPoint))
+                return null;
 
-            return lpPoint;
+            return (Point)lpPoint;
         }
 
         public enum TOKEN_INFORMATION_CLASS
