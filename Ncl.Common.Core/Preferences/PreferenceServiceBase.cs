@@ -280,7 +280,7 @@ namespace Ncl.Common.Core.Preferences
                 return defaultDirectory;
             }
 
-            return FallbackDirectory;
+            return FallbackDirectory ?? DefaultDirectory;
         }
 
         /// <summary>
