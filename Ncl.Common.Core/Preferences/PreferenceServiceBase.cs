@@ -500,6 +500,9 @@ namespace Ncl.Common.Core.Preferences
         /// </exception>
         protected virtual void SaveToFilePath(Type prefType, IPreference preference, string path)
         {
+            if (path == null)
+                throw new ArgumentException("Invalid file path", nameof(path));
+
             XmlSerializationService.WriteObject(path, preference, prefType);
             var cache = SetPreferenceCache(prefType, preference, path);
             cache.IsDirty = false;
