@@ -83,7 +83,7 @@ namespace Ncl.Common.Core.UI
         /// </returns>
         public bool CanExecute()
         {
-            return _canExecuteFunction == null || _canExecuteFunction();
+            return _canExecuteFunction?.Invoke() ?? true;
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Ncl.Common.Core.UI
         /// <returns>The <see cref="Task" /> which represents the asynchronous operation.</returns>
         public Task ExecuteAsync()
         {
-            return _executeFunction();
+            return _executeFunction.Invoke();
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Ncl.Common.Core.UI
         /// </returns>
         public bool CanExecute(T parameter)
         {
-            return _canExecuteFunction == null || _canExecuteFunction(parameter);
+            return _canExecuteFunction?.Invoke(parameter) ?? true;
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace Ncl.Common.Core.UI
         /// <param name="parameter">The command parameter.</param>
         public Task ExecuteAsync(T parameter)
         {
-            return _executeFunction(parameter);
+            return _executeFunction.Invoke(parameter);
         }
 
         /// <summary>

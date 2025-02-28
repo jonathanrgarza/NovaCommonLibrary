@@ -35,7 +35,7 @@ namespace Ncl.Common.Core.UI
         /// </returns>
         public bool CanExecute()
         {
-            return _canExecuteFunction == null || _canExecuteFunction();
+            return _canExecuteFunction?.Invoke() ?? true;
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Ncl.Common.Core.UI
         /// </summary>
         public void Execute()
         {
-            _executeAction();
+            _executeAction.Invoke();
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Ncl.Common.Core.UI
         /// </returns>
         public bool CanExecute(T parameter)
         {
-            return _canExecuteFunction == null || _canExecuteFunction(parameter);
+            return _canExecuteFunction?.Invoke(parameter) ?? true;
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Ncl.Common.Core.UI
         /// <param name="parameter">The command parameter.</param>
         public void Execute(T parameter)
         {
-            _executeAction(parameter);
+            _executeAction.Invoke(parameter);
         }
 
         /// <summary>
