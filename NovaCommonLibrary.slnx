@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="Ncl.Common.Core.Tests/Ncl.Common.Core.Tests.csproj" />
+  <Project Path="Ncl.Common.Core/Ncl.Common.Core.csproj" />
+  <Project Path="Ncl.Common.Csv.Tests/Ncl.Common.Csv.Tests.csproj" />
+  <Project Path="Ncl.Common.Csv/Ncl.Common.Csv.csproj" />
+  <Project Path="Ncl.Common.Modern.Core/Ncl.Common.Modern.Core.csproj" />
+  <Project Path="Ncl.Common.Wpf.Tests/Ncl.Common.Wpf.Tests.csproj" />
+  <Project Path="Ncl.Common.Wpf/Ncl.Common.Wpf.csproj" />
+</Solution>
