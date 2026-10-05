@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Ncl.Common.Core.Events;
 using Ncl.Common.Core.Infrastructure;
@@ -845,7 +845,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
         }
 
         [Fact]
-        public void ExecuteActionAsync_WithDefaultAction_ShouldResetIsActionExecutingOnException()
+        public async Task ExecuteActionAsync_WithDefaultAction_ShouldResetIsActionExecutingOnException()
         {
             // Arrange
             ActionService instance = GetDefaultInstance();
@@ -858,7 +858,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             }
 
             // Assert
-            Assert.ThrowsAsync<Exception>(TestCode);
+            await Assert.ThrowsAsync<Exception>(TestCode);
             Assert.False(instance.IsActionExecuting);
         }
 

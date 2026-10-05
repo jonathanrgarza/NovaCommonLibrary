@@ -960,8 +960,8 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = new(streamWriter);
 
             // Act
-            await csvStream.WriteHeaderAsync(ValidHeader).ConfigureAwait(false);
-            await csvStream.FlushAsync().ConfigureAwait(false);
+            await csvStream.WriteHeaderAsync(ValidHeader);
+            await csvStream.FlushAsync();
 
             string actual = GetString(memoryStream);
 
@@ -1094,7 +1094,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeaderAsync(ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteHeaderAsync(ValidHeader);
 
             string actual = GetString(memoryStream);
 
@@ -1110,7 +1110,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeaderAsync(NeedsEscapingHeader).ConfigureAwait(false);
+            await csvStream.WriteHeaderAsync(NeedsEscapingHeader);
 
             string actual = GetString(memoryStream);
 
@@ -1126,7 +1126,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeaderAsync(null).ConfigureAwait(false);
+            await csvStream.WriteHeaderAsync(null);
             int actual = csvStream.FieldPosition;
 
             // Assert
@@ -1138,8 +1138,8 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
-            await csvStream.WriteHeaderAsync(ValidHeader).ConfigureAwait(false);
-            await csvStream.WriteRowEndAsync().ConfigureAwait(false);
+            await csvStream.WriteHeaderAsync(ValidHeader);
+            await csvStream.WriteRowEndAsync();
 
             // Act
             async Task TestCode()
@@ -1149,7 +1149,7 @@ namespace Ncl.Common.Csv.Tests
             }
 
             // Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
 
         [Fact]
@@ -1240,7 +1240,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeadersAsync(new[] { ValidHeader, ValidHeader }).ConfigureAwait(false);
+            await csvStream.WriteHeadersAsync(new[] { ValidHeader, ValidHeader });
 
             string actual = GetString(memoryStream);
 
@@ -1256,7 +1256,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeadersAsync((IEnumerable<string>) null).ConfigureAwait(false);
+            await csvStream.WriteHeadersAsync((IEnumerable<string>) null);
             int actual = csvStream.FieldPosition;
 
             // Assert
@@ -1271,7 +1271,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeadersAsync(new string[] { null }).ConfigureAwait(false);
+            await csvStream.WriteHeadersAsync(new string[] { null });
             int actual = csvStream.FieldPosition;
 
             // Assert
@@ -1283,7 +1283,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
-            await csvStream.WriteHeaderRowAsync(new[] { ValidHeader, ValidHeader }).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(new[] { ValidHeader, ValidHeader });
 
             // Act
             async Task TestCode()
@@ -1293,7 +1293,7 @@ namespace Ncl.Common.Csv.Tests
             }
 
             // Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
 
         [Fact]
@@ -1430,7 +1430,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeadersAsync(ValidHeader, ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteHeadersAsync(ValidHeader, ValidHeader);
 
             string actual = GetString(memoryStream);
 
@@ -1446,7 +1446,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeadersAsync(null, ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteHeadersAsync(null, ValidHeader);
 
             string actual = GetString(memoryStream);
 
@@ -1462,7 +1462,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeadersAsync(ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteHeadersAsync(ValidHeader);
 
             string actual = GetString(memoryStream);
 
@@ -1478,7 +1478,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeadersAsync(ValidHeader, null, ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteHeadersAsync(ValidHeader, null, ValidHeader);
 
             string actual = GetString(memoryStream);
 
@@ -1494,7 +1494,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeadersAsync(null, null).ConfigureAwait(false);
+            await csvStream.WriteHeadersAsync(null, null);
             int actual = csvStream.FieldPosition;
 
             // Assert
@@ -1509,7 +1509,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeadersAsync(null, (string) null).ConfigureAwait(false);
+            await csvStream.WriteHeadersAsync(null, (string) null);
             int actual = csvStream.FieldPosition;
 
             // Assert
@@ -1524,7 +1524,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeadersAsync(null, null, null).ConfigureAwait(false);
+            await csvStream.WriteHeadersAsync(null, null, null);
             int actual = csvStream.FieldPosition;
 
             // Assert
@@ -1536,7 +1536,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
-            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader);
 
             // Act
             async Task TestCode()
@@ -1546,7 +1546,7 @@ namespace Ncl.Common.Csv.Tests
             }
 
             // Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
 
         [Fact]
@@ -1620,7 +1620,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeaderRowAsync(new[] { ValidHeader, ValidHeader }).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(new[] { ValidHeader, ValidHeader });
 
             string actual = GetString(memoryStream);
 
@@ -1636,7 +1636,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeaderRowAsync((IEnumerable<string>) null).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync((IEnumerable<string>) null);
             int actual = csvStream.FieldPosition;
 
             // Assert
@@ -1651,7 +1651,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeaderRowAsync(new string[] { null }).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(new string[] { null });
             int actual = csvStream.FieldPosition;
 
             // Assert
@@ -1663,7 +1663,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
-            await csvStream.WriteHeaderRowAsync(new[] { ValidHeader, ValidHeader }).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(new[] { ValidHeader, ValidHeader });
 
             // Act
             async Task TestCode()
@@ -1673,7 +1673,7 @@ namespace Ncl.Common.Csv.Tests
             }
 
             // Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
 
         [Fact]
@@ -1810,7 +1810,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader);
 
             string actual = GetString(memoryStream);
 
@@ -1826,7 +1826,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeaderRowAsync(null, ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(null, ValidHeader);
 
             string actual = GetString(memoryStream);
 
@@ -1842,7 +1842,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeaderRowAsync(ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(ValidHeader);
 
             string actual = GetString(memoryStream);
 
@@ -1858,7 +1858,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance(out MemoryStream memoryStream);
 
             // Act
-            await csvStream.WriteHeaderRowAsync(ValidHeader, null, ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(ValidHeader, null, ValidHeader);
 
             string actual = GetString(memoryStream);
 
@@ -1874,7 +1874,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeaderRowAsync(null, null).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(null, null);
             int actual = csvStream.FieldPosition;
 
             // Assert
@@ -1889,7 +1889,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeaderRowAsync(null, (string) null).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(null, (string) null);
             int actual = csvStream.FieldPosition;
 
             // Assert
@@ -1904,7 +1904,7 @@ namespace Ncl.Common.Csv.Tests
             using CsvStreamWriter csvStream = GetDefaultInstance();
 
             // Act
-            await csvStream.WriteHeaderRowAsync(null, null, null).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(null, null, null);
             int actual = csvStream.FieldPosition;
 
             // Assert
@@ -1916,7 +1916,7 @@ namespace Ncl.Common.Csv.Tests
         {
             // Arrange
             using CsvStreamWriter csvStream = GetDefaultInstance();
-            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader).ConfigureAwait(false);
+            await csvStream.WriteHeaderRowAsync(ValidHeader, ValidHeader);
 
             // Act
             async Task TestCode()
@@ -1926,7 +1926,7 @@ namespace Ncl.Common.Csv.Tests
             }
 
             // Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(TestCode).ConfigureAwait(false);
+            await Assert.ThrowsAsync<InvalidOperationException>(TestCode);
         }
 
         [Fact]

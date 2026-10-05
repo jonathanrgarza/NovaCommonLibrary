@@ -23,7 +23,7 @@ public class WindowManager : IWindowManager
     private IReadOnlyCollectionWrapper<Window>? _readonlyOpenWindows;
 
     /// <inheritdoc/>
-    public IReadOnlyCollectionWrapper<Window> OpenWindows => _readonlyOpenWindows ??= _openWindows.AsReadOnly();
+    public IReadOnlyCollectionWrapper<Window> OpenWindows => _readonlyOpenWindows ??= new ReadOnlyCollectionWrapper<Window>(_openWindows);
 
     /// <inheritdoc/>
     public IReadOnlyStack<Window> OpenDialogs => _readonlyOpenDialogs ??= _openDialogs.AsReadOnly();
