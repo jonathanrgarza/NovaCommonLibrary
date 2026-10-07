@@ -30,7 +30,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = actual.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], DefaultErrorMessage);
+            Assert.Equal(DefaultErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Ncl.Common.Core.Tests.UI
 
             Assert.Equal(PropertyName, propertyName);
             Assert.Single(propertyErrors);
-            Assert.Equal(propertyErrors[0], DefaultErrorMessage);
+            Assert.Equal(DefaultErrorMessage, propertyErrors[0]);
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace Ncl.Common.Core.Tests.UI
 
             Assert.Equal(PropertyName, propertyName);
             Assert.Single(propertyErrors);
-            Assert.Equal(propertyErrors[0], DefaultErrorMessage);
+            Assert.Equal(DefaultErrorMessage, propertyErrors[0]);
         }
 
         [Fact]
@@ -134,7 +134,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], DefaultErrorMessage);
+            Assert.Equal(DefaultErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -152,7 +152,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Equal(2, collection.Count);
-            Assert.Equal(collection[1], SecondErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[1]);
         }
 
         [Fact]
@@ -256,7 +256,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], DefaultErrorMessage);
+            Assert.Equal(DefaultErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -274,7 +274,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Equal(2, collection.Count);
-            Assert.Equal(collection[1], SecondErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[1]);
         }
 
         [Fact]
@@ -422,7 +422,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], SecondErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -544,7 +544,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], SecondErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -563,7 +563,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], ThirdErrorMessage);
+            Assert.Equal(ThirdErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -668,8 +668,8 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Equal(2, collection.Count);
-            Assert.Equal(collection[0], SecondErrorMessage);
-            Assert.Equal(collection[1], ThirdErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[0]);
+            Assert.Equal(ThirdErrorMessage, collection[1]);
         }
 
         [Fact]
@@ -825,7 +825,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], SecondErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -1059,7 +1059,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = actual.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], DefaultErrorMessage);
+            Assert.Equal(DefaultErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -1083,7 +1083,7 @@ namespace Ncl.Common.Core.Tests.UI
 
             Assert.Equal(PropertyName, propertyName);
             Assert.Single(propertyErrors);
-            Assert.Equal(propertyErrors[0], DefaultErrorMessage);
+            Assert.Equal(DefaultErrorMessage, propertyErrors[0]);
         }
 
         [Fact]
@@ -1107,7 +1107,7 @@ namespace Ncl.Common.Core.Tests.UI
 
             Assert.Equal(PropertyName, propertyName);
             Assert.Single(propertyErrors);
-            Assert.Equal(propertyErrors[0], DefaultErrorMessage);
+            Assert.Equal(DefaultErrorMessage, propertyErrors[0]);
         }
 
         [Fact]
@@ -1163,7 +1163,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], DefaultErrorMessage);
+            Assert.Equal(DefaultErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -1181,7 +1181,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Equal(2, collection.Count);
-            Assert.Equal(collection[1], SecondErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[1]);
         }
 
         [Fact]
@@ -1285,7 +1285,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], DefaultErrorMessage);
+            Assert.Equal(DefaultErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -1303,7 +1303,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Equal(2, collection.Count);
-            Assert.Equal(collection[1], SecondErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[1]);
         }
 
         [Fact]
@@ -1451,7 +1451,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], SecondErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -1573,7 +1573,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], SecondErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -1592,7 +1592,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], ThirdErrorMessage);
+            Assert.Equal(ThirdErrorMessage, collection[0]);
         }
 
         [Fact]
@@ -1697,8 +1697,8 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Equal(2, collection.Count);
-            Assert.Equal(collection[0], SecondErrorMessage);
-            Assert.Equal(collection[1], ThirdErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[0]);
+            Assert.Equal(ThirdErrorMessage, collection[1]);
         }
 
         [Fact]
@@ -1854,7 +1854,7 @@ namespace Ncl.Common.Core.Tests.UI
             List<object> collection = errors.Cast<object>().ToList();
 
             Assert.Single(collection);
-            Assert.Equal(collection[0], SecondErrorMessage);
+            Assert.Equal(SecondErrorMessage, collection[0]);
         }
 
         [Fact]

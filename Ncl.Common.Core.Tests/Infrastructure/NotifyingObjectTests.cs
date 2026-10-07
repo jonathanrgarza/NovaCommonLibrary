@@ -313,7 +313,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetImpl(ref actual, expected);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -328,7 +328,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetImpl(ref initialValue, 10);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -362,7 +362,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetImpl(ref actual, expected);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -377,7 +377,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetImpl(ref initialValue, 10);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -413,7 +413,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -432,7 +432,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetImpl(ref initialValue, 10, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -477,7 +477,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetImpl(ref initialValue, 10, CallOnSet, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -496,7 +496,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -515,7 +515,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetImpl(ref initialValue, 10, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -558,7 +558,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetImpl(ref initialValue, 5, CallOnSet, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -577,7 +577,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -596,7 +596,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetAndCallFirstImpl(ref initialValue, 10, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -641,7 +641,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetAndCallFirstImpl(ref initialValue, 10, CallOnSet, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -660,7 +660,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -679,7 +679,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetAndCallFirstImpl(ref initialValue, 10, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -722,7 +722,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetAndCallFirstImpl(ref initialValue, 5, CallOnSet, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         #endregion
@@ -730,11 +730,11 @@ namespace Ncl.Common.Core.Tests.Infrastructure
         #region Double Set
 
         [Theory]
-        [InlineData(0.0, 10.5)]
-        [InlineData(0.0, double.NaN)]
-        [InlineData(0.0, double.NegativeInfinity)]
-        [InlineData(0.0, double.PositiveInfinity)]
-        public void SetDouble_SetsValueWithDifferentValue(double actual, double expected)
+        [InlineData(10.5, 0.0)]
+        [InlineData(double.NaN, 0.0)]
+        [InlineData(double.NegativeInfinity, 0.0)]
+        [InlineData(double.PositiveInfinity, 0.0)]
+        public void SetDouble_SetsValueWithDifferentValue(double expected, double actual)
         {
             //Arrange
             var instance = new NotifyingObjectMock();
@@ -743,7 +743,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleImpl(ref actual, expected);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -761,7 +761,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleImpl(ref initialValue, setValue);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -791,7 +791,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
         [InlineData(double.NaN, double.NaN)]
         [InlineData(double.NegativeInfinity, double.NegativeInfinity)]
         [InlineData(double.PositiveInfinity, double.PositiveInfinity)]
-        public void SetDouble_NoChangeWithSameValue(double actual, double expected)
+        public void SetDouble_NoChangeWithSameValue(double expected, double actual)
         {
             //Arrange
             var instance = new NotifyingObjectMock();
@@ -802,7 +802,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
 
             //Assert
             Assert.Equal(initialValue, expected);
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -820,7 +820,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleImpl(ref initialValue, setValue);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -859,7 +859,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -878,7 +878,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleImpl(ref initialValue, 10.5, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -923,7 +923,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleImpl(ref initialValue, 10.5, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -942,7 +942,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -961,7 +961,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleImpl(ref initialValue, 10.5, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1004,7 +1004,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleImpl(ref initialValue, 5.5, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1023,7 +1023,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1042,7 +1042,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1087,7 +1087,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1106,7 +1106,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1125,7 +1125,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1168,7 +1168,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleAndCallFirstImpl(ref initialValue, 5.5, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         #endregion
@@ -1176,11 +1176,11 @@ namespace Ncl.Common.Core.Tests.Infrastructure
         #region Float Set
 
         [Theory]
-        [InlineData(0.0f, 10.5f)]
-        [InlineData(0.0f, float.NaN)]
-        [InlineData(0.0f, float.NegativeInfinity)]
-        [InlineData(0.0f, float.PositiveInfinity)]
-        public void SetFloat_SetsValueWithDifferentValue(float actual, float expected)
+        [InlineData(10.5f, 0.0f)]
+        [InlineData(float.NaN, 0.0f)]
+        [InlineData(float.NegativeInfinity, 0.0f)]
+        [InlineData(float.PositiveInfinity, 0.0f)]
+        public void SetFloat_SetsValueWithDifferentValue(float expected, float actual)
         {
             //Arrange
             var instance = new NotifyingObjectMock();
@@ -1189,7 +1189,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatImpl(ref actual, expected);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -1207,7 +1207,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatImpl(ref initialValue, setValue);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -1237,7 +1237,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
         [InlineData(float.NaN, float.NaN)]
         [InlineData(float.NegativeInfinity, float.NegativeInfinity)]
         [InlineData(float.PositiveInfinity, float.PositiveInfinity)]
-        public void SetFloat_NoChangeWithSameValue(float actual, float expected)
+        public void SetFloat_NoChangeWithSameValue(float expected, float actual)
         {
             //Arrange
             var instance = new NotifyingObjectMock();
@@ -1248,7 +1248,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
 
             //Assert
             Assert.Equal(initialValue, expected);
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -1266,7 +1266,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatImpl(ref initialValue, setValue);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -1305,7 +1305,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1324,7 +1324,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatImpl(ref initialValue, 10.5f, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1369,7 +1369,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatImpl(ref initialValue, 10.5f, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1388,7 +1388,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1407,7 +1407,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatImpl(ref initialValue, 10.5f, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1450,7 +1450,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatImpl(ref initialValue, 5.5f, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1469,7 +1469,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1488,7 +1488,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatAndCallFirstImpl(ref initialValue, 10.5f, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1533,7 +1533,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatAndCallFirstImpl(ref initialValue, 10.5f, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1552,7 +1552,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1571,7 +1571,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatAndCallFirstImpl(ref initialValue, 10.5f, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1614,7 +1614,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatAndCallFirstImpl(ref initialValue, 5.5f, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         #endregion
@@ -1622,13 +1622,13 @@ namespace Ncl.Common.Core.Tests.Infrastructure
         #region Nullable Double Set
 
         [Theory]
-        [InlineData(null, 10.5)]
-        [InlineData(0.0, null)]
-        [InlineData(0.0, 10.5)]
-        [InlineData(0.0, double.NaN)]
-        [InlineData(0.0, double.NegativeInfinity)]
-        [InlineData(0.0, double.PositiveInfinity)]
-        public void SetDouble2_SetsValueWithDifferentValue(double? actual, double? expected)
+        [InlineData(10.5, null)]
+        [InlineData(null, 0.0)]
+        [InlineData(10.5, 0.0)]
+        [InlineData(double.NaN, 0.0)]
+        [InlineData(double.NegativeInfinity, 0.0)]
+        [InlineData(double.PositiveInfinity, 0.0)]
+        public void SetDouble2_SetsValueWithDifferentValue(double? expected, double? actual)
         {
             //Arrange
             var instance = new NotifyingObjectMock();
@@ -1637,7 +1637,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleImpl(ref actual, expected);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -1657,7 +1657,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleImpl(ref initialValue, setValue);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -1690,7 +1690,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
         [InlineData(double.NaN, double.NaN)]
         [InlineData(double.NegativeInfinity, double.NegativeInfinity)]
         [InlineData(double.PositiveInfinity, double.PositiveInfinity)]
-        public void SetDouble2_NoChangeWithSameValue(double? actual, double? expected)
+        public void SetDouble2_NoChangeWithSameValue(double? expected, double? actual)
         {
             //Arrange
             var instance = new NotifyingObjectMock();
@@ -1701,7 +1701,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
 
             //Assert
             Assert.Equal(initialValue, expected);
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -1720,7 +1720,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleImpl(ref initialValue, setValue);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -1760,7 +1760,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1779,7 +1779,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleImpl(ref initialValue, 10.5, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1824,7 +1824,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleImpl(ref initialValue, null, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1843,7 +1843,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1862,7 +1862,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleImpl(ref initialValue, null, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1905,7 +1905,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleImpl(ref initialValue, null, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1924,7 +1924,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1943,7 +1943,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -1988,7 +1988,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleAndCallFirstImpl(ref initialValue, 10.5, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2007,7 +2007,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2026,7 +2026,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetDoubleAndCallFirstImpl(ref initialValue, null, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2069,7 +2069,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetDoubleAndCallFirstImpl(ref initialValue, null, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         #endregion
@@ -2077,13 +2077,13 @@ namespace Ncl.Common.Core.Tests.Infrastructure
         #region Nullable Float Set
 
         [Theory]
-        [InlineData(null, 10.5f)]
-        [InlineData(0.0f, null)]
-        [InlineData(0.0f, 10.5f)]
-        [InlineData(0.0f, float.NaN)]
-        [InlineData(0.0f, float.NegativeInfinity)]
-        [InlineData(0.0f, float.PositiveInfinity)]
-        public void SetFloat2_SetsValueWithDifferentValue(float? actual, float? expected)
+        [InlineData(10.5f, null)]
+        [InlineData(null, 0.0f)]
+        [InlineData(10.5f, 0.0f)]
+        [InlineData(float.NaN, 0.0f)]
+        [InlineData(float.NegativeInfinity, 0.0f)]
+        [InlineData(float.PositiveInfinity, 0.0f)]
+        public void SetFloat2_SetsValueWithDifferentValue(float? expected, float? actual)
         {
             //Arrange
             var instance = new NotifyingObjectMock();
@@ -2092,7 +2092,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatImpl(ref actual, expected);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -2112,7 +2112,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatImpl(ref initialValue, setValue);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -2145,7 +2145,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
         [InlineData(float.NaN, float.NaN)]
         [InlineData(float.NegativeInfinity, float.NegativeInfinity)]
         [InlineData(float.PositiveInfinity, float.PositiveInfinity)]
-        public void SetFloat2_NoChangeWithSameValue(float? actual, float? expected)
+        public void SetFloat2_NoChangeWithSameValue(float? expected, float? actual)
         {
             //Arrange
             var instance = new NotifyingObjectMock();
@@ -2156,7 +2156,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
 
             //Assert
             Assert.Equal(initialValue, expected);
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -2175,7 +2175,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatImpl(ref initialValue, setValue);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -2215,7 +2215,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2234,7 +2234,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatImpl(ref initialValue, 10.5f, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2279,7 +2279,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatImpl(ref initialValue, null, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2298,7 +2298,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2317,7 +2317,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatImpl(ref initialValue, null, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2360,7 +2360,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatImpl(ref initialValue, null, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2379,7 +2379,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2398,7 +2398,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatAndCallFirstImpl(ref initialValue, 10.5f, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2443,7 +2443,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatAndCallFirstImpl(ref initialValue, 10.5f, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2462,7 +2462,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatAndCallFirstImpl(ref actual, expected, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2481,7 +2481,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             bool actual = instance.SetFloatAndCallFirstImpl(ref initialValue, null, CallOnSet);
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -2524,7 +2524,7 @@ namespace Ncl.Common.Core.Tests.Infrastructure
             instance.SetFloatAndCallFirstImpl(ref initialValue, null, CallOnSet, 3, "Value");
 
             //Assert
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         #endregion
